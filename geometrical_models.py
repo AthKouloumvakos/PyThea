@@ -14,6 +14,9 @@ from astropy.coordinates import (
 from sunpy.coordinates import frames
 from scipy.spatial.transform import Rotation
 from numpy.linalg import norm
+import seaborn as sns
+import re
+import operator
 
 def sphere(n= 20, plot = 0):
     """
@@ -69,6 +72,26 @@ class spheroid:
         
         x, y, z = self.rotate(x_, y_, z_)
         
+        return SkyCoord(CartesianRepresentation(x, y, z),
+                        frame=frames.HeliographicStonyhurst,
+                        observer=self.center.observer,
+                        obstime=self.center.obstime)
+
+    def intersecting_curve(self):
+        # e.g., see https://mathworld.wolfram.com/Sphere-SphereIntersection.html
+        d = self.rcenter
+        r = self.radaxis
+        R = 1 * u.R_sun
+
+        step = 40
+        theta = np.linspace(0, 2*np.pi, step+1)[:-1]
+        x_ = np.ones_like(theta) * (d**2 - r**2 + R**2) / (2 * d)
+        # y_**2 - z_**2 = R**2 - x_**2
+        alpha = np.sqrt(4 * d**2 * R**2 - (d**2 - r**2 + R**2)**2 ) / (2 * d)
+        y_ = alpha * np.sin(theta)
+        z_ = alpha * np.cos(theta)
+        x, y, z = self.rotate(x_, y_, z_)
+
         return SkyCoord(CartesianRepresentation(x, y, z),
                         frame=frames.HeliographicStonyhurst,
                         observer=self.center.observer,
@@ -144,18 +167,43 @@ class spheroid:
         elif redused is True:
             lw = 1.
             n = self.n
-            axis.plot_coord(self.coordinates[:,int(n/2)], color='c',linestyle='-', linewidth=lw)
-            axis.plot_coord(self.coordinates[:,0], color='c',linestyle='--', linewidth=lw)
-            axis.plot_coord(self.coordinates[0:int(n/2)+1,int(n/4)], color='orange',linestyle='-', linewidth=lw)
-            axis.plot_coord(self.coordinates[int(n/2):n+1,int(n/4)], color='orange',linestyle='-', linewidth=lw)
-            axis.plot_coord(self.coordinates[0:int(n/2)+1,int(3*n/4)], color='orange',linestyle='-', linewidth=lw)
-            axis.plot_coord(self.coordinates[int(n/2):n+1,int(3*n/4)], color='orange',linestyle='-', linewidth=lw)
-            axis.plot_coord(self.coordinates[int(n/2),0:int(n/4)+1], color='green',linestyle='--', linewidth=lw)
-            axis.plot_coord(self.coordinates[int(n/2),int(3*n/4):n+1], color='green',linestyle='--', linewidth=lw)
-            axis.plot_coord(self.coordinates[int(n/2),int(n/4):int(3*n/4)+1], color='green',linestyle='-', linewidth=lw)
-            axis.plot_coord(self.apex, marker = 'o',color=(1,1,1,1))
-            axis.plot_coord(self.base, marker = 'x',color=(1,1,1,1))
-            axis.plot_coord(concatenate((self.apex, self.base)),linestyle='-', linewidth=0.5, color=(1,0,0,1))
+            palete = sns.color_palette("colorblind")
+            
+            # Plot the part of the intersecting curve at the solar surface
+            coords = self.intersecting_curve()
+            axes_frame = axis._transform_pixel2world.frame_out
+            coord_in_axes = coords.transform_to(axes_frame)
+            rsun = getattr(axes_frame, 'rsun', u.R_sun)
+            reference_distance = np.sqrt(axes_frame.observer.radius**2 - rsun**2)
+            is_visible = coord_in_axes.spherical.distance <= reference_distance
+            if np.any(is_visible):
+                axis.plot_coord(coords[is_visible], linestyle='-', linewidth=0.8, color=(0,0,0,1))
+                #coord_ = coords[is_visible]
+                #s = ''.join('X' if p else 'O' for p in np.diff(np.diff(coord_.lat))<5*u.deg)
+                #clist = list([m.span()[0], abs(operator.sub(*m.span()))] for m in re.finditer('X+', s))
+                #for c in clist:
+                #   axis.plot_coord(coord_[c[0]:(c[0]+c[1])], linestyle='-', linewidth=0.8, color=(0,0,0,1))
+            if np.any(~is_visible):
+                axis.plot_coord(coords[~is_visible], linestyle='--', linewidth=0.8, color=(0,0,0,1))
+                #coord_ = coords[~is_visible]
+                #s = ''.join('X' if p else 'O' for p in np.diff(np.diff(coord_.lat))<5*u.deg)
+                #clist = list([m.span()[0], abs(operator.sub(*m.span()))] for m in re.finditer('X+', s))
+                #for c in clist:
+                #    axis.plot_coord(coord_[c[0]:(c[0]+c[1])], linestyle='--', linewidth=0.8, color=(0,0,0,1))
+
+            # Plot the part of the spheroid mesh but filter lines bellow the solar surface
+            axis.plot_coord(self.coordinates[:,int(n/2)], color=palete[0],linestyle='-', linewidth=lw)
+            my_plot_coord(self.coordinates[:,0], axis, color=palete[6], linestyle='-', linewidth=lw)
+            axis.plot_coord(self.coordinates[0:int(n/2)+1,int(n/4)], color=palete[1], linestyle='-', linewidth=lw)
+            axis.plot_coord(self.coordinates[int(n/2):n+1,int(n/4)], color=palete[1], linestyle='-', linewidth=lw)
+            axis.plot_coord(self.coordinates[0:int(n/2)+1,int(3*n/4)], color=palete[1], linestyle='-', linewidth=lw)
+            axis.plot_coord(self.coordinates[int(n/2):n+1,int(3*n/4)], color=palete[1], linestyle='-', linewidth=lw)
+            my_plot_coord(self.coordinates[int(n/2),0:int(n/4)+1], axis, color=palete[2],linestyle='-', linewidth=lw)
+            my_plot_coord(self.coordinates[int(n/2),int(3*n/4):n+1], axis, color=palete[2],linestyle='-', linewidth=lw)
+            axis.plot_coord(self.coordinates[int(n/2),int(n/4):int(3*n/4)+1], color=palete[3],linestyle='-', linewidth=lw)
+            axis.plot_coord(self.apex, marker = 'o',color=(0,0,0,1))
+            axis.plot_coord(self.base, marker = 'x',color=(0,0,0,1))
+            axis.plot_coord(concatenate((self.apex, self.base)),linestyle='-', linewidth=0.5, color=(0,0,0,1))
 
     def to_dataframe(self):
         center_ = self.center.transform_to(frames.HeliographicCarrington)
@@ -314,3 +362,10 @@ class gcs():
                     }
         
         return pd.DataFrame(data_dict, index=[self.center.obstime.to_datetime()])
+
+def my_plot_coord(coord, axis, **kargs):
+    ass = coord.spherical.distance > 1*u.R_sun # above solar surface
+    s = ''.join('X' if p else 'O' for p in ass)
+    clist = list([m.span()[0], abs(operator.sub(*m.span()))] for m in re.finditer('X+', s))
+    for c in clist:
+        axis.plot_coord(coord[c[0]:(c[0]+c[1])], **kargs)
