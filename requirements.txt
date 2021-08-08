@@ -1,0 +1,10 @@
+python=3.8
+numpy
+pandas
+scipy
+astropy
+astroquery
+sunpy
+matplotlib
+streamlit=0.85.1
+stqdm

@@ -1,0 +1,17 @@
+name: PyThea
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.8
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib
+  - astropy
+  - astroquery
+  - sunpy=3.0.1
+  - streamlit=0.85.1
+  - seaborn
