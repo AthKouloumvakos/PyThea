@@ -1,6 +1,8 @@
 import datetime
 import astropy.units as u
-from utils import get_hek_flare
+import pandas as pd
+import json
+from utils import get_hek_flare, model_fittings
 from callbacks import (
     load_or_delete_fittings,
     change_long_lat_sliders
@@ -42,8 +44,23 @@ def date_and_event_selection(st):
                 st.experimental_rerun()
             st.form_submit_button()
     elif initialisation == 'File':
-        uploaded_files = st.sidebar.file_uploader("Provide a fitting file", accept_multiple_files=False)
-        st.sidebar.error('This mode in not availiable yet.')
+        uploaded_file = st.sidebar.file_uploader("Provide a fitting file", accept_multiple_files=False)
+        if uploaded_file:
+            if uploaded_file.type != 'application/json':
+                st.sidebar.error('Unsupported file type')
+                st.stop()
+            fitting = json.loads(uploaded_file.read())
+            st.session_state.event_selected = fitting["event_selected"]
+            st.session_state.date_process  = datetime.datetime.strptime(fitting["date_process"], "%Y-%m-%dT%H:%M:%S.%f")
+            st.session_state.geometrical_model = fitting["geometrical_model"]
+            table_indx = [datetime.datetime.strptime(t, "%Y-%m-%dT%H:%M:%S.%f") for t in fitting["parameters"]["time"]]
+            parameters = pd.DataFrame(fitting["parameters"], index=table_indx)
+            parameters = parameters.drop(['time'], axis=1)
+            st.session_state.model_fittings = model_fittings(fitting["event_selected"],
+                                                             fitting["date_process"],
+                                                             fitting["geometrical_model"],
+                                                             parameters)
+            st.experimental_rerun()
 
 def fitting_and_slider_options_container(st):
     container = st.sidebar.container()
