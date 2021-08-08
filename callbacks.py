@@ -16,6 +16,8 @@ def load_or_delete_fittings(st):
         
         if st.session_state.model_fittings.geometrical_model == 'Spheroid':
             keys = ['height', 'kappa', 'epsilon', 'rcenter', 'radaxis', 'orthoaxis1']
+        elif st.session_state.model_fittings.geometrical_model == 'Ellipsoid':
+            keys = ['height', 'kappa', 'epsilon', 'alpha', 'rcenter', 'radaxis', 'orthoaxis1', 'orthoaxis2', 'tilt']
         elif st.session_state.model_fittings.geometrical_model == 'GCS':
             keys = ['height', 'alpha', 'kappa', 'tilt']
 

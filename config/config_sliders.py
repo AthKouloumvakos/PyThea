@@ -31,6 +31,23 @@ sliders_Spheroid = {
                         'unit': '[R_sun]' },
                }
 
+sliders_Ellipsoid = {
+                'alpha': {'Standard': {'min': 0.5, 'max': 1.5, 'step': 0.05, 'def': 1.},
+                            '<10Rsun': {'min': 0.5, 'max': 1.5, 'step': 0.01, 'def': 1.},
+                            '>10Rsun': {'min': 0.5, 'max': 1.5, 'step': 0.01, 'def': 1.},
+                            '>30Rsun': {'min': 0.5, 'max': 1.5, 'step': 0.01, 'def': 1.},
+                            'unit': '' },
+                'tilt': {'Standard': {'min': 0., 'max': 90., 'step': 0.25, 'def': 0.},
+                           '<10Rsun': {'min': 0., 'max': 90., 'step': 0.1, 'def': 0.},
+                           '>10Rsun': {'min': 0., 'max': 90., 'step': 0.1, 'def': 0.},
+                           '>30Rsun': {'min': 0., 'max': 90., 'step': 0.1, 'def': 0.},
+                           'unit': '[deg.]' },
+                'orthoaxis2': {'Standard': {'min': 0., 'max': 30., 'step': 0.05, 'def': 1.},
+                        '<10Rsun': {'min': 0., 'max': 10., 'step': 0.01, 'def': 1.},
+                        '>10Rsun': {'min': 0., 'max': 30., 'step': 0.01, 'def': 1.},
+                        '>30Rsun': {'min': 0., 'max': 215., 'step': 0.1, 'def': 1.},
+                        'unit': '[R_sun]'}
+               }
 
 sliders_GCS = {
                 'height': {'Standard': {'min': 1., 'max': 30., 'step': 0.05, 'def': 4.},
@@ -56,4 +73,5 @@ sliders_GCS = {
                }
 
 sliders_dict = {'Spheroid': sliders_Spheroid,
+                'Ellipsoid': {**sliders_Spheroid, **sliders_Ellipsoid},
                 'GCS': sliders_GCS}

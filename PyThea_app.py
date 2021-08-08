@@ -52,6 +52,7 @@ from utils import (
 )
 from geometrical_models import (
     spheroid,
+    ellipsoid,
     gcs
 )
 from config.selected_imagers import imager_dict
@@ -178,7 +179,7 @@ def run():
 
     if 'geometrical_model' not in st.session_state:
         geometrical_model = st.sidebar.selectbox('Geometrical model to fit',
-            options=['Select a model', 'Spheroid', 'GCS'])
+                                   options=['Select a model', 'Spheroid', 'Ellipsoid', 'GCS'])
         if geometrical_model != 'Select a model':
             st.session_state.geometrical_model = geometrical_model
             st.experimental_rerun()
@@ -294,6 +295,8 @@ def run():
 
     if st.session_state.geometrical_model == 'Spheroid':
         rcenter, radaxis, orthoaxis1 = final_parameters_gmodel(st)
+    elif st.session_state.geometrical_model == 'Ellipsoid':
+        rcenter, radaxis, orthoaxis1, orthoaxis2, tilt = final_parameters_gmodel(st)
     elif st.session_state.geometrical_model=='GCS':
         rcenter, height, alpha, kappa, tilt = final_parameters_gmodel(st)
 
@@ -313,6 +316,8 @@ def run():
 
     if st.session_state.geometrical_model == 'Spheroid':
         model = spheroid(center, radaxis, orthoaxis1)
+    elif st.session_state.geometrical_model == 'Ellipsoid':
+        model = ellipsoid(center, radaxis, orthoaxis1, orthoaxis2, tilt)
     elif st.session_state.geometrical_model == 'GCS':
         model = gcs(center, height, alpha, kappa, tilt)
 

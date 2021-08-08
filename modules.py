@@ -10,6 +10,7 @@ from callbacks import (
 from config.config_sliders import sliders_dict as sd
 from geometrical_models import (
     spheroid,
+    ellipsoid,
     gcs
 )
 
@@ -92,6 +93,9 @@ def fitting_sliders(st):
     options = {'Spheroid':{'h, e, k': ['height', 'kappa', 'epsilon'],
                            'r, a, b': ['rcenter', 'radaxis', 'orthoaxis1']
                            },
+               'Ellipsoid':{'h, e, k, a': ['height', 'kappa', 'epsilon', 'alpha', 'tilt'],
+                            'r, a, b, c': ['rcenter', 'radaxis', 'orthoaxis1', 'orthoaxis2', 'tilt']
+                           },
                'GCS':{'h, a, k, t': ['height', 'alpha', 'kappa', 'tilt'],
                       },
                }
@@ -99,6 +103,7 @@ def fitting_sliders(st):
     adjustments = st.session_state.sliders_adjustment_mode
     
     if st.session_state.geometrical_model=='Spheroid' or \
+       st.session_state.geometrical_model=='Ellipsoid' or \
        st.session_state.geometrical_model=='GCS':
        gmodel = st.session_state.geometrical_model
        rmode = st.session_state.sliders_repr_mode
@@ -121,6 +126,19 @@ def final_parameters_gmodel(st):
                                            st.session_state.radaxis * u.R_sun, \
                                            st.session_state.orthoaxis1 * u.R_sun
         return rcenter, radaxis, orthoaxis1
+    elif st.session_state.geometrical_model=='Ellipsoid':
+        if st.session_state.sliders_repr_mode=='h, e, k, a':
+            rcenter, radaxis, orthoaxis1, orthoaxis2 = ellipsoid.rabc_to_heka(st.session_state.height * u.R_sun,
+                                                                              st.session_state.kappa,
+                                                                              st.session_state.epsilon,
+                                                                              st.session_state.alpha)
+        elif st.session_state.sliders_repr_mode=='r, a, b, c':
+            rcenter, radaxis, orthoaxis1, orthoaxis2 = st.session_state.rcenter * u.R_sun, \
+                                                       st.session_state.radaxis * u.R_sun, \
+                                                       st.session_state.orthoaxis1 * u.R_sun, \
+                                                       st.session_state.orthoaxis2 * u.R_sun
+        tilt = st.session_state.tilt * u.degree
+        return rcenter, radaxis, orthoaxis1, orthoaxis2, tilt
     elif st.session_state.geometrical_model=='GCS':
         if st.session_state.sliders_repr_mode=='h, a, k, t':
             height = st.session_state.height * u.R_sun

@@ -103,7 +103,7 @@ class spheroid:
         R = 1 * u.R_sun
 
         step = 40
-        theta = np.linspace(0, 2*np.pi, step+1)[:-1]
+        theta = np.linspace(0, 2*np.pi, step)
         x_ = np.ones_like(theta) * (d**2 - r**2 + R**2) / (2 * d)
         # y_**2 - z_**2 = R**2 - x_**2
         alpha = np.sqrt(4 * d**2 * R**2 - (d**2 - r**2 + R**2)**2 ) / (2 * d)
@@ -200,14 +200,14 @@ class spheroid:
             reference_distance = np.sqrt(axes_frame.observer.radius**2 - rsun**2)
             is_visible = coord_in_axes.spherical.distance <= reference_distance
             if np.any(is_visible):
-                axis.plot_coord(coords[is_visible], linestyle='-', linewidth=0.8, color=(0,0,0,1))
+                axis.plot_coord(coords[is_visible], linestyle='',  marker='+',  markersize=3, color=(0.9,0.24,0.38,1))
                 #coord_ = coords[is_visible]
                 #s = ''.join('X' if p else 'O' for p in np.diff(np.diff(coord_.lat))<5*u.deg)
                 #clist = list([m.span()[0], abs(operator.sub(*m.span()))] for m in re.finditer('X+', s))
                 #for c in clist:
                 #   axis.plot_coord(coord_[c[0]:(c[0]+c[1])], linestyle='-', linewidth=0.8, color=(0,0,0,1))
             if np.any(~is_visible):
-                axis.plot_coord(coords[~is_visible], linestyle='--', linewidth=0.8, color=(0,0,0,1))
+                axis.plot_coord(coords[~is_visible], linestyle='',  marker="+",  markersize=3, color=(0,0,0,1))
                 #coord_ = coords[~is_visible]
                 #s = ''.join('X' if p else 'O' for p in np.diff(np.diff(coord_.lat))<5*u.deg)
                 #clist = list([m.span()[0], abs(operator.sub(*m.span()))] for m in re.finditer('X+', s))
@@ -245,6 +245,104 @@ class spheroid:
                     }
 
         return pd.DataFrame(data_dict, index=[self.center.obstime.to_datetime()])
+
+class ellipsoid(spheroid):
+    def __init__(self, center, radaxis: (u.R_sun), orthoaxis1: (u.R_sun), orthoaxis2: (u.R_sun), tilt: (u.degree), n=40):
+        super().__init__(center, radaxis, orthoaxis1, n)
+          
+        self.orthoaxis2 = orthoaxis2
+        self.tilt = tilt
+        self.alpha = orthoaxis1 / orthoaxis2
+
+    def intersecting_curve(self):
+        from vedo import Sphere, Ellipsoid
+        sph = Sphere(pos=(0, 0, 0), r=1)
+        ell = Ellipsoid(pos=(self.rcenter.to_value(1*u.R_sun), 0, 0),
+                        axis1=(2*self.radaxis.to_value(1*u.R_sun), 0, 0),
+                        axis2=(0, 2*self.orthoaxis1.to_value(1*u.R_sun), 0),
+                        axis3=(0, 0, 2*self.orthoaxis2.to_value(1*u.R_sun)) )
+        sic = sph.intersectWith(ell)
+        poi = sic.points()
+        print(self.radaxis.to_value(1*u.R_sun))
+        x, y, z = self.rotate(poi[:,0]*u.R_sun, poi[:,1]*u.R_sun, poi[:,2]*u.R_sun)
+
+        return SkyCoord(CartesianRepresentation(x, y, z),
+                        frame=frames.HeliographicStonyhurst,
+                        observer=self.center.observer,
+                        obstime=self.center.obstime)
+
+    @property
+    def coordinates(self):
+        [x__, y__, z__] = sphere(self.n)
+        
+        x_ = self.radaxis * x__ + self.rcenter
+        y_ = self.orthoaxis1 * y__
+        z_ = self.orthoaxis2 * z__
+        
+        x, y, z = self.rotate(x_, y_, z_)
+        
+        return SkyCoord(CartesianRepresentation(x, y, z),
+                        frame=frames.HeliographicStonyhurst,
+                        observer=self.center.observer,
+                        obstime=self.center.obstime)
+
+    def to_dataframe(self):
+        center_ = self.center.transform_to(frames.HeliographicCarrington)
+        data_dict = {
+                     'hgln': self.center.lon.to_value(u.degree),
+                     'hglt': self.center.lat.to_value(u.degree),
+                     'crln': center_.lon.to_value(u.degree),
+                     'crlt': center_.lat.to_value(u.degree),
+                     'rcenter': self.rcenter.to_value(u.R_sun),
+                     'radaxis': self.radaxis.to_value(u.R_sun),
+                     'orthoaxis1': self.orthoaxis1.to_value(u.R_sun),
+                     'orthoaxis2': self.orthoaxis2.to_value(u.R_sun),
+                     'tilt': self.tilt.to_value(u.degree),
+                     'height': self.height.to_value(u.R_sun),
+                     'kappa': self.kappa,
+                     'epsilon': self.epsilon,
+                     'alpha': self.alpha,
+                    }
+        
+        return pd.DataFrame(data_dict, index=[self.center.obstime.to_datetime()])
+        
+    @staticmethod
+    @u.quantity_input
+    def heka_to_rabc(rc: (u.R_sun), radaxis: (u.R_sun), orthoaxis1: (u.R_sun), orthoaxis2: (u.R_sun)):
+        height = rc + radaxis
+        kappa = orthoaxis1 / (height - 1* u.R_sun)
+        alpha = orthoaxis1 / orthoaxis2
+
+        if radaxis<orthoaxis1:
+            epsilon = -1. * np.sqrt(1 - (radaxis/orthoaxis1)**2)
+        elif radaxis>orthoaxis1:
+            epsilon = np.sqrt(1. - (orthoaxis1/radaxis)**2)
+        elif radaxis==orthoaxis1:
+            epsilon = 0.
+        else:
+            height, kappa, epsilon, alpha = np.nan * u.R_sun, np.nan, np.nan, np.nan
+
+        return height, kappa, epsilon, alpha
+
+    @staticmethod
+    @u.quantity_input
+    def rabc_to_heka(height: (u.R_sun), kappa, epsilon, alpha):
+        s = kappa * (height - 1. * u.R_sun)
+        if epsilon<0:
+            d = s * np.sqrt(1. - epsilon**2)
+        elif epsilon>0:
+            d = s / np.sqrt(1. - epsilon**2)
+        elif epsilon==0:
+            d = s
+        else:
+            rc, radaxis, orthoaxis1, orthoaxis2 = np.nan * u.R_sun, np.nan * u.R_sun, np.nan * u.R_sun, np.nan * u.R_sun
+            return rc, radaxis, orthoaxis1, orthoaxis2
+        radaxis = d
+        orthoaxis1 = s
+        orthoaxis2 = s / alpha
+        rc = height - radaxis
+
+        return rc, radaxis, orthoaxis1, orthoaxis2
 
 class gcs():
     """
