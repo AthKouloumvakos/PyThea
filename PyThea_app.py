@@ -264,18 +264,15 @@ def run():
     elif st.session_state.geometrical_model=='GCS':
         rcenter, height, alpha, kappa, tilt = final_parameters_gmodel(st)
 
+    Spher_rep = SphericalRepresentation(longit, latitu,
+                                        Distance(np.abs(rcenter)))     
     if st.session_state.coord_system == 'HGC':
-        c = np.sign(rcenter)  # TODO: A hack because negative distance values are not allowed, wait for astropy-4.3
-        center = SkyCoord(SphericalRepresentation(c*longit, c*latitu,
-                                                  Distance(c*rcenter, allow_negative=True)),
-                        frame=frames.HeliographicCarrington,
-                        observer='earth',
-                        obstime=running_map.date)
+        center = SkyCoord(np.sign(rcenter) * Spher_rep.to_cartesian(),
+                          frame=frames.HeliographicCarrington,
+                          observer='earth',
+                          obstime=running_map.date)
     elif st.session_state.coord_system == 'HGS':
-        c = np.sign(rcenter)  # TODO: A hack because negative distance values are not allowed, wait for astropy-4.3
-        center = SkyCoord(SphericalRepresentation(c*longit, c*latitu,
-                                                  Distance(c*rcenter,
-                                                  allow_negative=True)),
+        center = SkyCoord(np.sign(rcenter) * Spher_rep.to_cartesian(),
                           frame=frames.HeliographicStonyhurst,
                           observer='earth',
                           obstime=running_map.date)

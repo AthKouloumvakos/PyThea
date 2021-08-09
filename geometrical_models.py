@@ -135,19 +135,23 @@ class spheroid:
 
     @property
     def apex(self):
-        return SkyCoord(SphericalRepresentation(self.center.lon, self.center.lat, 
-                                                Distance(self.center.radius + self.radaxis, allow_negative=True)),
-                             frame=frames.HeliographicStonyhurst,
-                             obstime=self.center.obstime,
-                             observer=self.center.observer)
+        rappex = self.center.radius + self.radaxis
+        Spher_rep = SphericalRepresentation(self.center.lon, self.center.lat,
+                                            Distance(np.abs(rappex)))
+        return SkyCoord(Spher_rep.to_cartesian(),
+                        frame=frames.HeliographicStonyhurst,
+                        obstime=self.center.obstime,
+                        observer=self.center.observer)
     @property
     def base(self):
-        c = np.sign(-self.center.radius + self.radaxis) # TODO: A hack because negative distance values are not allowed, wait for astropy-4.3
-        return SkyCoord(SphericalRepresentation(-c*self.center.lon, -c*self.center.lat, 
-                                                Distance( c*(-self.center.radius + self.radaxis), allow_negative=True)),
-                             frame=frames.HeliographicStonyhurst,
-                             obstime=self.center.obstime,
-                             observer=self.center.observer)
+        rbase = (- self.center.radius + self.radaxis)
+        Spher_rep = SphericalRepresentation(self.center.lon, self.center.lat,
+                                            Distance(np.abs(rbase)))
+        return SkyCoord(-Spher_rep.to_cartesian(),
+                        frame=frames.HeliographicStonyhurst,
+                        obstime=self.center.obstime,
+                        observer=self.center.observer)
+
     def rotate(self, x_, y_, z_):
         Longc = self.center.lon.to_value(u.rad)
         Latc  = self.center.lat.to_value(u.rad)
@@ -203,6 +207,7 @@ class spheroid:
             axis.plot_coord(self.coordinates[int(n/2),int(n/4):int(3*n/4)+1], color=palete[3],linestyle='-', linewidth=lw)
             axis.plot_coord(self.apex, marker = 'o',color=(0,0,0,1))
             axis.plot_coord(self.base, marker = 'x',color=(0,0,0,1))
+            axis.plot_coord(self.center, marker = '+',color=(0,0,0,1))
             axis.plot_coord(concatenate((self.apex, self.base)),linestyle='-', linewidth=0.5, color=(0,0,0,1))
 
     def to_dataframe(self):
