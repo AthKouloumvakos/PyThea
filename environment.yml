@@ -13,5 +13,5 @@ dependencies:
   - astropy
   - astroquery
   - sunpy=3.0.1
-  - streamlit=0.85.1
+  - streamlit=0.86.0
   - seaborn

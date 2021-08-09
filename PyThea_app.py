@@ -180,14 +180,14 @@ def run():
 
     fitting_sliders(st)
 
-    col1, col3, col2 = st.sidebar.beta_columns(3)
+    col1, col3, col2 = st.sidebar.columns(3)
     store_fit_button_pressed = st.sidebar.button('|------------ [Store Fit] ------------|')
 
     #############################################################
     # 3D Fitting and Reconstruction
     st.sidebar.markdown('## Imaging menu')
-    with st.sidebar.beta_expander('Options'):
-        imagers_container = st.beta_container()
+    with st.sidebar.expander('Options'):
+        imagers_container = st.container()
         imagers_list = imagers_container.multiselect('Select Imagers',
                                       options=imager_dict.keys(),
                                       default=['LC2', 'LC3', 'COR2A'],
@@ -236,7 +236,7 @@ def run():
     #############################################################
     # Selection for the primary image to plot
     st.markdown('### Multi-viewpoint imaging')
-    col1, col2 = st.beta_columns((1, 3))
+    col1, col2 = st.columns((1, 3))
     imager_select = col1.selectbox('Select an imager to focus on',
                                    options=st.session_state.imagers_list_)
 
@@ -251,7 +251,7 @@ def run():
 
     qmin = np.nanquantile(running_map.data, 0.20)
     qmax = np.nanquantile(running_map.data, 0.80)
-    col1, col2 = st.beta_columns((1,3))
+    col1, col2 = st.columns((1,3))
     clim = imagers_container.slider('Images climits:', float(qmin-20),
                                     float(qmax+20), (float(qmin-5),
                                     float(qmax+5)), key='clim')
@@ -305,7 +305,7 @@ def run():
                                         value=(st.session_state.imagers_list_[1],
                                         st.session_state.imagers_list_[-1]),
                                         key='supl_imagers')
-        col1, col2 = st.beta_columns(2)
+        col1, col2 = st.columns(2)
         fig, axis = make_figure(get_closest(st.session_state.map[supl_imagers[0]],
                                 running_map_date), image_mode)
         model.plot(axis, redused=True)
@@ -339,7 +339,7 @@ def run():
         if 'model_fittings' in st.session_state:
             st.markdown('**Stored Fitting Table:**')
             st.dataframe(st.session_state.model_fittings.parameters)
-            col1, col2 = st.beta_columns((2, 2))
+            col1, col2 = st.columns((2, 2))
             col2.selectbox("Select a fitting",
                 options=st.session_state.model_fittings.parameters.index,
                 key='fitting_select')
@@ -354,12 +354,12 @@ def run():
        (st.session_state.plt_kinematics is True):
         st.markdown('---')
         st.markdown('### Plots of kinematics ')
-        col1, col2 = st.beta_columns((1, 3))
+        col1, col2 = st.columns((1, 3))
         plt_kinematics_select = col1.selectbox('Select Plots',
                                                options=['All', 'HeightT', 'SpeedT'])
         polyfit_order = col2.slider('Polynomial order', 1, 4, 2, 1, key='polyfit_order')
         if plt_kinematics_select == 'All':
-            col1, col2 = st.beta_columns(2)
+            col1, col2 = st.columns(2)
             fig_ht = plot_fitting_model(st.session_state.model_fittings,
                                         order=polyfit_order,
                                         plt_type='HeightT')

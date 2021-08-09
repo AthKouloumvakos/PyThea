@@ -13,7 +13,7 @@ from geometrical_models import (
 
 def date_and_event_selection(st):
     st.sidebar.markdown('## Date and event selection')
-    col1, col2 = st.sidebar.beta_columns(2)
+    col1, col2 = st.sidebar.columns(2)
     day = col1.date_input("Select a day to process",
                           datetime.date.today() - datetime.timedelta(days=1))
     initialisation = col2.select_slider("How to initialise?",
@@ -31,7 +31,7 @@ def date_and_event_selection(st):
             st.sidebar.warning('Initiate manually')
     elif initialisation == 'Manual':
         with st.sidebar.form("my_form"):
-            col1, col2 = st.beta_columns(2)
+            col1, col2 = st.columns(2)
             ev_id = col1.selectbox('Event ID',
                                    options=['Select','FL', 'CME', 'SHW'])
             time = col2.time_input('Time', datetime.time(12, 0))
@@ -46,9 +46,9 @@ def date_and_event_selection(st):
         st.sidebar.error('This mode in not availiable yet.')
 
 def fitting_and_slider_options_container(st):
-    container = st.sidebar.beta_container()
-    with container.beta_expander('Options'):
-        col1, col2 = st.beta_columns(2)
+    container = st.sidebar.container()
+    with container.expander('Options'):
+        col1, col2 = st.columns(2)
         col1.radio('Coordinate system', options=['HGS', 'HGC'], 
                    on_change=change_long_lat_sliders, args=[st], key='coord_system')
 
