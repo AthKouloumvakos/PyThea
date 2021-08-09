@@ -19,26 +19,18 @@
 """
 
 
-import io
 import numpy as np
+import streamlit as st
 
-import time
-import sunpy.map
 from sunpy.coordinates import frames
-from sunpy.net import attrs as a
 import astropy.units as u
 from astropy.coordinates import (
     SkyCoord,
     Distance,
     SphericalRepresentation,
-    CartesianRepresentation
 )
-import matplotlib.pyplot as plt
-import streamlit as st
-from externals import stqdm # See also https://github.com/tqdm/tqdm
 
-import zipfile
-import base64
+from externals import stqdm  # See also https://github.com/tqdm/tqdm
 
 from sunpy_dev.map.maputils import get_closest
 from modules import (
@@ -48,11 +40,9 @@ from modules import (
     final_parameters_gmodel
 )
 from callbacks import (
-    load_or_delete_fittings,
-    change_long_lat_sliders
+    load_or_delete_fittings
 )
 from utils import (
-    get_hek_flare,
     download_fits,
     maps_process,
     make_figure,
@@ -68,12 +58,34 @@ from config.selected_imagers import imager_dict
 from config.selected_bodies import bodies_dict
 from extensions.buttons import download_button
 
+
 def delete_from_state(state, var):
-    if var=='map_':
+    if var == 'map_':
         del st.session_state['map_']
         del st.session_state['map']
     elif var == 'map':
         del st.session_state['map']
+
+
+def footer_text():
+    st.subheader('About this application:')
+    st.markdown("""
+                   _PyThea_ is an open-source software package that can be
+                   used to perform CME and shock wave forward modeling using
+                   remote-sensing observations. The tool implements various
+                   geometrical models that can be used to model CMEs and
+                   shock waves. It also uses remote-sensing observations from
+                   multiple viewpoints such as the Solar and Heliospheric
+                   Observatory (SoHO) and Solar Terrestrial Relations
+                   Observatory (STEREO).
+
+                   **Github**: You can find [here](https://github.com/AthKouloumvakos/PyThea) the latest version of PyThea.
+
+                   **Version**: PyThea ([v0.1.0](changelog))
+
+                   **Citation**: Please cite this software as [Kouloumvakos et al. (2021)]()
+                """)
+
 
 def run():
     ###################################################################
@@ -117,10 +129,10 @@ def run():
 
     #############################################################
     # Main page information text
-    st.title('PyThea: Forward modeling CMEs and Shock Waves ')
+    st.title('PyThea: Forward model CMEs and Shock Waves ')
     st.markdown("""
                 ** ⏻ Select a day & solar event and then the
-                geometrical model you want to fit.** 
+                geometrical model you want to fit.**
                 """)
     st.markdown('---')
 
@@ -133,7 +145,8 @@ def run():
         st.sidebar.markdown('## Processing Event|Date:')
         st.sidebar.info(f'{st.session_state.event_selected}')
 
-    if ('date_process' not in st.session_state):
+    if 'date_process' not in st.session_state:
+        footer_text()
         st.stop()
 
     #############################################################
@@ -142,22 +155,28 @@ def run():
 
     if 'geometrical_model' not in st.session_state:
         geometrical_model = st.sidebar.selectbox('Geometrical model to fit',
-                                   options=['Select a model','Spheroid', 'GCS'])
+            options=['Select a model', 'Spheroid', 'GCS'])
         if geometrical_model != 'Select a model':
             st.session_state.geometrical_model = geometrical_model
             st.experimental_rerun()
     else:
-        st.sidebar.info(f'Geometrical Model: {st.session_state.geometrical_model}')
+        st.sidebar.info(f'Geometrical Model: \
+                          {st.session_state.geometrical_model}')
 
-    if ('geometrical_model' not in st.session_state):
+    if 'geometrical_model' not in st.session_state:
+        footer_text()
         st.stop()
 
     #############################################################
     # 3D Fitting and Reconstruction
     fitting_and_slider_options_container(st)
 
-    longit = st.sidebar.slider(f'{st.session_state.coord_system} Longitude [deg.]:', 0., 360., 0., step=0.01, key='longit') * u.degree
-    latitu = st.sidebar.slider(f'{st.session_state.coord_system} Latitude [deg.]:', -90., 90., 0., step=0.01, key='latitu') * u.degree
+    longit = st.sidebar.slider(f'{st.session_state.coord_system} \
+                                 Longitude [deg.]:', 0., 360., 0.,
+                                 step=0.01, key='longit') * u.degree
+    latitu = st.sidebar.slider(f'{st.session_state.coord_system} \
+                                 Latitude [deg.]:', -90., 90., 0.,
+                                 step=0.01, key='latitu') * u.degree
 
     fitting_sliders(st)
 
@@ -165,21 +184,27 @@ def run():
     store_fit_button_pressed = st.sidebar.button('|------------ [Store Fit] ------------|')
 
     #############################################################
-    # 3D Fitting and Reconstruction    
+    # 3D Fitting and Reconstruction
     st.sidebar.markdown('## Imaging menu')
     with st.sidebar.beta_expander('Options'):
         imagers_container = st.beta_container()
         imagers_list = imagers_container.multiselect('Select Imagers',
                                       options=imager_dict.keys(),
-                                      default=['LC2', 'LC3', 'COR2A'], key='imagers_list',
-                                      on_change=delete_from_state, args=[st], kwargs={'var':'map'})
-        imaging_time_range = imagers_container.slider('Time Range [hours]',-1., 6., [-1.,1.], 0.5, key='imaging_time_range',
-                                                      on_change=delete_from_state, args=[st], kwargs={'var':'map_'})
+                                      default=['LC2', 'LC3', 'COR2A'],
+                                      key='imagers_list',
+                                      on_change=delete_from_state,
+                                      args=[st], kwargs={'var': 'map'})
+        imaging_time_range = imagers_container.slider('Time Range [hours]',
+                                                      -1., 6., [-1., 1.], 0.5,
+                                                      key='imaging_time_range',
+                                                      on_change=delete_from_state,
+                                                      args=[st], kwargs={'var': 'map_'})
         if 'imagers_list_' not in st.session_state:
-            st.session_state['imagers_list_'] = [] # imagers_list_ is used later when we download or filter the images
+            # imagers_list_ is used later when we download or filter the images
+            st.session_state['imagers_list_'] = []
         image_mode = imagers_container.selectbox('Image processing',
-                                                 options=['Running Diff.', 'Base Diff.', 'Plain'], key='image_mode', 
-                                                 on_change=delete_from_state, args=[st], kwargs={'var':'map'})
+                                                 options=['Running Diff.', 'Base Diff.', 'Plain'], key='image_mode',
+                                                 on_change=delete_from_state, args=[st], kwargs={'var': 'map'})
 
         plt_supp_imagers = imagers_container.checkbox("Supplementary Imaging", value=False)
         star_field = imagers_container.checkbox("View Bodies or s/c")
@@ -198,19 +223,20 @@ def run():
                 pass
             else:
                 progress_bar.desc = f'Downloaded {imager} images from VSO.'
-                st.session_state.map_[imager] = download_fits(st.session_state.date_process, imager, time_range=imaging_time_range)
+                st.session_state.map_[imager] = download_fits(st.session_state.date_process,
+                                                              imager, time_range=imaging_time_range)
 
     if 'map' not in st.session_state:
         st.session_state = maps_process(st.session_state, imagers_list, image_mode)
 
     if not st.session_state.imagers_list_:
-        st.error('No images have been downloaded or processed.') # TODO: Explain better
+        st.error('No images have been downloaded or processed.')  # TODO: Explain better
         st.stop()
 
     #############################################################
     # Selection for the primary image to plot
     st.markdown('### Multi-viewpoint imaging')
-    col1, col2 = st.beta_columns((1,3))
+    col1, col2 = st.beta_columns((1, 3))
     imager_select = col1.selectbox('Select an imager to focus on',
                                    options=st.session_state.imagers_list_)
 
@@ -223,45 +249,49 @@ def run():
 
     running_map = st.session_state.map[imager_select][maps_date.index(running_map_date)]
 
-    qmin = np.nanquantile(running_map.data,0.20)
-    qmax = np.nanquantile(running_map.data,0.80)
+    qmin = np.nanquantile(running_map.data, 0.20)
+    qmax = np.nanquantile(running_map.data, 0.80)
     col1, col2 = st.beta_columns((1,3))
-    clim = imagers_container.slider('Images climits:', float(qmin-20), float(qmax+20), (float(qmin-5), float(qmax+5)), key='clim')
+    clim = imagers_container.slider('Images climits:', float(qmin-20),
+                                    float(qmax+20), (float(qmin-5),
+                                    float(qmax+5)), key='clim')
 
     #############################################################
     # Finalize the geometrical model
 
-    if st.session_state.geometrical_model=='Spheroid':
+    if st.session_state.geometrical_model == 'Spheroid':
         rcenter, radaxis, orthoaxis1 = final_parameters_gmodel(st)
     elif st.session_state.geometrical_model=='GCS':
         rcenter, height, alpha, kappa, tilt = final_parameters_gmodel(st)
 
-    if st.session_state.coord_system=='HGC':
-        c = np.sign(rcenter) # TODO: A hack because negative distance values are not allowed, wait for astropy-4.3
+    if st.session_state.coord_system == 'HGC':
+        c = np.sign(rcenter)  # TODO: A hack because negative distance values are not allowed, wait for astropy-4.3
         center = SkyCoord(SphericalRepresentation(c*longit, c*latitu,
                                                   Distance(c*rcenter, allow_negative=True)),
                         frame=frames.HeliographicCarrington,
                         observer='earth',
                         obstime=running_map.date)
-    elif st.session_state.coord_system=='HGS':
-        c = np.sign(rcenter) # TODO: A hack because negative distance values are not allowed, wait for astropy-4.3
-        center = SkyCoord(SphericalRepresentation(c*longit, c*latitu, Distance(c*rcenter, allow_negative=True)),
-                        frame=frames.HeliographicStonyhurst,
-                        observer='earth',
-                        obstime=running_map.date)
+    elif st.session_state.coord_system == 'HGS':
+        c = np.sign(rcenter)  # TODO: A hack because negative distance values are not allowed, wait for astropy-4.3
+        center = SkyCoord(SphericalRepresentation(c*longit, c*latitu,
+                                                  Distance(c*rcenter,
+                                                  allow_negative=True)),
+                          frame=frames.HeliographicStonyhurst,
+                          observer='earth',
+                          obstime=running_map.date)
     st.session_state.center = center
 
-    if st.session_state.geometrical_model=='Spheroid':
+    if st.session_state.geometrical_model == 'Spheroid':
         model = spheroid(center, radaxis, orthoaxis1)
-    elif st.session_state.geometrical_model=='GCS':
+    elif st.session_state.geometrical_model == 'GCS':
         model = gcs(center, height, alpha, kappa, tilt)
 
     #############################################################
     # Plot main and supplement figure images
     fig, axis = make_figure(running_map, image_mode, clim=clim)
-    if st.session_state.plot_mesh_mode=='Simple': #'No plot',,'Full'
+    if st.session_state.plot_mesh_mode == 'Simple':  # 'No plot',,'Full'
         model.plot(axis, redused=True)
-    if st.session_state.plot_mesh_mode=='Full':
+    if st.session_state.plot_mesh_mode == 'Full':
         model.plot(axis, redused=True)
         model.plot(axis)
     if star_field is True:
@@ -269,15 +299,19 @@ def run():
         axis.legend()
     st.pyplot(fig)
 
-    if plt_supp_imagers and len(st.session_state.imagers_list_)>2:
+    if plt_supp_imagers and len(st.session_state.imagers_list_) > 2:
         supl_imagers = st.select_slider("Select supplement imagers",
-                                        options=st.session_state.imagers_list_, 
-                                        value=(st.session_state.imagers_list_[1], st.session_state.imagers_list_[-1]), key='supl_imagers')
+                                        options=st.session_state.imagers_list_,
+                                        value=(st.session_state.imagers_list_[1],
+                                        st.session_state.imagers_list_[-1]),
+                                        key='supl_imagers')
         col1, col2 = st.beta_columns(2)
-        fig, axis = make_figure(get_closest(st.session_state.map[supl_imagers[0]], running_map_date), image_mode)
+        fig, axis = make_figure(get_closest(st.session_state.map[supl_imagers[0]],
+                                running_map_date), image_mode)
         model.plot(axis, redused=True)
         col1.pyplot(fig)
-        fig, axis = make_figure(get_closest(st.session_state.map[supl_imagers[1]], running_map_date), image_mode)
+        fig, axis = make_figure(get_closest(st.session_state.map[supl_imagers[1]],
+                                            running_map_date), image_mode)
         model.plot(axis, redused=True)
         col2.pyplot(fig)
 
@@ -297,65 +331,62 @@ def run():
 
     #############################################################
     # View the fittings table
-    if (st.session_state.fitting_table is True):
+    if st.session_state.fitting_table is True:
         st.markdown('---')
         st.markdown('### Parameters Table')
         st.markdown('**Running Fitting Table:**')
         st.dataframe(single_fit)
-        if ('model_fittings' in st.session_state):
+        if 'model_fittings' in st.session_state:
             st.markdown('**Stored Fitting Table:**')
             st.dataframe(st.session_state.model_fittings.parameters)
-            col1, col2 = st.beta_columns((2,2))
-            fitting_select = col2.selectbox("Select a fitting",
-                                  options=st.session_state.model_fittings.parameters.index, key='fitting_select')
-            fit_action = col1.selectbox('Action', options=['Select','Load', 'Delete'],
-                                        on_change=load_or_delete_fittings, args=[st], key='fit_action')
+            col1, col2 = st.beta_columns((2, 2))
+            col2.selectbox("Select a fitting",
+                options=st.session_state.model_fittings.parameters.index,
+                key='fitting_select')
+            fit_action = col1.selectbox('Action',
+                options=['Select', 'Load', 'Delete'],
+                on_change=load_or_delete_fittings, args=[st],
+                key='fit_action')
 
     #############################################################
     # Plot the kinematics
-    if ('model_fittings' in st.session_state) and (st.session_state.plt_kinematics is True):
+    if ('model_fittings' in st.session_state) and \
+       (st.session_state.plt_kinematics is True):
         st.markdown('---')
         st.markdown('### Plots of kinematics ')
-        col1, col2 = st.beta_columns((1,3))
+        col1, col2 = st.beta_columns((1, 3))
         plt_kinematics_select = col1.selectbox('Select Plots',
                                                options=['All', 'HeightT', 'SpeedT'])
         polyfit_order = col2.slider('Polynomial order', 1, 4, 2, 1, key='polyfit_order')
-        if plt_kinematics_select=='All':
+        if plt_kinematics_select == 'All':
             col1, col2 = st.beta_columns(2)
-            fig_ht = plot_fitting_model(st.session_state.model_fittings, order=polyfit_order, plt_type='HeightT')
+            fig_ht = plot_fitting_model(st.session_state.model_fittings,
+                                        order=polyfit_order,
+                                        plt_type='HeightT')
             col1.pyplot(fig_ht)
-            fig_vt = plot_fitting_model(st.session_state.model_fittings, order=polyfit_order, plt_type='SpeedT')
+            fig_vt = plot_fitting_model(st.session_state.model_fittings,
+                                        order=polyfit_order,
+                                        plt_type='SpeedT')
             col2.pyplot(fig_vt)
         else:
-            fig = plot_fitting_model(st.session_state.model_fittings, order=polyfit_order, plt_type=plt_kinematics_select)
+            fig = plot_fitting_model(st.session_state.model_fittings,
+                                     order=polyfit_order,
+                                     plt_type=plt_kinematics_select)
             st.pyplot(fig)
 
     #############################################################
     # Download Fitting and Figures
     st.sidebar.markdown('## Finalize and save results')
     if 'model_fittings' in st.session_state:
-         json_buffer = st.session_state.model_fittings.to_jsonbuffer()
-         download_button_str = download_button(json_buffer.getvalue(), 
-                                   st.session_state.model_fittings.model_id()+'.json', 
-                                   'Download Fitting as .json file')
-         st.sidebar.markdown(download_button_str, unsafe_allow_html=True)
+        json_buffer = st.session_state.model_fittings.to_jsonbuffer()
+        download_button_str = download_button(json_buffer.getvalue(),
+            st.session_state.model_fittings.model_id()+'.json',
+            'Download Fitting as .json file')
+        st.sidebar.markdown(download_button_str, unsafe_allow_html=True)
     else:
-         st.sidebar.info('Store a fit to enable this feature.')
+        st.sidebar.info('Store a fit to enable this feature.')
     st.markdown('---')
-    
-    st.subheader('About this application:')
-    st.markdown(""" 
-                 _PyThea_ is an open-source software package that can be used to perform
-                 CME and shock wave forward modeling using remote-sensing observations.
-                
-                **Github**: You can find [here](https://github.com/AthKouloumvakos/PyThea) the latest version of PyThea.
-
-                **Version**: PyThea ([v0.1.0](changelog))
-
-                **Citation**: Please cite this software as [Kouloumvakos et al. (2021)]()
-                """)
-
-
+    footer_text()
 
 if __name__ == "__main__":
     run()
