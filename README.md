@@ -25,7 +25,7 @@ conda activate pythea
 conda deactivate
 ```
 
-**Alternative (pip)**
+**Alternative (pip, not tested)**
 
 ```python
 # You can create a virtual environment in python inside the project folder.
@@ -49,7 +49,7 @@ Install the required python packages, and then run the application with streamli
 ```
 # Activate the enviroment as shown above
 # You can now run the application using streamlit
-streamlit run HDPt_app.py
+streamlit run PyThea_app.py
 ```
 The application should now open in the default browser!
 
@@ -62,6 +62,6 @@ Complete documentation of the _PyThea_ can be found in (under construction)
 - [SunPy](https://sunpy.org/): The community-developed, free and open-source solar data analysis environment for Python.
 - [AstroPy](https://www.astropy.org/): The Astropy Project is a community effort to develop a single core package for Astronomy in Python.
 
-## The mythology of Thea
+## The mythology of Thea:
 
 In Greek mythology, Thea, also called Euryphaessa "wide-shining", is the Titaness of sight and the shining light of the clear blue sky. Her brother/consort is Hyperion, a Titan and god of the sun, and together they are the parents of Helios (the Sun), Selene (the Moon), and Eos (the Dawn).

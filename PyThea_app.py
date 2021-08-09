@@ -81,7 +81,7 @@ def footer_text():
 
                    **Github**: You can find [here](https://github.com/AthKouloumvakos/PyThea) the latest version of PyThea.
 
-                   **Version**: PyThea ([v0.1.0](changelog))
+                   **Version**: PyThea ([v0.1.1](changelog))
 
                    **Citation**: Please cite this software as [Kouloumvakos et al. (2021)]()
                 """)
@@ -129,7 +129,7 @@ def run():
 
     #############################################################
     # Main page information text
-    st.title('PyThea: Forward model CMEs and Shock Waves ')
+    st.title('PyThea: Forward model CMEs & Shocks')
     st.markdown("""
                 ** ⏻ Select a day & solar event and then the
                 geometrical model you want to fit.**
