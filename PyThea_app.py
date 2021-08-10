@@ -186,30 +186,35 @@ def run():
     #############################################################
     # 3D Fitting and Reconstruction
     st.sidebar.markdown('## Imaging menu')
-    with st.sidebar.expander('Options'):
-        imagers_container = st.container()
-        imagers_list = imagers_container.multiselect('Select Imagers',
+    with st.sidebar.expander('Download Options'):
+        downoption_container = st.container()
+        imagers_list = downoption_container.multiselect('Select Imagers',
                                       options=imager_dict.keys(),
                                       default=['LC2', 'LC3', 'COR2A'],
                                       key='imagers_list',
                                       on_change=delete_from_state,
                                       args=[st], kwargs={'var': 'map'})
-        imaging_time_range = imagers_container.slider('Time Range [hours]',
+        imaging_time_range = downoption_container.slider('Time Range [hours]',
                                                       -1., 6., [-1., 1.], 0.5,
                                                       key='imaging_time_range',
                                                       on_change=delete_from_state,
                                                       args=[st], kwargs={'var': 'map_'})
+
+    with st.sidebar.expander('Processing Options'):
+        procoption_container = st.container()
         if 'imagers_list_' not in st.session_state:
             # imagers_list_ is used later when we download or filter the images
             st.session_state['imagers_list_'] = []
-        image_mode = imagers_container.selectbox('Image processing',
+        image_mode = procoption_container.selectbox('Image processing',
                                                  options=['Running Diff.', 'Base Diff.', 'Plain'], key='image_mode',
                                                  on_change=delete_from_state, args=[st], kwargs={'var': 'map'})
 
-        plt_supp_imagers = imagers_container.checkbox("Supplementary Imaging", value=False)
-        star_field = imagers_container.checkbox("View Bodies or s/c")
+    with st.sidebar.expander('Plot/View Options'):
+        plotviewopt_container = st.container()
+        plt_supp_imagers = plotviewopt_container.checkbox("Supplementary Imaging", value=False)
+        star_field = plotviewopt_container.checkbox("View Bodies or s/c")
         if star_field is True:
-            bodies_list = imagers_container.multiselect('Select Bodies', options=bodies_dict.keys(),
+            bodies_list = plotviewopt_container.multiselect('Select Bodies', options=bodies_dict.keys(),
                                                         default=['Mercury', 'Venus', 'Jupiter'])
 
     #############################################################
@@ -252,7 +257,7 @@ def run():
     qmin = np.nanquantile(running_map.data, 0.20)
     qmax = np.nanquantile(running_map.data, 0.80)
     col1, col2 = st.columns((1,3))
-    clim = imagers_container.slider('Images climits:', float(qmin-20),
+    clim = plotviewopt_container.slider('Images climits:', float(qmin-20),
                                     float(qmax+20), (float(qmin-5),
                                     float(qmax+5)), key='clim')
 
