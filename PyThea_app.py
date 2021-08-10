@@ -30,7 +30,7 @@ from astropy.coordinates import (
     SphericalRepresentation,
 )
 
-from externals import stqdm  # See also https://github.com/tqdm/tqdm
+from extensions import stqdm  # See also https://github.com/tqdm/tqdm
 
 from sunpy_dev.map.maputils import get_closest
 from modules import (
@@ -94,7 +94,7 @@ def run():
 
     #############################################################
     # set page config
-    st.set_page_config(page_title='HDRt', page_icon=":rocket:",
+    st.set_page_config(page_title='PyThea', page_icon=":rocket:",
                        initial_sidebar_state="expanded")
 
     #############################################################

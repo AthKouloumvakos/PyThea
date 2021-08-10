@@ -147,7 +147,7 @@ class spheroid:
         rbase = (- self.center.radius + self.radaxis)
         Spher_rep = SphericalRepresentation(self.center.lon, self.center.lat,
                                             Distance(np.abs(rbase)))
-        return SkyCoord(-Spher_rep.to_cartesian(),
+        return SkyCoord( - np.sign(rbase) * Spher_rep.to_cartesian(),
                         frame=frames.HeliographicStonyhurst,
                         obstime=self.center.obstime,
                         observer=self.center.observer)
