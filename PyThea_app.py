@@ -44,6 +44,7 @@ from callbacks import (
 from utils import (
     download_fits,
     maps_process,
+    maps_clims,
     make_figure,
     plot_bodies,
     model_fittings,
@@ -259,6 +260,7 @@ def run():
 
     if 'map' not in st.session_state:
         st.session_state = maps_process(st.session_state, imagers_list, image_mode)
+        st.session_state = maps_clims(st.session_state, imagers_list)
 
     if not st.session_state.imagers_list_:
         st.error('No images have been downloaded or processed.')  # TODO: Explain better
@@ -280,8 +282,8 @@ def run():
 
     running_map = st.session_state.map[imager_select][maps_date.index(running_map_date)]
 
-    qmin = np.nanquantile(running_map.data, 0.20)
-    qmax = np.nanquantile(running_map.data, 0.80)
+    qmin = st.session_state.map_clim[imager_select][0] #np.nanquantile(running_map.data, 0.20)
+    qmax = st.session_state.map_clim[imager_select][1] #np.nanquantile(running_map.data, 0.80)
     col1, col2 = st.columns((1,3))
     clim = plotviewopt_container.slider('Images climits:', float(qmin-20),
                                     float(qmax+20), (float(qmin-5),
