@@ -171,9 +171,13 @@ def run():
     # 3D Fitting and Reconstruction
     fitting_and_slider_options_container(st)
 
+    if st.session_state.coord_system == 'HGC':
+        long_val = [0., 360.]
+    elif st.session_state.coord_system == 'HGS':
+        long_val = [-180., 180.]
     longit = st.sidebar.slider(f'{st.session_state.coord_system} \
-                                 Longitude [deg.]:', 0., 360., 0.,
-                                 step=0.01, key='longit') * u.degree
+                                     Longitude [deg.]:', long_val[0], long_val[1], 0.,
+                                     step=0.01, key='longit') * u.degree
     latitu = st.sidebar.slider(f'{st.session_state.coord_system} \
                                  Latitude [deg.]:', -90., 90., 0.,
                                  step=0.01, key='latitu') * u.degree
