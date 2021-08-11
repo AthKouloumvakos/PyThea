@@ -23,7 +23,7 @@ def load_or_delete_fittings(st):
             if key in st.session_state:
                 st.session_state[key] = float(dataframe.loc[selected_row,key])
     elif st.session_state.fit_action == 'Delete':
-        st.session_state.model_fittings.parameters = dataframe.drop([selected_row])
+        st.session_state.model_fittings.parameters = dataframe.drop(st.session_state.fitting_select)
         del st.session_state.fitting_select
         if len(st.session_state.model_fittings.parameters)<1:
             del st.session_state.model_fittings
