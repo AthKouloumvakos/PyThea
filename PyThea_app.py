@@ -71,17 +71,14 @@ def footer_text():
     st.subheader('About this application:')
     st.markdown("""
                    _PyThea_ is an open-source software package that can be
-                   used to perform CME and shock wave forward modeling using
-                   remote-sensing observations. The tool implements various
-                   geometrical models that can be used to model CMEs and
-                   shock waves. It also uses remote-sensing observations from
-                   multiple viewpoints such as the Solar and Heliospheric
-                   Observatory (SoHO) and Solar Terrestrial Relations
-                   Observatory (STEREO).
+                   used to perform forward modeling of coronal mass ejections 
+                   (CMEs) and shock waves, using various geometrical models and
+                   remote-sensing observations from multiple viewpoints such as
+                   images from the Solar Terrestrial Relations Observatory (STEREO)
+                   mission.
 
-                   **Github**: You can find [here](https://github.com/AthKouloumvakos/PyThea) the latest version of PyThea.
-
-                   **Version**: PyThea ([v0.1.1](changelog))
+                   **Github**: You can find the latest version of PyThea 
+                               [here](https://github.com/AthKouloumvakos/PyThea).
 
                    **Citation**: Please cite this software as [Kouloumvakos et al. (2021)]()
                 """)
