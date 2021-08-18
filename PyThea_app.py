@@ -126,6 +126,32 @@ def run():
                 hr {{
                 margin: 10px 0px;
                 }} </style> """, unsafe_allow_html=True)
+    # Custom button appearance
+    st.markdown('''
+                <style>
+                div.stButton > button:first-child {
+               display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 100%;
+                background-color: rgb(255, 255, 255);
+                color: rgb(38, 39, 48);
+                padding: .25rem .75rem;
+                position: relative;
+                text-decoration: none;
+                border-radius: 4px;
+                border-width: 1px;
+                border-style: solid;
+                border-color: rgb(230, 234, 241);
+                border-image: initial; }
+                div.stButton > button:hover {
+                border-color: rgb(246, 51, 102);
+                color: rgb(246, 51, 102);}
+                div.stButton > button:active{
+                box-shadow: none;
+                background-color: rgb(246, 51, 102);
+                color: white; }
+                </style>''', unsafe_allow_html=True)
 
     #############################################################
     # Main page information text
@@ -185,7 +211,7 @@ def run():
     fitting_sliders(st)
 
     col1, col3, col2 = st.sidebar.columns(3)
-    store_fit_button_pressed = st.sidebar.button('|------------ [Store Fit] ------------|')
+    store_fit_button_pressed = st.sidebar.button('Store Fit')
 
     #############################################################
     # 3D Fitting and Reconstruction
@@ -246,12 +272,12 @@ def run():
     # Selection for the primary image to plot
     st.markdown('### Multi-viewpoint imaging')
     col1, col2 = st.columns((1, 3))
-    imager_select = col1.selectbox('Select an imager to focus on',
+    imager_select = col1.selectbox('Select an imager',
                                    options=st.session_state.imagers_list_)
 
     maps_date = [maps.date for maps in st.session_state.map[imager_select]]
     if len(maps_date)>1:
-        running_map_date = col2.select_slider("Slide to a time of the loaded images",
+        running_map_date = col2.select_slider("Slide to the image time",
                                               options=maps_date, key='running_map_date')
     else:
         running_map_date = maps_date[0]
@@ -393,6 +419,7 @@ def run():
         st.sidebar.info('Store a fit to enable this feature.')
     st.markdown('---')
     footer_text()
+
 
 if __name__ == "__main__":
     run()

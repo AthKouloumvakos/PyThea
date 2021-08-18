@@ -57,9 +57,13 @@ def download_button(object_to_download, download_filename, button_text, pickle_i
     custom_css = f""" 
         <style>
             #{button_id} {{
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 100%;
                 background-color: rgb(255, 255, 255);
                 color: rgb(38, 39, 48);
-                padding: 0.25em 0.38em;
+                padding: .25rem .75rem;
                 position: relative;
                 text-decoration: none;
                 border-radius: 4px;
