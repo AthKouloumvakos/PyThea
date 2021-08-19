@@ -1,7 +1,6 @@
 """
-    PyThea is an open-source software package that can be used to perform
-    CME and shock wave forward modeling using remote-sensing observations.
-
+    PyThea: A software package to perform forward modeling of CMEs and
+    shock waves using multi-viewpoint remote-sensing observations.
     Copyright (C) 2021  Athanasios Kouloumvakos
 
     This program is free software: you can redistribute it and/or modify
