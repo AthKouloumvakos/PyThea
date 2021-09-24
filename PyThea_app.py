@@ -29,7 +29,7 @@ from astropy.coordinates import (
     SphericalRepresentation,
 )
 
-from extensions import stqdm  # See also https://github.com/tqdm/tqdm
+from extensions.stqdm import stqdm  # See also https://github.com/tqdm/tqdm
 
 from sunpy_dev.map.maputils import get_closest
 from modules import (
@@ -249,12 +249,12 @@ def run():
     # This part runs only if the map_ doesn't exits or the session_state.map_ does not contain all the imagers requested
     if 'map_' not in st.session_state or [False for lst in imagers_list if lst not in st.session_state.map_]:
         st.session_state.map_ = {} if 'map_' not in st.session_state else st.session_state.map_
-        progress_bar = stqdm.stqdm(imagers_list, desc="Preparing to Download data")
+        progress_bar = stqdm(imagers_list, desc="Preparing to Download data")
         for imager in progress_bar:
             if imager in st.session_state.map_:
                 pass
             else:
-                progress_bar.desc = f'Downloaded {imager} images from VSO.'
+                progress_bar.desc = f'Downloaded {imager} images from VSO'
                 st.session_state.map_[imager] = download_fits(st.session_state.date_process,
                                                               imager, time_range=imaging_time_range)
 
