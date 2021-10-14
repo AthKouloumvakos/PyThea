@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="60mm"
+   height="60mm"
+   viewBox="0 0 60 60"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1 (ce6663b3b7, 2021-05-25)"
+   sodipodi:docname="pythea_icon.svg"
+   inkscape:export-filename="/home/akouloumvak/Desktop/Ubuntu_Bup/mysunpy/upstream/PyThea/docs/logo/pythea_icon.png"
+   inkscape:export-xdpi="303.59399"
+   inkscape:export-ydpi="303.59399"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.0954582"
+     inkscape:cx="376.55476"
+     inkscape:cy="240.53862"
+     inkscape:window-width="1848"
+     inkscape:window-height="1016"
+     inkscape:window-x="72"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     width="195mm" />
+  <defs
+     id="defs2">
+    <inkscape:path-effect
+       effect="fill_between_many"
+       method="originald"
+       linkedpaths="#image7176,0,1"
+       id="path-effect22385"
+       is_visible="true"
+       lpeversion="0"
+       join="true"
+       close="true"
+       autoreverse="true"
+       applied="false" />
+    <inkscape:path-effect
+       effect="fill_between_many"
+       method="originald"
+       linkedpaths="#path7506-3-5,0,1|#path7506-7,0,1"
+       id="path-effect22426"
+       is_visible="true"
+       lpeversion="0"
+       join="true"
+       close="true"
+       autoreverse="true"
+       applied="false" />
+    <pattern
+       inkscape:collect="always"
+       xlink:href="#pattern24628"
+       id="pattern24713"
+       patternTransform="matrix(0.26210792,0,0,-0.3019701,55.065264,46.71555)" />
+    <pattern
+       patternUnits="userSpaceOnUse"
+       width="1.4849376"
+       height="1.5108535"
+       patternTransform="translate(767.5056,35.085384)"
+       id="pattern24628">
+      <rect
+         style="fill:#f0f0f0;fill-opacity:1;stroke:#000000;stroke-width:0.23708;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         width="1.2478578"
+         height="1.2737738"
+         x="0.11853986"
+         y="0.11853986"
+         id="rect24230" />
+    </pattern>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path7506-3-5-7"
+       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.39345;stroke-miterlimit:4;stroke-dasharray:none"
+       d="M 53.490014,29.616447 A 23.471835,23.471834 0 0 1 30.018174,53.088287 23.471835,23.471834 0 0 1 6.5463441,29.616447 23.471835,23.471834 0 0 1 30.018174,6.1446072 23.471835,23.471834 0 0 1 53.490014,29.616447 Z m 4.65298,0.31099 A 28.097352,28.09735 0 0 1 30.045634,58.024787 28.097352,28.09735 0 0 1 1.9482841,29.927437 28.097352,28.09735 0 0 1 30.045634,1.8300885 28.097352,28.09735 0 0 1 58.142994,29.927437 Z"
+       inkscape:export-filename="/home/akouloumvak/Desktop/Ubuntu_Bup/mysunpy/upstream/PyThea/docs/text6541.png"
+       inkscape:export-xdpi="303.59399"
+       inkscape:export-ydpi="303.59399" />
+    <circle
+       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#fffffe;stroke-width:0.666484;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path39970"
+       cx="30.068638"
+       cy="29.950443"
+       r="26.652746"
+       inkscape:export-filename="/home/akouloumvak/Desktop/Ubuntu_Bup/mysunpy/upstream/PyThea/docs/text6541.png"
+       inkscape:export-xdpi="303.59399"
+       inkscape:export-ydpi="303.59399" />
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#010000;stroke-width:0.189794;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 24.951454,18.733793 0.81036,0.002 c -0.22863,1.282415 2.22544,1.483025 2.80493,1.492151 0.14197,0.002 2.30488,0.06406 3.15288,-0.01059 1.49889,-0.131903 2.37447,-0.515326 2.28888,-1.487741 l 0.75865,-2.42e-4 0.0184,4.406197 -0.79179,-0.0044 c -0.12207,-1.136252 -1.31516,-1.426121 -2.59505,-1.458705 -1.27991,-0.03256 -2.60367,-7.95e-4 -3.08678,0.01039 -1.30374,0.03078 -2.33448,0.258041 -2.54935,1.443639 h -0.78607 z"
+       id="path34078"
+       sodipodi:nodetypes="ccsscccczsccc"
+       inkscape:export-filename="/home/akouloumvak/Desktop/Ubuntu_Bup/mysunpy/upstream/PyThea/docs/text6541.png"
+       inkscape:export-xdpi="303.59399"
+       inkscape:export-ydpi="303.59399" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.833969;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 16.638654,33.786077 h 27.49147"
+       id="path6916"
+       inkscape:export-filename="/home/akouloumvak/Desktop/Ubuntu_Bup/mysunpy/upstream/PyThea/docs/text6541.png"
+       inkscape:export-xdpi="303.59399"
+       inkscape:export-ydpi="303.59399" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.772304;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 20.057554,35.563657 h 20.11431"
+       id="path6918"
+       inkscape:export-filename="/home/akouloumvak/Desktop/Ubuntu_Bup/mysunpy/upstream/PyThea/docs/text6541.png"
+       inkscape:export-xdpi="303.59399"
+       inkscape:export-ydpi="303.59399" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.772304;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 26.992574,51.052427 v -9.58373"
+       id="path6920"
+       inkscape:export-filename="/home/akouloumvak/Desktop/Ubuntu_Bup/mysunpy/upstream/PyThea/docs/text6541.png"
+       inkscape:export-xdpi="303.59399"
+       inkscape:export-ydpi="303.59399" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.772304;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 30.038234,53.238687 V 39.580317"
+       id="path6922"
+       inkscape:export-filename="/home/akouloumvak/Desktop/Ubuntu_Bup/mysunpy/upstream/PyThea/docs/text6541.png"
+       inkscape:export-xdpi="303.59399"
+       inkscape:export-ydpi="303.59399" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.772304;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 33.298014,51.276977 v -9.68546"
+       id="path6924"
+       inkscape:export-filename="/home/akouloumvak/Desktop/Ubuntu_Bup/mysunpy/upstream/PyThea/docs/text6541.png"
+       inkscape:export-xdpi="303.59399"
+       inkscape:export-ydpi="303.59399" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.772304;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 22.711894,41.684697 h -1.91225 v -2.21883 h 3.98898 v 3.83338 h -5.4311 v -5.8929 h 21.24394 v 5.7798 h -5.2847 v -3.63075 h 3.63634 v 2.13128 h -1.59485"
+       id="path6926"
+       inkscape:export-filename="/home/akouloumvak/Desktop/Ubuntu_Bup/mysunpy/upstream/PyThea/docs/text6541.png"
+       inkscape:export-xdpi="303.59399"
+       inkscape:export-ydpi="303.59399" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:0.666484;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 56.707834,30.131057 h -1.92832"
+       id="path42322"
+       inkscape:export-filename="/home/akouloumvak/Desktop/Ubuntu_Bup/mysunpy/upstream/PyThea/docs/text6541.png"
+       inkscape:export-xdpi="303.59399"
+       inkscape:export-ydpi="303.59399" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:0.666484;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 30.038234,3.194569 V 5.1228982"
+       id="path42322-9"
+       inkscape:export-filename="/home/akouloumvak/Desktop/Ubuntu_Bup/mysunpy/upstream/PyThea/docs/text6541.png"
+       inkscape:export-xdpi="303.59399"
+       inkscape:export-ydpi="303.59399" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:0.666484;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 30.038234,54.697627 v 1.92833"
+       id="path42322-9-3"
+       inkscape:export-filename="/home/akouloumvak/Desktop/Ubuntu_Bup/mysunpy/upstream/PyThea/docs/text6541.png"
+       inkscape:export-xdpi="303.59399"
+       inkscape:export-ydpi="303.59399" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:0.666484;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 5.3101941,30.131057 h -1.92833"
+       id="path42322-0"
+       inkscape:export-filename="/home/akouloumvak/Desktop/Ubuntu_Bup/mysunpy/upstream/PyThea/docs/text6541.png"
+       inkscape:export-xdpi="303.59399"
+       inkscape:export-ydpi="303.59399" />
+    <g
+       id="g56231"
+       transform="matrix(0.3019701,0,0,-0.3019701,-133.23844,61.108484)"
+       inkscape:export-filename="/home/akouloumvak/Desktop/Ubuntu_Bup/mysunpy/upstream/PyThea/docs/text6541.png"
+       inkscape:export-xdpi="303.59399"
+       inkscape:export-ydpi="303.59399">
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1.22667;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 582.13215,122.146 570.80892,109.94835 581.84059,97.318215"
+         id="path55506"
+         sodipodi:nodetypes="ccc" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1.22667;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 570.80892,109.94835 h 11.50144"
+         id="path55758" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1.22667;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 597.35888,110.29629 -8.9074,-2.44607 4.78239,13.83531 8.34328,-24.235685"
+         id="path55760"
+         sodipodi:nodetypes="cccc" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1.22667;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 588.45148,107.85022 -1.64755,-4.90691"
+         id="path55762" />
+    </g>
+    <g
+       id="g50838"
+       transform="matrix(0.26495907,0,0,-0.26495907,-157.20516,56.217658)"
+       inkscape:export-filename="/home/akouloumvak/Desktop/Ubuntu_Bup/mysunpy/upstream/PyThea/docs/text6541.png"
+       inkscape:export-xdpi="303.59399"
+       inkscape:export-ydpi="303.59399">
+      <path
+         style="fill:none;stroke:#c20000;stroke-width:6.30857;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 658.39993,149.22617 c 0,0 5.24864,3.29301 8.19195,4.11385 3.7894,1.0568 7.88378,1.56471 11.76561,0.92616 2.22009,-0.3652 4.9515,-0.78868 6.20473,-2.65726 1.15771,-1.72615 0.73547,-4.25694 0.096,-6.23455 -1.20879,-3.73826 -4.20931,-6.73068 -7.04722,-9.44767 -3.44838,-3.30145 -7.00128,-5.10424 -11.84176,-8.05548 -4.47914,-2.73092 -8.9578,-5.63474 -12.65394,-9.35753 -2.23565,-2.25178 -4.67173,-4.66156 -5.60487,-7.69436 -0.69291,-2.25204 -1.28655,-5.26186 0.23027,-7.06493 1.78016,-2.11611 5.35821,-1.6257 8.12286,-1.68556 5.83969,-0.12643 11.75559,0.96365 17.29568,2.81442 5.46765,1.82657 12.37223,3.08086 15.31156,8.03988 0.709,1.19618 0.5696,2.9371 -0.0717,4.17092 -0.70184,1.35037 -2.20735,2.34793 -3.69087,2.68742 -1.84912,0.42315 -4.08533,0.12718 -5.5994,-1.01559 -1.69999,-1.28309 -2.43784,-3.63825 -2.82022,-5.7335 -0.60588,-3.31996 -0.21377,-6.91361 0.95473,-10.08151 0.008,-0.021 0.0155,-0.0419 0.0233,-0.0628"
+         id="path42939"
+         sodipodi:nodetypes="caaaaasaaaaaaaaassc" />
+      <path
+         style="fill:#c20000;fill-opacity:1;stroke:#c20000;stroke-width:0.87619px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 657.30109,151.75524 c 0,0 -1.97148,-1.44939 -2.90577,-1.46584 -4.0895,-0.072 -7.53509,0.27972 -9.98306,-2.09414 -2.16783,-2.1022 -3.02938,-5.65745 -2.67246,-8.65601 0.18693,-1.57041 1.05038,-3.29552 2.42466,-4.07813 2.14262,-1.22016 5.01377,-0.63909 7.39706,-0.007 2.79325,0.74082 5.90958,1.90797 7.52593,4.30348 1.52673,2.26269 1.10851,8.11339 1.10851,8.11339"
+         id="path48317"
+         sodipodi:nodetypes="cssaaaac" />
+      <path
+         style="fill:#c40000;fill-opacity:1;stroke:#c20000;stroke-width:0.438095;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 673.1219,157.43678 c -3.33027,-0.25428 -6.28326,0.32741 -12.7073,-2.53633 l -7.31493,-3.73726 -2.75655,0.30006 8.02681,3.73407 c 2.55134,1.27044 5.05511,2.65958 9.64749,3.40908 10.62552,1.46652 15.58102,-1.27567 17.34759,-3.63506"
+         id="path43529"
+         sodipodi:nodetypes="ccccccc" />
+      <path
+         style="fill:#c20000;fill-opacity:1;stroke:none;stroke-width:0.87619px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 674.11877,102.49288 c 0.74683,-0.65591 0.66859,-2.46611 8.03615,-8.208929 2.3703,-1.847588 7.11175,-2.610987 10.8186,-3.83356 0,0 -5.10466,3.005338 -7.16017,5.091385 -2.3258,2.360362 -5.64079,8.185814 -5.64079,8.185814"
+         id="path46104"
+         sodipodi:nodetypes="cscsc" />
+      <path
+         style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.438095;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 657.14629,144.44562 c -4.36343,-2.40933 -5.03179,-3.3307 -5.99022,-3.92956 -0.47288,-0.29547 -0.99397,-0.87284 -0.88479,-1.41965 0.0708,-0.35463 0.52278,-0.6027 0.8834,-0.62975 1.16446,-0.0873 2.19605,0.87636 3.12397,1.58527 0.82328,0.62897 1.54693,1.4195 2.0857,2.30445 0.38668,0.63514 1.43289,2.44867 0.78194,2.08924 z"
+         id="path48770"
+         sodipodi:nodetypes="sssssss" />
+      <path
+         style="fill:#c20000;fill-opacity:1;stroke:none;stroke-width:0.438095;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 643.10485,135.71057 c -0.36052,-2.08143 -2.07525,-3.56277 -3.63948,-5.11081 l 1.81208,-0.0517 1.03517,-2.63279 0.68301,3.44342 c 0.86632,3.18972 1.03367,2.40922 1.52476,3.46757"
+         id="path49234"
+         sodipodi:nodetypes="cccccc" />
+    </g>
+    <path
+       id="path7506-3-5"
+       style="fill:url(#pattern24713);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.493004;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 37.442684,20.80881 a 7.8093594,8.8308266 0 0 1 -7.80936,8.83082 7.8093594,8.8308266 0 0 1 -7.80936,-8.83082 7.8093594,8.8308266 0 0 1 7.80936,-8.83083 7.8093594,8.8308266 0 0 1 7.80936,8.83083 z m 1.5481,0.117 a 9.348324,10.571088 0 0 1 -9.34833,10.57109 9.348324,10.571088 0 0 1 -9.34832,-10.57109 9.348324,10.571088 0 0 1 9.34832,-10.57109 9.348324,10.571088 0 0 1 9.34833,10.57109 z"
+       inkscape:export-filename="/home/akouloumvak/Desktop/Ubuntu_Bup/mysunpy/upstream/PyThea/docs/text6541.png"
+       inkscape:export-xdpi="303.59399"
+       inkscape:export-ydpi="303.59399" />
+    <path
+       style="fill:#c20000;fill-opacity:1;stroke:none;stroke-width:0.26254px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 25.159534,17.111961 c 0.24773,-3.526731 -4.43618,-3.128552 -4.74775,-3.025951 l -0.078,2.151877 c 0.60394,-0.178386 3.51983,-0.314536 3.12993,0.948102 z"
+       id="path3070"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="fill:#c20000;fill-opacity:1;stroke:none;stroke-width:0.26254px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 22.681324,23.845919 c -2.271,0.837644 -1.54187,4.770917 -1.2726,5.215321 l 1.60401,-0.327148 c -0.1245,-0.463747 -0.46167,-2.506107 0.40403,-3.421515 z"
+       id="path3070-5"
+       sodipodi:nodetypes="ccccc" />
+  </g>
+</svg>
