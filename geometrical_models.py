@@ -193,26 +193,28 @@ class spheroid:
             palete = sns.color_palette("colorblind")
             
             # Plot the part of the intersecting curve at the solar surface
-            coords = self.intersecting_curve()
-            axes_frame = axis._transform_pixel2world.frame_out
-            coord_in_axes = coords.transform_to(axes_frame)
-            rsun = getattr(axes_frame, 'rsun', u.R_sun)
-            reference_distance = np.sqrt(axes_frame.observer.radius**2 - rsun**2)
-            is_visible = coord_in_axes.spherical.distance <= reference_distance
-            if np.any(is_visible):
-                axis.plot_coord(coords[is_visible], linestyle='',  marker='+',  markersize=3, color=(0.9,0.24,0.38,1))
-                #coord_ = coords[is_visible]
-                #s = ''.join('X' if p else 'O' for p in np.diff(np.diff(coord_.lat))<5*u.deg)
-                #clist = list([m.span()[0], abs(operator.sub(*m.span()))] for m in re.finditer('X+', s))
-                #for c in clist:
-                #   axis.plot_coord(coord_[c[0]:(c[0]+c[1])], linestyle='-', linewidth=0.8, color=(0,0,0,1))
-            if np.any(~is_visible):
-                axis.plot_coord(coords[~is_visible], linestyle='',  marker="+",  markersize=3, color=(0,0,0,1))
-                #coord_ = coords[~is_visible]
-                #s = ''.join('X' if p else 'O' for p in np.diff(np.diff(coord_.lat))<5*u.deg)
-                #clist = list([m.span()[0], abs(operator.sub(*m.span()))] for m in re.finditer('X+', s))
-                #for c in clist:
-                #    axis.plot_coord(coord_[c[0]:(c[0]+c[1])], linestyle='--', linewidth=0.8, color=(0,0,0,1))
+            d_val = self.rcenter - self.radaxis
+            if d_val > -1*u.R_sun and d_val < 1*u.R_sun:
+                coords = self.intersecting_curve()
+                axes_frame = axis._transform_pixel2world.frame_out
+                coord_in_axes = coords.transform_to(axes_frame)
+                rsun = getattr(axes_frame, 'rsun', u.R_sun)
+                reference_distance = np.sqrt(axes_frame.observer.radius**2 - rsun**2)
+                is_visible = coord_in_axes.spherical.distance <= reference_distance
+                if np.any(is_visible):
+                    axis.plot_coord(coords[is_visible], linestyle='',  marker='+',  markersize=3, color=(0.9,0.24,0.38,1))
+                    #coord_ = coords[is_visible]
+                    #s = ''.join('X' if p else 'O' for p in np.diff(np.diff(coord_.lat))<5*u.deg)
+                    #clist = list([m.span()[0], abs(operator.sub(*m.span()))] for m in re.finditer('X+', s))
+                    #for c in clist:
+                    #   axis.plot_coord(coord_[c[0]:(c[0]+c[1])], linestyle='-', linewidth=0.8, color=(0,0,0,1))
+                if np.any(~is_visible):
+                    axis.plot_coord(coords[~is_visible], linestyle='',  marker="+",  markersize=3, color=(0,0,0,1))
+                    #coord_ = coords[~is_visible]
+                    #s = ''.join('X' if p else 'O' for p in np.diff(np.diff(coord_.lat))<5*u.deg)
+                    #clist = list([m.span()[0], abs(operator.sub(*m.span()))] for m in re.finditer('X+', s))
+                    #for c in clist:
+                    #    axis.plot_coord(coord_[c[0]:(c[0]+c[1])], linestyle='--', linewidth=0.8, color=(0,0,0,1))
 
             # Plot the part of the spheroid mesh but filter lines bellow the solar surface
             axis.plot_coord(self.coordinates[:,int(n/2)], color=palete[0],linestyle='-', linewidth=lw)
@@ -263,7 +265,6 @@ class ellipsoid(spheroid):
                         axis3=(0, 0, 2*self.orthoaxis2.to_value(1*u.R_sun)) )
         sic = sph.intersectWith(ell)
         poi = sic.points()
-        print(self.radaxis.to_value(1*u.R_sun))
         x, y, z = self.rotate(poi[:,0]*u.R_sun, poi[:,1]*u.R_sun, poi[:,2]*u.R_sun)
 
         return SkyCoord(CartesianRepresentation(x, y, z),

@@ -6,10 +6,11 @@ astroquery
 sunpy
 matplotlib
 seaborn
-streamlit==0.86.0
+streamlit==1.0.0
 Pillow
 stqdm
 lxml
 zeep
 drms
 tqdm
+vedo

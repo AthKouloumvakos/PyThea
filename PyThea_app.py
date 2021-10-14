@@ -250,7 +250,7 @@ def run():
     # This part runs only if the map_ doesn't exits or the session_state.map_ does not contain all the imagers requested
     if 'map_' not in st.session_state or [False for lst in imagers_list if lst not in st.session_state.map_]:
         st.session_state.map_ = {} if 'map_' not in st.session_state else st.session_state.map_
-        progress_bar = stqdm(imagers_list, desc="Preparing to Download data")
+        progress_bar = stqdm.stqdm(imagers_list, desc="Preparing to Download data")
         for imager in progress_bar:
             if imager in st.session_state.map_:
                 pass

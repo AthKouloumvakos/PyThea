@@ -1,1 +1,1 @@
-from stqdm.stqdm import stqdm
+from extensions.stqdm import stqdm
