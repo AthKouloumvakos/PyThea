@@ -184,14 +184,26 @@ class spheroid:
         z = np.reshape(v[:,2], z_.shape) * z_.unit
         return x, y, z
 
-    def plot(self, axis, redused=False):
-        if redused is False:
+    def plot(self, axis, mode='Skeleton', only_surface=False):
+        if mode == 'Full':
             axis.plot_coord(self.coordinates, color='red', linestyle='-', linewidth=0.2)
-        elif redused is True:
+        elif (mode == 'Skeleton') and (only_surface is False):
             lw = 1.
             n = self.n
             palete = sns.color_palette("colorblind")
-            
+
+            # Plot the part of the spheroid mesh but filter lines bellow the solar surface
+            axis.plot_coord(self.coordinates[:,int(n/2)], color=palete[0],linestyle='-', linewidth=lw)
+            my_plot_coord(self.coordinates[:,0], axis, color=palete[6], linestyle='-', linewidth=lw)
+            axis.plot_coord(self.coordinates[0:int(n/2)+1,int(n/4)], color=palete[1], linestyle='-', linewidth=lw)
+            axis.plot_coord(self.coordinates[int(n/2):n+1,int(n/4)], color=palete[1], linestyle='-', linewidth=lw)
+            axis.plot_coord(self.coordinates[0:int(n/2)+1,int(3*n/4)], color=palete[1], linestyle='-', linewidth=lw)
+            axis.plot_coord(self.coordinates[int(n/2):n+1,int(3*n/4)], color=palete[1], linestyle='-', linewidth=lw)
+            my_plot_coord(self.coordinates[int(n/2),0:int(n/4)+1], axis, color=palete[2],linestyle='-', linewidth=lw)
+            my_plot_coord(self.coordinates[int(n/2),int(3*n/4):n+1], axis, color=palete[2],linestyle='-', linewidth=lw)
+            axis.plot_coord(self.coordinates[int(n/2),int(n/4):int(3*n/4)+1], color=palete[3],linestyle='-', linewidth=lw)
+
+        if (mode == 'Skeleton') or (only_surface is True):
             # Plot the part of the intersecting curve at the solar surface
             d_val = self.rcenter - self.radaxis
             if d_val > -1*u.R_sun and d_val < 1*u.R_sun:
@@ -216,20 +228,10 @@ class spheroid:
                     #for c in clist:
                     #    axis.plot_coord(coord_[c[0]:(c[0]+c[1])], linestyle='--', linewidth=0.8, color=(0,0,0,1))
 
-            # Plot the part of the spheroid mesh but filter lines bellow the solar surface
-            axis.plot_coord(self.coordinates[:,int(n/2)], color=palete[0],linestyle='-', linewidth=lw)
-            my_plot_coord(self.coordinates[:,0], axis, color=palete[6], linestyle='-', linewidth=lw)
-            axis.plot_coord(self.coordinates[0:int(n/2)+1,int(n/4)], color=palete[1], linestyle='-', linewidth=lw)
-            axis.plot_coord(self.coordinates[int(n/2):n+1,int(n/4)], color=palete[1], linestyle='-', linewidth=lw)
-            axis.plot_coord(self.coordinates[0:int(n/2)+1,int(3*n/4)], color=palete[1], linestyle='-', linewidth=lw)
-            axis.plot_coord(self.coordinates[int(n/2):n+1,int(3*n/4)], color=palete[1], linestyle='-', linewidth=lw)
-            my_plot_coord(self.coordinates[int(n/2),0:int(n/4)+1], axis, color=palete[2],linestyle='-', linewidth=lw)
-            my_plot_coord(self.coordinates[int(n/2),int(3*n/4):n+1], axis, color=palete[2],linestyle='-', linewidth=lw)
-            axis.plot_coord(self.coordinates[int(n/2),int(n/4):int(3*n/4)+1], color=palete[3],linestyle='-', linewidth=lw)
-            axis.plot_coord(self.apex, marker = 'o',color=(0,0,0,1))
-            axis.plot_coord(self.base, marker = 'x',color=(0,0,0,1))
-            axis.plot_coord(self.center, marker = '+',color=(0,0,0,1))
-            axis.plot_coord(concatenate((self.apex, self.base)),linestyle='-', linewidth=0.5, color=(0,0,0,1))
+        axis.plot_coord(self.apex, marker = 'o',color=(0,0,0,1))
+        axis.plot_coord(self.base, marker = 'x',color=(0,0,0,1))
+        axis.plot_coord(self.center, marker = '+',color=(0,0,0,1))
+        axis.plot_coord(concatenate((self.apex, self.base)),linestyle='-', linewidth=0.5, color=(0,0,0,1))
 
     def to_dataframe(self):
         center_ = self.center.transform_to(frames.HeliographicCarrington)
@@ -466,7 +468,7 @@ class gcs():
 
         return mesh[:,0], mesh[:,1], mesh[:,2]
 
-    def plot(self, axis, redused=False):
+    def plot(self, axis, mode=False):
         axis.plot_coord(self.coordinates, color='red', linestyle='-', linewidth=0.4)
         
     def to_dataframe(self):

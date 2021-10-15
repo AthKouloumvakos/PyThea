@@ -337,11 +337,14 @@ def run():
     #############################################################
     # Plot main and supplement figure images
     fig, axis = make_figure(running_map, image_mode, clim=clim)
-    if st.session_state.plot_mesh_mode == 'Simple':  # 'No plot',,'Full'
-        model.plot(axis, redused=True)
+    if st.session_state.plot_mesh_mode == 'Skeleton':
+        model.plot(axis, mode='Skeleton')
     if st.session_state.plot_mesh_mode == 'Full':
-        model.plot(axis, redused=True)
-        model.plot(axis)
+        model.plot(axis, mode='Skeleton')
+        model.plot(axis, mode='Full')
+    if st.session_state.plot_mesh_mode == 'Surface':
+        model.plot(axis, only_surface=True)
+
     if star_field is True:
         plot_bodies(axis, bodies_list, running_map)
         axis.legend()
@@ -356,11 +359,11 @@ def run():
         col1, col2 = st.columns(2)
         fig, axis = make_figure(get_closest(st.session_state.map[supl_imagers[0]],
                                 running_map_date), image_mode)
-        model.plot(axis, redused=True)
+        model.plot(axis, mode='Skeleton')
         col1.pyplot(fig)
         fig, axis = make_figure(get_closest(st.session_state.map[supl_imagers[1]],
                                             running_map_date), image_mode)
-        model.plot(axis, redused=True)
+        model.plot(axis, mode='Skeleton')
         col2.pyplot(fig)
 
     #############################################################

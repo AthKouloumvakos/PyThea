@@ -82,8 +82,8 @@ def fitting_and_slider_options_container(st):
         st.selectbox('Adjustments mode', options=['Standard', '<10Rsun', '>10Rsun', '>30Rsun'],
             key='sliders_adjustment_mode')
 
-        st.select_slider("Plot option for fitting mesh", options=['No plot','Simple','Full'],
-            value='Simple', key='plot_mesh_mode')
+        st.select_slider("Plot option for fitting mesh", options=['No plot','Skeleton','Full', 'Surface'],
+            value='Skeleton', key='plot_mesh_mode')
 
         fitting_table = st.checkbox("View Fitting Table", value=False, key='fitting_table')
 
