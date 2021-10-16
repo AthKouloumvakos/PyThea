@@ -110,7 +110,7 @@ def run():
                 .reportview-container .main .block-container{{
                 padding-top: {padding}rem;
                 margin-top: -3.5rem;
-                max-width: 45rem;
+                max-width: 50rem;
                 padding-right: {padding}rem;
                 padding-left: {padding}rem;
                 padding-bottom: {padding}rem;
@@ -225,17 +225,20 @@ def run():
     # 3D Fitting and Reconstruction
     st.sidebar.markdown('## Imaging menu')
     with st.sidebar.expander('Download Options'):
-        downoption_container = st.container()
-        imagers_list = downoption_container.multiselect('Select Imagers',
+        select_imagers_form = st.form(key='select_imagers_form')
+        imagers_list = select_imagers_form.multiselect('Select Imagers',
                                       options=imager_dict.keys(),
                                       default=['LC2', 'LC3', 'COR2A'],
-                                      key='imagers_list',
-                                      on_change=delete_from_state,
-                                      args=[st], kwargs={'var': 'map'})
-        imaging_time_range = downoption_container.slider('Time Range [hours]',
-                                                      -1., 6., [-1., 1.], 0.5,
-                                                      key='imaging_time_range',
-                                                      on_change=delete_from_state,
+                                      key='imagers_list')
+        submit_button = select_imagers_form.form_submit_button(label='Submit',
+                                                   on_click=delete_from_state,
+                                                   args=[st], kwargs={'var': 'map'})
+        select_timerange_form = st.form(key='select_timerange_form')
+        imaging_time_range = select_timerange_form.slider('Time Range [hours]',
+                                                       -1., 6., [-1., 1.], 0.5,
+                                                       key='imaging_time_range')
+        submit_button = select_timerange_form.form_submit_button(label='Submit',
+                                                      on_click=delete_from_state,
                                                       args=[st], kwargs={'var': 'map_'})
 
     with st.sidebar.expander('Processing Options'):
