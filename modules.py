@@ -109,10 +109,11 @@ def fitting_sliders(st):
        rmode = st.session_state.sliders_repr_mode
        sliders = options[gmodel][rmode]
        for slider in sliders:
+           def_val = sd[gmodel][slider][adjustments]['def'] if slider not in st.session_state else st.session_state[slider]
            st.sidebar.slider(f'{slider} {sd[gmodel][slider]["unit"]}:', # Add units here
-                              sd[gmodel][slider][adjustments]['min'],
-                              sd[gmodel][slider][adjustments]['max'],
-                              sd[gmodel][slider][adjustments]['def'],
+                              min_value=sd[gmodel][slider][adjustments]['min'],
+                              max_value=sd[gmodel][slider][adjustments]['max'],
+                              value=def_val,
                               step=sd[gmodel][slider][adjustments]['step'], key=slider) # * u.R_sun
 
 def final_parameters_gmodel(st):

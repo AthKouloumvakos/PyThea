@@ -199,11 +199,21 @@ def run():
         long_val = [0., 360.]
     elif st.session_state.coord_system == 'HGS':
         long_val = [-180., 180.]
+        
+    def_val = 0. if 'longit' not in st.session_state else st.session_state['longit']
     longit = st.sidebar.slider(f'{st.session_state.coord_system} \
-                                     Longitude [deg.]:', long_val[0], long_val[1], 0.,
+                                     Longitude [deg.]:',
+                                     min_value=long_val[0],
+                                     max_value=long_val[1],
+                                     value=def_val,
                                      step=0.01, key='longit') * u.degree
+
+    def_val = 0. if 'latitu' not in st.session_state else st.session_state['latitu']
     latitu = st.sidebar.slider(f'{st.session_state.coord_system} \
-                                 Latitude [deg.]:', -90., 90., 0.,
+                                 Latitude [deg.]:',
+                                 min_value=-90.,
+                                 max_value=90.,
+                                 value=def_val,
                                  step=0.01, key='latitu') * u.degree
 
     fitting_sliders(st)
@@ -378,7 +388,9 @@ def run():
             col2.selectbox("Select a fitting",
                 options=st.session_state.model_fittings.parameters.index,
                 key='fitting_select')
-            fit_action = col1.selectbox('Action',
+            if "fit_action" not in st.session_state:
+                st.session_state.fit_action = 'Select'
+            col1.selectbox('Action',
                 options=['Select', 'Load', 'Delete'],
                 on_change=load_or_delete_fittings, args=[st],
                 key='fit_action')
