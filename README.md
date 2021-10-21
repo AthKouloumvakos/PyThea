@@ -1,4 +1,4 @@
-# PyThea: A software package to perform forward modeling of CMEs and shock waves
+# PyThea: A software package to reconstruct the 3D structure of CMEs and shock waves
 
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 [![Version](https://img.shields.io/github/v/release/AthKouloumvakos/PyThea)](https://github.com/AthKouloumvakos/PyThea/releases)
@@ -7,7 +7,7 @@
 
 ![Logo](https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_logo.png)
 
-_PyThea_ is an open-source software package that can be used to perform coronal mass ejection (CME) and shock wave forward modeling using remote-sensing observations. The tool implements various geometrical models that can be used to reconstruct CME and shock waves. It also implements remote-sensing observations from multiple viewpoints such as the Solar and Heliospheric Observatory (SoHO) and Solar Terrestrial Relations Observatory (STEREO). An online preview of this tool is available at [https://athkouloumvakos.github.io/PyThea](https://athkouloumvakos.github.io/PyThea).
+_PyThea_ is an open-source software package that can be used to reconstruct the 3D structure of Coronal Mass Ejections (CMEs) and shock waves and determine their kinematics using remote-sensing observations. The tool implements the Graduate Cylindrical Shell (GCS) model that can be used to reconstruct CMEs and two geometrical models, namely a spheroid and ellipsoid model to reconstruct shock waves. It also implements remote-sensing observations from multiple viewpoints such as the Solar and Heliospheric Observatory (SoHO) and Solar Terrestrial Relations Observatory (STEREO). An online preview of this tool is available at [https://athkouloumvakos.github.io/PyThea](https://athkouloumvakos.github.io/PyThea).
 
 ## 💾 Installation
 
@@ -74,7 +74,7 @@ Complete documentation of the _PyThea_ can be found in (under construction)
 
 [![TBD](https://zenodo.org/badge/DOI/TBD/TBD.svg)](https://doi.org/TBD/TBD)
 
-If you use _PyThea_ for scientific work or research presented in a publication, please cite this package by including in the methods or acknowledgement section the following: "This research has made use of PyThea v?.?.? (cite software), an open-source and free Python package (cite paper).". The paper citation should be to the _PyThea_ (TBD) paper, and the software citation to the Zenodo DOI (TBD). _PyThea_ has a strong dependency to SunPy and AstroPy Python packages, consider citing these packages as well. To acknowledge _PyThea_ in posters or talks include the project [logo](https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_logo.png) or [icon](https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_icon.png).
+If you use _PyThea_ for scientific work or research presented in a publication, please cite this package by including in the methods or acknowledgement section the following: "This research has made use of PyThea v?.?.? (cite software), an open-source and free Python package (cite paper).". The paper citation should be to the _PyThea_ paper (TBA), and the software citation to the Zenodo DOI (TBA). _PyThea_ has a strong dependency to SunPy and AstroPy Python packages, consider citing these packages as well. To acknowledge _PyThea_ in posters or talks include the project [logo](https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_logo.png) or [icon](https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_icon.png).
 
 ## ⓘ The mythology of Thea:
 

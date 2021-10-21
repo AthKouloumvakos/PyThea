@@ -632,8 +632,8 @@ to attach them to the start of each source file to most effectively
 state the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
-    PyThea: A software package to perform forward modeling of CMEs and
-    shock waves using multi-viewpoint remote-sensing observations.
+    PyThea: A software package to reconstruct the 3D structure of CMEs
+    and shock waves using multi-viewpoint remote-sensing observations.
     Copyright (C) 2021  Athanasios Kouloumvakos
 
     This program is free software: you can redistribute it and/or modify

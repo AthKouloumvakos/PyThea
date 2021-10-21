@@ -71,12 +71,14 @@ def delete_from_state(state, var):
 def footer_text():
     st.subheader('About this application:')
     st.markdown("""
-                   _PyThea_ is an open-source software package that can be
-                   used to perform forward modeling of coronal mass ejections 
-                   (CMEs) and shock waves, using various geometrical models and
-                   remote-sensing observations from multiple viewpoints such as
-                   images from the Solar Terrestrial Relations Observatory (STEREO)
-                   mission.
+                   _PyThea_  is an open-source software package that can be used to
+                   reconstruct the 3D structure of Coronal Mass Ejections (CMEs) and
+                   shock waves and determine their kinematics using remote-sensing observations. 
+                   The tool implements the Graduate Cylindrical Shell (GCS) model that can be used
+                   to reconstruct CMEs and two geometrical models, namely a spheroid and ellipsoid model
+                   to reconstruct shock waves. It also implements remote-sensing observations
+                   from multiple viewpoints such as the SOlar and Heliospheric Observatory (SOHO)
+                   and Solar Terrestrial Relations Observatory (STEREO).
 
                    **Github**: You can find the latest version of PyThea 
                                [here](https://github.com/AthKouloumvakos/PyThea).
@@ -153,7 +155,7 @@ def run():
 
     #############################################################
     # Main page information text
-    st.title('PyThea: Forward model CMEs & Shocks')
+    st.title('PyThea: Reconstruct CMEs & Shocks')
     st.markdown("""
                 ** ⏻ Select a day & solar event and then the
                 geometrical model you want to fit.**
