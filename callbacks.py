@@ -25,13 +25,14 @@ def load_or_delete_fittings(st):
             if key in st.session_state:
                 #del st.session_state[key]
                 st.session_state[key] = float(dataframe.loc[selected_row,key])
+        del st.session_state.fit_action
     elif st.session_state.fit_action == 'Delete':
         st.session_state.model_fittings.parameters = dataframe.drop(st.session_state.fitting_select)
         del st.session_state.fitting_select
         if len(st.session_state.model_fittings.parameters)<1:
             del st.session_state.model_fittings
+        del st.session_state.fit_action
     
-    del st.session_state.fit_action
 
 def change_long_lat_sliders(st):
     if st.session_state.coord_system == 'HGS':

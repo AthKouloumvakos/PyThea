@@ -201,21 +201,19 @@ def run():
         long_val = [0., 360.]
     elif st.session_state.coord_system == 'HGS':
         long_val = [-180., 180.]
-        
-    def_val = 0. if 'longit' not in st.session_state else st.session_state['longit']
+
+    if 'longit' not in st.session_state: st.session_state.longit = 0
     longit = st.sidebar.slider(f'{st.session_state.coord_system} \
                                      Longitude [deg.]:',
                                      min_value=long_val[0],
                                      max_value=long_val[1],
-                                     value=def_val,
                                      step=0.01, key='longit') * u.degree
 
-    def_val = 0. if 'latitu' not in st.session_state else st.session_state['latitu']
+    if 'latitu' not in st.session_state: st.session_state.latitu = 0
     latitu = st.sidebar.slider(f'{st.session_state.coord_system} \
                                  Latitude [deg.]:',
                                  min_value=-90.,
                                  max_value=90.,
-                                 value=def_val,
                                  step=0.01, key='latitu') * u.degree
 
     fitting_sliders(st)
