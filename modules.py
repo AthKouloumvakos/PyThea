@@ -53,13 +53,13 @@ def date_and_event_selection(st):
             fitting = json.loads(uploaded_file.read())
             st.session_state.event_selected = fitting["event_selected"]
             st.session_state.date_process  = datetime.datetime.strptime(fitting["date_process"], "%Y-%m-%dT%H:%M:%S.%f")
-            st.session_state.geometrical_model = fitting["geometrical_model"]
-            table_indx = [datetime.datetime.strptime(t, "%Y-%m-%dT%H:%M:%S.%f") for t in fitting["parameters"]["time"]]
-            parameters = pd.DataFrame(fitting["parameters"], index=table_indx)
+            st.session_state.geometrical_model = fitting["geometrical_model"]["type"]
+            table_indx = [datetime.datetime.strptime(t, "%Y-%m-%dT%H:%M:%S.%f") for t in fitting["geometrical_model"]["parameters"]["time"]]
+            parameters = pd.DataFrame(fitting["geometrical_model"]["parameters"], index=table_indx)
             parameters = parameters.drop(['time'], axis=1)
             st.session_state.model_fittings = model_fittings(fitting["event_selected"],
                                                              fitting["date_process"],
-                                                             fitting["geometrical_model"],
+                                                             fitting["geometrical_model"]["type"],
                                                              parameters)
             st.experimental_rerun()
 

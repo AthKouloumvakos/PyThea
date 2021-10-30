@@ -246,8 +246,8 @@ class model_fittings:
         parameters = parameters.to_dict(orient='list')
         fitting_full_file = {'event_selected': self.event_selected,
                              'date_process': self.date_process,
-                             'geometrical_model': self.geometrical_model,
-                             'parameters': parameters
+                             'geometrical_model': {'type':self.geometrical_model,
+                                                   'parameters': parameters},
                              }
         json_buffer = io.BytesIO()
         json_buffer.write(json.dumps(fitting_full_file,indent=' ').encode())
