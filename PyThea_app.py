@@ -1,5 +1,5 @@
 """
-    PyThea: A software package to perform forward modeling of CMEs and
+    PyThea: A software package to reconstruct the 3D structure of CMEs and
     shock waves using multi-viewpoint remote-sensing observations.
     Copyright (C) 2021  Athanasios Kouloumvakos
 
@@ -252,6 +252,7 @@ def run():
 
     with st.sidebar.expander('Plot/View Options'):
         plotviewopt_container = st.container()
+        clip_model = plotviewopt_container.checkbox("Clip plot on image limits", value=True)
         plt_supp_imagers = plotviewopt_container.checkbox("Supplementary Imaging", value=False)
         star_field = plotviewopt_container.checkbox("View Bodies or s/c")
         if star_field is True:
@@ -336,7 +337,7 @@ def run():
 
     #############################################################
     # Plot main and supplement figure images
-    fig, axis = make_figure(running_map, image_mode, clim=clim)
+    fig, axis = make_figure(running_map, image_mode, clim=clim, clip_model=clip_model)
     if st.session_state.plot_mesh_mode == 'Skeleton':
         model.plot(axis, mode='Skeleton')
     if st.session_state.plot_mesh_mode == 'Full':
