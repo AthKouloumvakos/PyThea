@@ -404,23 +404,33 @@ def run():
        (st.session_state.plt_kinematics is True):
         st.markdown('---')
         st.markdown('### Plots of kinematics ')
-        col1, col2 = st.columns((1, 3))
+        col1, col2, col3 = st.columns(3)
         plt_kinematics_select = col1.selectbox('Select Plots',
                                                options=['All', 'HeightT', 'SpeedT'])
-        polyfit_order = col2.slider('Polynomial order', 1, 4, 2, 1, key='polyfit_order')
+        fit_mode = col2.selectbox('Select Fitting Mode',
+                                  options=['Polynomial', 'Spline'])
+        if fit_mode == 'Polynomial':
+            polyfit_order = col3.slider('Polynomial order', 1, 4, 2, 1, key='polyfit_order')
+            fit_args_ = {'type':'poly','order':polyfit_order}
+        else:
+            splinefit_order = col3.slider('Spline order', 1, 5, 3, 1, key='splinefit_order')
+            splinefit_smooth = st.slider('Spline smooth', 0., 1., 0.5, 0.01, key='splinefit_smooth')
+            fit_args_ = {'type':'spline','order':splinefit_order, 'smooth':splinefit_smooth}
+            
+
         if plt_kinematics_select == 'All':
             col1, col2 = st.columns(2)
             fig_ht = plot_fitting_model(st.session_state.model_fittings,
-                                        order=polyfit_order,
+                                        fit_args=fit_args_,
                                         plt_type='HeightT')
             col1.pyplot(fig_ht)
             fig_vt = plot_fitting_model(st.session_state.model_fittings,
-                                        order=polyfit_order,
+                                        fit_args=fit_args_,
                                         plt_type='SpeedT')
             col2.pyplot(fig_vt)
         else:
             fig = plot_fitting_model(st.session_state.model_fittings,
-                                     order=polyfit_order,
+                                     fit_args=fit_args_,
                                      plt_type=plt_kinematics_select)
             st.pyplot(fig)
 

@@ -44,6 +44,7 @@ from astropy.coordinates import (
 import json
 from copy import copy
 from scipy.optimize import curve_fit
+from scipy.interpolate import UnivariateSpline
 import seaborn as sns
 
 from config.selected_imagers import imager_dict
@@ -250,7 +251,7 @@ class model_fittings:
 
         return json_buffer
 
-def plot_fitting_model(model, order=2, plt_type='HeightT'):
+def plot_fitting_model(model, fit_args, plt_type='HeightT'):
     palete = sns.color_palette("deep")
     parameters = {'Spheroid': 
                              {'height': ['+', '', palete[3], 'h-apex'],
@@ -276,33 +277,39 @@ def plot_fitting_model(model, order=2, plt_type='HeightT'):
                      linestyle=parameters[p][1],
                      color=parameters[p][2],
                      label=parameters[p][3]) # label='fit: a=%5.3f, b=%5.3f, c=%5.3f' % tuple(popt)
-            if len(model.parameters[p])-1>order:
+            if len(model.parameters[p])-1 > fit_args['order']:
                 # How to get confidence intervals from curve_fit?
-                fit = parameter_fit(model.parameters.index, model.parameters[p], order)
+                fit = parameter_fit(model.parameters.index, model.parameters[p], fit_args)
                 plt.plot(fit['best_fit_x'], fit['best_fit_y'], '-', color=parameters[p][2])
-                plt.fill_between(fit['best_fit_x'], fit['bound_lower'], fit['bound_upper'],
-                                color = parameters[p][2], alpha = 0.15)
+                plt.fill_between(fit['best_fit_x'], fit['sigma_bounds']['up'], fit['sigma_bounds']['low'],
+                                 color = parameters[p][2], alpha = 0.20)
+                if fit_args['type'] == 'spline':
+                    plt.fill_between(fit['best_fit_x'], fit['sigv_bounds']['up'], fit['sigv_bounds']['low'],
+                                     color = parameters[p][2], alpha = 0.05)
             else:
                 plt.plot(model.parameters.index, model.parameters[p], '--', color=parameters[p][2])
             ylabel = 'Height [Rsun]'
         elif plt_type == 'SpeedT':
-            if len(model.parameters[p])-1>order:
+            if len(model.parameters[p])-1 > fit_args['order']:
                 # How to get confidence intervals from curve_fit?
-                fit = parameter_fit(model.parameters.index, model.parameters[p], order)
+                fit = parameter_fit(model.parameters.index, model.parameters[p], fit_args)
                 Rs2km = (1 * u.R_sun).to_value(u.km)
                 sec = 24*60*60
                 speed_best_fit = (Rs2km/sec) * np.gradient(fit['best_fit_y'], fit['best_fit_x_num'])
-                speed_bound_upper = (Rs2km/sec) * np.gradient(fit['bound_upper'], fit['best_fit_x_num'])
-                speed_bound_lower = (Rs2km/sec) * np.gradient(fit['bound_lower'], fit['best_fit_x_num'])
+                speed_bound_upper = (Rs2km/sec) * np.gradient(fit['sigma_bounds']['up'], fit['best_fit_x_num'])
+                speed_bound_lower = (Rs2km/sec) * np.gradient(fit['sigma_bounds']['low'], fit['best_fit_x_num'])
                 plt.plot(fit['best_fit_x'], speed_best_fit, '-', color=parameters[p][2], label=parameters[p][3])
                 plt.fill_between(fit['best_fit_x'], speed_bound_lower, speed_bound_upper,
-                                 color = parameters[p][2], alpha = 0.15)
+                                 color = parameters[p][2], alpha = 0.20)
+                if fit_args['type'] == 'spline':
+                    plt.fill_between(fit['best_fit_x'], (Rs2km/sec) * fit['sigv_bounds']['dlow'], (Rs2km/sec) * fit['sigv_bounds']['dup'],
+                                     color = parameters[p][2], alpha = 0.05)
             else:
                 pass
             ylabel = 'Speed [km/s]'
     plt.xlabel('Time [UT]')
     plt.ylabel(ylabel)
-    plt.title('Event: '+model.event_selected)
+    plt.title('Event: '+model.event_selected+' | ' + fit_args['type'] + str(fit_args['order']))
     plt.gca().set_ylim(bottom=0)
     axis.xaxis.set_major_formatter(mdates.DateFormatter("%Y\n%b-%d\n%H:%M"))
     fig.autofmt_xdate(bottom=0, rotation=0, ha='center')
@@ -310,25 +317,56 @@ def plot_fitting_model(model, order=2, plt_type='HeightT'):
 
     return fig
 
-def parameter_fit(x, y, order=2):
+def parameter_fit(x, y, fit_args):
     def fit_func(x, a, b, c):
         return a * x**2 + b * x + c
+        
     xx = (mdates.date2num(x) - mdates.date2num(x[0]))
-    ## scipy.optimize.curve_fit and numpy.polyfit
-    popt, pcov = np.polyfit(xx, y, order, full=False, cov=True) #curve_fit(fit_func, xx, y)
-    sigma = np.sqrt(np.diagonal(pcov))
     xxx = np.linspace(xx.min(), xx.max(), 120)
     dd = mdates.num2date(xxx + mdates.date2num(x[0]))
-    best_fit = np.polyval(popt, xxx) #fit_func(xxx, *popt)
-    bound_upper = np.polyval((popt + sigma), xxx) #fit_func(xxx, *(popt + sigma))
-    bound_lower = np.polyval((popt - sigma), xxx) #fit_func(xxx, *(popt - sigma))
-    fitting = {'popt': popt,
-               'pcov': pcov,
-               'sigma': sigma,
-               'best_fit_x_num': xxx,
-               'best_fit_x': dd,
-               'best_fit_y': best_fit,
-               'bound_upper': bound_upper,
-               'bound_lower': bound_lower
-               }
+    
+    if fit_args['type'] == 'poly':
+        ## scipy.optimize.curve_fit and numpy.polyfit
+        popt, pcov = np.polyfit(xx, y, fit_args['order'], full=False, cov=True) #curve_fit(fit_func, xx, y)
+        sigma = np.sqrt(np.diagonal(pcov)) # calculate sigma from covariance matrix
+        best_fit = np.polyval(popt, xxx) #fit_func(xxx, *popt)
+        sigma_bound_up = np.polyval((popt + sigma), xxx) #fit_func(xxx, *(popt + sigma))
+        sigma_bound_low = np.polyval((popt - sigma), xxx) #fit_func(xxx, *(popt - sigma))
+        fitting = {'popt': popt,
+                   'pcov': pcov,
+                   'sigma': sigma,
+                   'best_fit_x_num': xxx,
+                   'best_fit_x': dd,
+                   'best_fit_y': best_fit,
+                   'sigma_bounds': {'up':sigma_bound_up,
+                                    'low':sigma_bound_low},
+                   }
+    elif fit_args['type'] == 'spline':
+        spl = UnivariateSpline(xx, y, s=fit_args['smooth'], k=fit_args['order'])
+        resid = y - spl(xx) # true - prediction
+        sigma = np.nanstd(resid, axis=0) # sigma = std(res)
+        best_fit = spl(xxx)
+        sigma_bound_up = best_fit + sigma
+        sigma_bound_low = best_fit - sigma
+        
+        sv_bound_up, sv_bound_low, sv_bound_dup, sv_bound_dlow = best_fit, best_fit, np.gradient(best_fit, xxx), np.gradient(best_fit, xxx)
+        for i in range(0,100):
+            spl = UnivariateSpline(xx, y, s=i/100, k=fit_args['order']);
+            sv_bound_up = np.maximum(sv_bound_up, spl(xxx))
+            sv_bound_low = np.minimum(sv_bound_low, spl(xxx))
+            sv_bound_dup = np.maximum(sv_bound_dup, np.gradient(spl(xxx), xxx))
+            sv_bound_dlow = np.minimum(sv_bound_dlow, np.gradient(spl(xxx), xxx))
+            
+        fitting = {'spl': spl,
+                   'sigma': sigma,
+                   'best_fit_x_num': xxx,
+                   'best_fit_x': dd,
+                   'best_fit_y': best_fit,
+                   'sigma_bounds': {'up':sigma_bound_up,
+                                    'low':sigma_bound_low},
+                   'sigv_bounds': {'up':sv_bound_up,
+                                   'low':sv_bound_low,
+                                   'dup':sv_bound_dup,
+                                   'dlow':sv_bound_dlow},
+                   }
     return fitting
