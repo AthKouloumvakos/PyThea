@@ -1,1 +1,1 @@
-web: sh setup.sh && streamlit run PyThea_app.py
+web: sh setup.sh && streamlit run PyThea/PyThea_app.py
