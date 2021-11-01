@@ -17,3 +17,5 @@ dependencies:
   - seaborn
   - vedo
   - opencv-python-headless
+  - pytest-astropy
+  - pytest-sugar

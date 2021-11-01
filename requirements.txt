@@ -14,3 +14,5 @@ zeep
 drms
 tqdm
 vedo
+pytest-astropy
+pytest-sugar

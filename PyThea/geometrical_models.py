@@ -144,7 +144,7 @@ class spheroid:
 
     @staticmethod
     @u.quantity_input
-    def heka_to_rabc(rc: (u.R_sun), radaxis: (u.R_sun), orthoaxis1: (u.R_sun)):
+    def hek_from_rab(rc: (u.R_sun), radaxis: (u.R_sun), orthoaxis1: (u.R_sun)):
         height = rc + radaxis
         kappa = orthoaxis1 / (height - 1* u.R_sun)
 
@@ -157,11 +157,11 @@ class spheroid:
         else:
             height, kappa, epsilon = np.nan * u.R_sun, np.nan, np.nan
 
-        return height, kappa, epsilon
+        return height, epsilon, kappa
 
     @staticmethod
     @u.quantity_input
-    def rabc_to_heka(height: (u.R_sun), kappa, epsilon):
+    def rab_from_hek(height: (u.R_sun), epsilon, kappa):
         s = kappa * (height - 1. * u.R_sun)
         if epsilon<0:
             d = s * np.sqrt(1. - epsilon**2)
@@ -408,7 +408,7 @@ class ellipsoid(spheroid):
 
     @staticmethod
     @u.quantity_input
-    def heka_to_rabc(rc: (u.R_sun), radaxis: (u.R_sun), orthoaxis1: (u.R_sun), orthoaxis2: (u.R_sun)):
+    def heka_from_rabc(rc: (u.R_sun), radaxis: (u.R_sun), orthoaxis1: (u.R_sun), orthoaxis2: (u.R_sun)):
         height = rc + radaxis
         kappa = orthoaxis1 / (height - 1* u.R_sun)
         alpha = orthoaxis1 / orthoaxis2
@@ -422,11 +422,11 @@ class ellipsoid(spheroid):
         else:
             height, kappa, epsilon, alpha = np.nan * u.R_sun, np.nan, np.nan, np.nan
 
-        return height, kappa, epsilon, alpha
+        return height, epsilon, kappa, alpha
 
     @staticmethod
     @u.quantity_input
-    def rabc_to_heka(height: (u.R_sun), kappa, epsilon, alpha):
+    def rabc_from_heka(height: (u.R_sun), epsilon, kappa, alpha):
         s = kappa * (height - 1. * u.R_sun)
         if epsilon<0:
             d = s * np.sqrt(1. - epsilon**2)

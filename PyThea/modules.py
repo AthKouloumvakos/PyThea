@@ -113,9 +113,9 @@ def fitting_sliders(st):
 def final_parameters_gmodel(st):
     if st.session_state.geometrical_model=='Spheroid':
         if st.session_state.sliders_repr_mode=='h, e, k':
-            rcenter, radaxis, orthoaxis1 = spheroid.rabc_to_heka(st.session_state.height * u.R_sun,
-                                                                 st.session_state.kappa,
-                                                                 st.session_state.epsilon)
+            rcenter, radaxis, orthoaxis1 = spheroid.rab_from_hek(st.session_state.height * u.R_sun,
+                                                                 st.session_state.epsilon,
+                                                                 st.session_state.kappa)
         elif st.session_state.sliders_repr_mode=='r, a, b':
             rcenter, radaxis, orthoaxis1 = st.session_state.rcenter * u.R_sun, \
                                            st.session_state.radaxis * u.R_sun, \
@@ -123,10 +123,10 @@ def final_parameters_gmodel(st):
         return rcenter, radaxis, orthoaxis1
     elif st.session_state.geometrical_model=='Ellipsoid':
         if st.session_state.sliders_repr_mode=='h, e, k, a':
-            rcenter, radaxis, orthoaxis1, orthoaxis2 = ellipsoid.rabc_to_heka(st.session_state.height * u.R_sun,
-                                                                              st.session_state.kappa,
-                                                                              st.session_state.epsilon,
-                                                                              st.session_state.alpha)
+            rcenter, radaxis, orthoaxis1, orthoaxis2 = ellipsoid.rabc_from_heka(st.session_state.height * u.R_sun,
+                                                                                st.session_state.epsilon,
+                                                                                st.session_state.kappa,
+                                                                                st.session_state.alpha)
         elif st.session_state.sliders_repr_mode=='r, a, b, c':
             rcenter, radaxis, orthoaxis1, orthoaxis2 = st.session_state.rcenter * u.R_sun, \
                                                        st.session_state.radaxis * u.R_sun, \
