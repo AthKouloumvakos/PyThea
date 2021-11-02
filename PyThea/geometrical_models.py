@@ -1,5 +1,5 @@
 """
-    PyThea: A software package to perform forward modeling of CMEs and
+    PyThea: A software package to reconstruct the 3D structure of CMEs and
     shock waves using multi-viewpoint remote-sensing observations.
     Copyright (C) 2021  Athanasios Kouloumvakos
 
@@ -39,10 +39,8 @@ import operator
 
 def sphere(n= 20, plot = 0):
     """
-    @summary: generates three (n+1)-by-((N+1) matrices representing the coordinates of a unit sphere
-    @param n: number of points in x and y
-    @return: x,y,z coordinates of the unit sphere
-        
+    Returns the (x,y,z) coordinates of a unit sphere centred at the origin.
+    The coordinates are (n+1)-by-(n+1) matrices.       
     """
 
     theta = np.linspace( -np.pi, np.pi, n+1)
@@ -61,6 +59,33 @@ def sphere(n= 20, plot = 0):
     return [x, y, z]
 
 class spheroid:
+    '''
+    A class for the spheroid model.
+    
+    Parameters
+    ----------
+    center : `~astropy.coordinates.SkyCoord`
+        The coordinates of the spheroid center.
+    rcenter : `~astropy.units.Quantity`
+        The radial distance of the spheroid center from the solar center.
+    radaxis : `~astropy.units.Quantity`
+        The spheroid's first (radial) semi-axis length.
+    orthoaxis1 : `~astropy.units.Quantity`
+        The spheroid's second semi-axis length (orthogonal axis wrt the radial axis).
+    height : `~astropy.units.Quantity`
+        The radial distance of the spheroid apex from the solar center (e.g., rcenter+radaxis).
+    kappa : `~astropy.units.Quantity`
+        Spheroid self-similar constant, defined as the ratio of the apex height to the length
+        of the orthoaxis1. (This is proportional to the aspect ratio of the spheroid)
+    epsilon : `~astropy.units.Quantity`
+        The eccentricity of the spheroid.
+
+    Notes
+    -----
+    Details about spheroids can be found here: https://en.wikipedia.org/wiki/Spheroid
+    The second and third semi-axis are equal in the spheroid. If all the axis are equal we have a sphere.
+    Tilt defaults to zero, since any rotation along the radial axis is trivial for the spheroid.
+    '''
     @u.quantity_input
     def __init__(self, center, radaxis: (u.R_sun), orthoaxis1: (u.R_sun), n=40):
         self.center = center.transform_to(frames.HeliographicStonyhurst) # This is the SkyCoord of the ellipsoid center
@@ -83,6 +108,9 @@ class spheroid:
     
     @property
     def coordinates(self):
+        """
+        Returns the coordinates of the spheroid cloud of points as `~astropy.coordinates.SkyCoord`.
+        """
         [x__, y__, z__] = sphere(self.n)
         
         x_ = self.radaxis * x__ + self.rcenter
@@ -97,7 +125,11 @@ class spheroid:
                         obstime=self.center.obstime)
 
     def intersecting_curve(self):
-        # e.g., see https://mathworld.wolfram.com/Sphere-SphereIntersection.html
+        """
+        Returns the coordinates of intersection of the spheroid with a unit sphere
+         centred at the origin as `~astropy.coordinates.SkyCoord`.
+         More information here: https://mathworld.wolfram.com/Sphere-SphereIntersection.html
+        """
         d = self.rcenter
         r = self.radaxis
         R = 1 * u.R_sun
@@ -154,6 +186,9 @@ class spheroid:
 
     @property
     def apex(self):
+        """
+        Returns the coordinates of the spheroid apex as `~astropy.coordinates.SkyCoord`.
+        """
         rappex = self.center.radius + self.radaxis
         Spher_rep = SphericalRepresentation(self.center.lon, self.center.lat,
                                             Distance(np.abs(rappex)))
@@ -163,6 +198,9 @@ class spheroid:
                         observer=self.center.observer)
     @property
     def base(self):
+        """
+        Returns the coordinates of the spheroid base as `~astropy.coordinates.SkyCoord`.
+        """
         rbase = (- self.center.radius + self.radaxis)
         Spher_rep = SphericalRepresentation(self.center.lon, self.center.lat,
                                             Distance(np.abs(rbase)))
@@ -172,6 +210,12 @@ class spheroid:
                         observer=self.center.observer)
 
     def rotate(self, x_, y_, z_):
+        """
+        Rotates the (x,y,z) coordinates from the geometrical model's coordinate system
+         to the Heliospheric coordinates.
+
+        Returns the coordinates as `~astropy.coordinates.SkyCoord`.
+        """
         Longc = self.center.lon.to_value(u.rad)
         Latc  = self.center.lat.to_value(u.rad)
         tilt = self.tilt.to_value(u.rad)
@@ -234,6 +278,9 @@ class spheroid:
         axis.plot_coord(concatenate((self.apex, self.base)),linestyle='-', linewidth=0.5, color=(0,0,0,1))
 
     def to_dataframe(self):
+        """
+        Returns the spheroid parameters as `~pandas.DataFrame`.
+        """
         center_ = self.center.transform_to(frames.HeliographicCarrington)
         data_dict = {
                      'hgln': self.center.lon.to_value(u.degree),
@@ -250,7 +297,52 @@ class spheroid:
 
         return pd.DataFrame(data_dict, index=[self.center.obstime.to_datetime()])
 
+    def __str__(self):
+        center_ = self.center.transform_to(frames.HeliographicCarrington)
+        output = '<Spheroid object \n'
+        output += 'HGLN = %3.2f degrees \n'%self.center.lon.to_value(u.degree)
+        output += 'HGLT = %3.2f degrees \n'%self.center.lat.to_value(u.degree)
+        output += 'CRLN = %3.2f degrees \n'%center_.lon.to_value(u.degree)
+        output += 'CRLT = %3.2f degrees \n'%center_.lat.to_value(u.degree)
+        output += 'rcenter = %3.2f Rsun \n'%self.rcenter.to_value(u.R_sun)
+        output += 'radaxis = %3.2f Rsun \n'%self.radaxis.to_value(u.R_sun)
+        output += 'height = %3.2f Rsun \n'%self.radaxis.to_value(u.R_sun)
+        output += 'kappa = %3.2f \n'%self.kappa
+        output += 'epsilon = %3.2f '%self.epsilon
+        output += '>'
+        return output
+
 class ellipsoid(spheroid):
+    '''
+    A class for the ellipsoid model.
+    
+    Parameters
+    ----------
+    center : `~astropy.coordinates.SkyCoord`
+        The coordinates of the ellipsoid center.
+    rcenter : `~astropy.units.Quantity`
+        The radial distance of the ellipsoid center from the solar center.
+    radaxis : `~astropy.units.Quantity`
+        The ellipsoid's first (radial) semi-axis length.
+    orthoaxis1 : `~astropy.units.Quantity`
+        The ellipsoid's second semi-axis length (orthogonal axis wrt the radial axis).
+    orthoaxis2 : `~astropy.units.Quantity`
+        The ellipsoid's third semi-axis axis length (orthogonal axis wrt the radial axis).
+    height : `~astropy.units.Quantity`
+        The radial distance of the ellipsoid apex from the solar center (e.g., rcenter+radaxis).
+    kappa : `~astropy.units.Quantity`
+        Ellipsoid self-similar constant, defined as the ratio of the apex height to the length
+        of the orthoaxis1. (This is proportional to the first aspect ratio of the ellipsoid)
+   alpha : `~astropy.units.Quantity`
+        The ellipsoid's second aspect ratio, namely the ratio between the second and the third 
+         semi-axis.
+    epsilon : `~astropy.units.Quantity`
+        The eccentricity of the ellipsoid.
+
+    Notes
+    -----
+    Details about ellipsoids can be found here: https://en.wikipedia.org/wiki/Ellipsoid
+    '''
     def __init__(self, center, radaxis: (u.R_sun), orthoaxis1: (u.R_sun), orthoaxis2: (u.R_sun), tilt: (u.degree), n=40):
         super().__init__(center, radaxis, orthoaxis1, n)
           
@@ -259,6 +351,11 @@ class ellipsoid(spheroid):
         self.alpha = orthoaxis1 / orthoaxis2
 
     def intersecting_curve(self):
+        """
+        Returns the coordinates of intersection of the ellipsoid with a unit sphere
+         centred at the origin as `~astropy.coordinates.SkyCoord`.
+        We use vedo package for this calculation.
+        """
         from vedo import Sphere, Ellipsoid
         sph = Sphere(pos=(0, 0, 0), r=1)
         ell = Ellipsoid(pos=(self.rcenter.to_value(1*u.R_sun), 0, 0),
@@ -276,6 +373,9 @@ class ellipsoid(spheroid):
 
     @property
     def coordinates(self):
+        """
+        Returns the coordinates of the ellipsoid cloud of points as `~astropy.coordinates.SkyCoord`.
+        """
         [x__, y__, z__] = sphere(self.n)
         
         x_ = self.radaxis * x__ + self.rcenter
@@ -290,6 +390,9 @@ class ellipsoid(spheroid):
                         obstime=self.center.obstime)
 
     def to_dataframe(self):
+        """
+        Returns the ellipsoid parameters as `~pandas.DataFrame`.
+        """
         center_ = self.center.transform_to(frames.HeliographicCarrington)
         data_dict = {
                      'hgln': self.center.lon.to_value(u.degree),
@@ -347,9 +450,30 @@ class ellipsoid(spheroid):
 
         return rc, radaxis, orthoaxis1, orthoaxis2
 
+    def __str__(self):
+        center_ = self.center.transform_to(frames.HeliographicCarrington)
+        output = '<Ellipsoid object \n'
+        output += 'HGLN = %3.2f degrees \n'%self.center.lon.to_value(u.degree)
+        output += 'HGLT = %3.2f degrees \n'%self.center.lat.to_value(u.degree)
+        output += 'CRLN = %3.2f degrees \n'%center_.lon.to_value(u.degree)
+        output += 'CRLT = %3.2f degrees \n'%center_.lat.to_value(u.degree)
+        output += 'rcenter = %3.2f Rsun \n'%self.rcenter.to_value(u.R_sun)
+        output += 'radaxis = %3.2f Rsun \n'%self.radaxis.to_value(u.R_sun)
+        output += 'orthoaxis1 = %3.2f Rsun \n'%self.orthoaxis1.to_value(u.R_sun)
+        output += 'orthoaxis2 = %3.2f Rsun \n'%self.orthoaxis2.to_value(u.R_sun)
+        output += 'height = %3.2f Rsun \n'%self.radaxis.to_value(u.R_sun)
+        output += 'kappa = %3.2f \n'%self.kappa
+        output += 'alpha = %3.2f \n'%self.alpha
+        output += 'epsilon = %3.2f '%self.epsilon
+        output += '>'
+        return output
+
 class gcs():
     """
     A class of the GCS CME model.
+    
+    Notes
+    -----
     This is based on IDL script in here: https://hesperia.gsfc.nasa.gov/ssw/stereo/secchi/idl/scraytrace/shellskeleton.pro
     and with some additions from here: https://gitlab.physik.uni-kiel.de/ET/gcs_python/-/blob/master/gcs/geometry.py
     """
@@ -445,7 +569,10 @@ class gcs():
 
     def cloud(self):
         """
-        Build a cloud of the GCS model.
+        Returns the cloud of points for the GCS model.
+        
+        Notes
+        -----
         Converted and modified from the IDL script cmecloud.pro.
         https://hesperia.gsfc.nasa.gov/ssw/stereo/secchi/idl/scraytrace/cmecloud.pro
         https://gitlab.physik.uni-kiel.de/ET/gcs_python/-/blob/master/gcs/geometry.py
