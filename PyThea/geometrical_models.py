@@ -595,8 +595,8 @@ class gcs():
 
         return mesh[:,0], mesh[:,1], mesh[:,2]
 
-    def plot(self, axis, mode=False):
-        axis.plot_coord(self.coordinates, color='red', linestyle='-', linewidth=0.4)
+    def plot(self, axis, mode=False, only_surface=False):
+        axis.plot_coord(self.coordinates, color='green', linestyle='-', linewidth=0.4)
         
     def to_dataframe(self):
         center_ = self.center.transform_to(frames.HeliographicCarrington)
