@@ -33,7 +33,7 @@ conda activate pythea
 conda deactivate
 ```
 
-**Alternative (pip, not tested)**
+**Alternative (pip)**
 
 ```python
 # You can create a virtual environment in Python inside the project folder.
@@ -52,12 +52,21 @@ deactivate
 
 Now you can run any part of the _PyThea_ (see Usage section).
 
-## 🐾 Run localy the _PyThea_ application
-Install the required Python packages, and then run the application with streamlit. 
+You may also add your _PyThea_ directory to the environment variable ```PYTHONPATH```. This is usefull if you need to run _PyThea_ tests or when you need to run some of the package modules out of streamlit.
+
+In the terminal use the following and change the \<PyTheaRootDir\> with your path.
+
 ```
-# Activate the enviroment as shown above
-# You can now run the application using streamlit
-streamlit run PyThea/PyThea_app.py
+export PYTHONPATH="${PYTHONPATH}:<PyTheaRootDir>/PyThea"
+```
+
+For a premanent solution, if you're using bash (on a Mac or GNU/Linux distribution), add the above line to your ```~/.bashrc``` file (changing the \<PyTheaRootDir\> with your path first).
+
+## 🐾 Run localy the _PyThea_ application
+Install the required Python packages, activate the enviroment as shown above, and then run the application with streamlit. 
+```
+# cd into the package directory and run,
+streamlit run PyThea_app.py
 ```
 The application should now open in the default browser!
 
@@ -74,7 +83,7 @@ Complete documentation of the _PyThea_ can be found in (under construction)
 
 [![TBD](https://zenodo.org/badge/DOI/TBD/TBD.svg)](https://doi.org/TBD/TBD)
 
-If you use _PyThea_ for scientific work or research presented in a publication, please cite this package by including in the methods or acknowledgement section the following: "This research has made use of PyThea v?.?.? (cite software), an open-source and free Python package (cite paper).". The paper citation should be to the _PyThea_ paper (TBA), and the software citation to the Zenodo DOI (TBA). _PyThea_ has a strong dependency to SunPy and AstroPy Python packages, consider citing these packages as well. To acknowledge _PyThea_ in posters or talks include the project [logo](https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_logo.png) or [icon](https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_icon.png).
+If you use _PyThea_ for scientific work or research presented in a publication, please cite this package by including in the methods or acknowledgement section the following: "This research has made use of PyThea v?.?.? (cite software), an open-source and free Python package to reconstruct the 3D structure of CMEs and shock waves (cite paper).". The paper citation should be to the _PyThea_ paper (TBA), and the software citation to the Zenodo DOI (TBA). _PyThea_ has a strong dependency to SunPy and AstroPy Python packages, consider citing these packages as well. To acknowledge _PyThea_ in posters or talks include the project [logo](https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_logo.png) or [icon](https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_icon.png).
 
 ## ⓘ The mythology of Thea:
 
