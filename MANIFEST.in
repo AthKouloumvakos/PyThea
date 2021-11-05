@@ -1,0 +1,8 @@
+exclude Procfile
+exclude runtime.txt
+exclude Aptfile
+exclude .gitignore
+exclude docs/index.html
+exclude setup.sh
+prune .heroku
+prune .git
