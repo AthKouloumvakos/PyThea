@@ -69,6 +69,7 @@ def delete_from_state(state, var):
 
 
 def footer_text():
+    from PIL import Image
     st.subheader('About this application:')
     st.markdown("""
                    _PyThea_  is an open-source software package that can be used to
@@ -79,12 +80,17 @@ def footer_text():
                    to reconstruct shock waves. It also implements remote-sensing observations
                    from multiple viewpoints such as the SOlar and Heliospheric Observatory (SOHO)
                    and Solar Terrestrial Relations Observatory (STEREO).
-
-                   **Github**: You can find the latest version of PyThea 
-                               [here](https://github.com/AthKouloumvakos/PyThea).
-
-                   **Citation**: Please cite this software as [Kouloumvakos et al. (2021)]()
                 """)
+    right, left = st.columns((2,1))
+    right.markdown("""
+                   **Github**: You can find the latest version of PyThea here 
+                               [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AthKouloumvakos/PyThea)
+
+                   **Citation**: Please cite this software as [![TBD](https://zenodo.org/badge/DOI/TBD/TBD.svg)](https://doi.org/TBD/TBD)
+                """)
+    left.image('https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_logo.png?raw=true')
+    st.markdown('---')
+
 
 
 def run():
@@ -450,7 +456,7 @@ def run():
     else:
         st.sidebar.info('Store a fit to enable this feature.')
     st.markdown('---')
-    footer_text()
+    #footer_text()
 
 
 if __name__ == "__main__":
