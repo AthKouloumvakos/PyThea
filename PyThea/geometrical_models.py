@@ -17,30 +17,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import operator
+import re
+
+import astropy.units as u
 import numpy as np
 import pandas as pd
-import datetime
-import matplotlib.pyplot as plt
-from scipy.spatial.transform import Rotation as R  
-import astropy.units as u
-from astropy.coordinates import (
-    SkyCoord,
-    Distance,
-    SphericalRepresentation,
-    CartesianRepresentation,
-    concatenate
-)
-from sunpy.coordinates import frames
-from scipy.spatial.transform import Rotation
-from numpy.linalg import norm
 import seaborn as sns
-import re
-import operator
+from astropy.coordinates import (CartesianRepresentation, Distance, SkyCoord,
+                                 SphericalRepresentation, concatenate)
+from numpy.linalg import norm
+from scipy.spatial.transform import Rotation
+from sunpy.coordinates import frames
+
 
 def sphere(n= 20, plot = 0):
     """
     Returns the (x,y,z) coordinates of a unit sphere centred at the origin.
-    The coordinates are (n+1)-by-(n+1) matrices.       
+    The coordinates are (n+1)-by-(n+1) matrices.
     """
 
     theta = np.linspace( -np.pi, np.pi, n+1)
@@ -55,13 +49,13 @@ def sphere(n= 20, plot = 0):
     x =  np.outer(cosphi, np.cos(theta))
     y =  np.outer(cosphi, sintheta)
     z =  np.outer(np.sin(phi), np.ones_like(theta))
-    
+
     return [x, y, z]
 
 class spheroid:
     '''
     A class for the spheroid model.
-    
+
     Parameters
     ----------
     center : `~astropy.coordinates.SkyCoord`
@@ -95,7 +89,7 @@ class spheroid:
 
         self.height = radaxis + self.rcenter
         self.kappa = orthoaxis1 / (self.height-1.*u.R_sun)
-        
+
         if radaxis<orthoaxis1:
             self.epsilon = -1. * np.sqrt(1. - (radaxis/orthoaxis1)**2)
         elif radaxis>orthoaxis1:
@@ -105,20 +99,20 @@ class spheroid:
 
         self.tilt = 0 * u.degree
         self.n = n
-    
+
     @property
     def coordinates(self):
         """
         Returns the coordinates of the spheroid cloud of points as `~astropy.coordinates.SkyCoord`.
         """
         [x__, y__, z__] = sphere(self.n)
-        
+
         x_ = self.radaxis * x__ + self.rcenter
         y_ = self.orthoaxis1 * y__
         z_ = self.orthoaxis1 * z__
-        
+
         x, y, z = self.rotate(x_, y_, z_)
-        
+
         return SkyCoord(CartesianRepresentation(x, y, z),
                         frame=frames.HeliographicStonyhurst,
                         observer=self.center.observer,
@@ -220,9 +214,9 @@ class spheroid:
         Latc  = self.center.lat.to_value(u.rad)
         tilt = self.tilt.to_value(u.rad)
 
-        v = np.transpose([x_.flatten(), y_.flatten(), z_.flatten()]) 
+        v = np.transpose([x_.flatten(), y_.flatten(), z_.flatten()])
         v = Rotation.from_euler('xyz', [tilt, -Latc, Longc]).apply(v)
-        
+
         x = np.reshape(v[:,0], x_.shape) * x_.unit
         y = np.reshape(v[:,1], y_.shape) * y_.unit
         z = np.reshape(v[:,2], z_.shape) * z_.unit
@@ -315,7 +309,7 @@ class spheroid:
 class ellipsoid(spheroid):
     '''
     A class for the ellipsoid model.
-    
+
     Parameters
     ----------
     center : `~astropy.coordinates.SkyCoord`
@@ -334,7 +328,7 @@ class ellipsoid(spheroid):
         Ellipsoid self-similar constant, defined as the ratio of the apex height to the length
         of the orthoaxis1. (This is proportional to the first aspect ratio of the ellipsoid)
    alpha : `~astropy.units.Quantity`
-        The ellipsoid's second aspect ratio, namely the ratio between the second and the third 
+        The ellipsoid's second aspect ratio, namely the ratio between the second and the third
          semi-axis.
     epsilon : `~astropy.units.Quantity`
         The eccentricity of the ellipsoid.
@@ -345,7 +339,7 @@ class ellipsoid(spheroid):
     '''
     def __init__(self, center, radaxis: (u.R_sun), orthoaxis1: (u.R_sun), orthoaxis2: (u.R_sun), tilt: (u.degree), n=40):
         super().__init__(center, radaxis, orthoaxis1, n)
-          
+
         self.orthoaxis2 = orthoaxis2
         self.tilt = tilt
         self.alpha = orthoaxis1 / orthoaxis2
@@ -356,7 +350,7 @@ class ellipsoid(spheroid):
          centred at the origin as `~astropy.coordinates.SkyCoord`.
         We use vedo package for this calculation.
         """
-        from vedo import Sphere, Ellipsoid
+        from vedo import Ellipsoid, Sphere
         sph = Sphere(pos=(0, 0, 0), r=1)
         ell = Ellipsoid(pos=(self.rcenter.to_value(1*u.R_sun), 0, 0),
                         axis1=(2*self.radaxis.to_value(1*u.R_sun), 0, 0),
@@ -377,13 +371,13 @@ class ellipsoid(spheroid):
         Returns the coordinates of the ellipsoid cloud of points as `~astropy.coordinates.SkyCoord`.
         """
         [x__, y__, z__] = sphere(self.n)
-        
+
         x_ = self.radaxis * x__ + self.rcenter
         y_ = self.orthoaxis1 * y__
         z_ = self.orthoaxis2 * z__
-        
+
         x, y, z = self.rotate(x_, y_, z_)
-        
+
         return SkyCoord(CartesianRepresentation(x, y, z),
                         frame=frames.HeliographicStonyhurst,
                         observer=self.center.observer,
@@ -409,9 +403,9 @@ class ellipsoid(spheroid):
                      'epsilon': self.epsilon,
                      'alpha': self.alpha,
                     }
-        
+
         return pd.DataFrame(data_dict, index=[self.center.obstime.to_datetime()])
-        
+
     @staticmethod
     @u.quantity_input
     def heka_to_rabc(rc: (u.R_sun), radaxis: (u.R_sun), orthoaxis1: (u.R_sun), orthoaxis2: (u.R_sun)):
@@ -471,7 +465,7 @@ class ellipsoid(spheroid):
 class gcs():
     """
     A class of the GCS CME model.
-    
+
     Notes
     -----
     This is based on IDL script in here: https://hesperia.gsfc.nasa.gov/ssw/stereo/secchi/idl/scraytrace/shellskeleton.pro
@@ -516,7 +510,7 @@ class gcs():
         Latc = self.center.lat.to_value(u.rad)
         tilt = self.tilt.to_value(u.rad)
 
-        v = np.transpose([x_.flatten(), y_.flatten(), z_.flatten()]) 
+        v = np.transpose([x_.flatten(), y_.flatten(), z_.flatten()])
         v = Rotation.from_euler('zyz', [tilt, -Latc+np.pi/2, Longc]).apply(v)
 
         x = np.reshape(v[:,0], x_.shape) * x_.unit
@@ -531,7 +525,7 @@ class gcs():
         Converted and modified from the IDL script shellskeleton.pro
         https://hesperia.gsfc.nasa.gov/ssw/stereo/secchi/idl/scraytrace/shellskeleton.pro
         """
-        height = self.height.to_value(u.R_sun)
+        self.height.to_value(u.R_sun)
         alpha = self.alpha.to_value(u.rad)
         kappa = self.kappa
         distjunc = self.distjunc.to_value(u.R_sun)
@@ -558,7 +552,7 @@ class gcs():
 
         pcR = np.array([np.zeros(beta.shape), X0 * np.cos(beta), h + X0 * np.sin(beta)]).T
         pcL = np.array([np.zeros(beta.shape), -X0 * np.cos(beta), h + X0 * np.sin(beta)]).T
-        
+
         # This part is from here
         # https://gitlab.physik.uni-kiel.de/ET/gcs_python/-/blob/master/gcs/geometry.py
         r = np.concatenate((rsl, rc[1:], np.flipud(rc)[1:], np.flipud(rsl)[1:]))
@@ -570,21 +564,21 @@ class gcs():
     def cloud(self):
         """
         Returns the cloud of points for the GCS model.
-        
+
         Notes
         -----
         Converted and modified from the IDL script cmecloud.pro.
         https://hesperia.gsfc.nasa.gov/ssw/stereo/secchi/idl/scraytrace/cmecloud.pro
         https://gitlab.physik.uni-kiel.de/ET/gcs_python/-/blob/master/gcs/geometry.py
         """
-        height = self.height.to_value(u.R_sun)
-        alpha = self.alpha.to_value(u.rad)
-        kappa = self.kappa
-        distjunc = self.distjunc.to_value(u.R_sun)
-        
+        self.height.to_value(u.R_sun)
+        self.alpha.to_value(u.rad)
+        self.kappa
+        self.distjunc.to_value(u.R_sun)
+
         # Compute the shell's skeleton axis
         p, r, ca = self.shell_skeleton()
-        
+
         # This part is from here
         # https://gitlab.physik.uni-kiel.de/ET/gcs_python/-/blob/master/gcs/geometry.py
         ptheta = np.linspace(0, 2*np.pi, self.nbvertcircshell)
@@ -597,7 +591,7 @@ class gcs():
 
     def plot(self, axis, mode=False, only_surface=False):
         axis.plot_coord(self.coordinates, color='green', linestyle='-', linewidth=0.4)
-        
+
     def to_dataframe(self):
         center_ = self.center.transform_to(frames.HeliographicCarrington)
         data_dict = {
@@ -612,7 +606,7 @@ class gcs():
                      'kappa': self.kappa,
                      'tilt': self.tilt.to_value(u.degree),
                     }
-        
+
         return pd.DataFrame(data_dict, index=[self.center.obstime.to_datetime()])
 
 def my_plot_coord(coord, axis, **kargs):

@@ -18,38 +18,28 @@
 """
 
 
-import io
-from operator import attrgetter
-import numpy as np
-import pandas as pd
-import matplotlib.colors as colors
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-import matplotlib.ticker as mticker
-import sunpy.map
-from sunpy.map.maputils import contains_coordinate
-from sunpy.coordinates import frames
-from sunpy.net import Fido, hek
-from sunpy.net import attrs as a
-from sunpy.coordinates import get_horizons_coord
 import datetime
-import astropy.units as u
-from astropy.coordinates import (
-    SkyCoord,
-    Distance,
-    SphericalRepresentation,
-    CartesianRepresentation,
-    concatenate
-)
+import io
 import json
 from copy import copy
-from scipy.optimize import curve_fit
-from scipy.interpolate import UnivariateSpline
-import seaborn as sns
+from operator import attrgetter
 
-from config.selected_imagers import imager_dict
+import astropy.units as u
+import matplotlib.colors as colors
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+import sunpy.map
 from config.selected_bodies import bodies_dict
-from sunpy_dev.map.maputils import (difference_maps, normalize_exposure)
+from config.selected_imagers import imager_dict
+from scipy.interpolate import UnivariateSpline
+from sunpy.coordinates import get_horizons_coord
+from sunpy.map.maputils import contains_coordinate
+from sunpy.net import Fido
+from sunpy.net import attrs as a
+from sunpy_dev.map.maputils import difference_maps, normalize_exposure
+
 
 def get_hek_flare(day):
     flare_list = Fido.search(a.Time(day, day + datetime.timedelta(days=1)),
@@ -92,14 +82,14 @@ def plot_bodies(axis, bodies_list, smap):
     for body in bodies_list:
         body_coo = get_horizons_coord(bodies_dict[body][0], smap.date)
         if contains_coordinate(smap, body_coo):
-            axis.plot_coord(body_coo, 'o', color=bodies_dict[body][1], 
+            axis.plot_coord(body_coo, 'o', color=bodies_dict[body][1],
                 fillstyle='none', markersize=6, label=body)
 
 
 def download_fits(date_process, imager, time_range=[-1,1]):
     timerange = a.Time(date_process + datetime.timedelta(hours=time_range[0]),
                        date_process + datetime.timedelta(hours=time_range[1]))
-    
+
     map_ = {}
     args = imager_dict[imager][0]
     extra = imager_dict[imager][1]
@@ -113,7 +103,7 @@ def download_fits(date_process, imager, time_range=[-1,1]):
         map_ = [mask_occulter(smap) for smap in map_]
         map_ = [smap.superpixel(super_dim) for smap in map_]
         map_ = filter_maps(map_, extra)
-        #map_ = [smap.rotate(recenter=True) for smap in map_] # Keep this afrer filter because images resize   
+        #map_ = [smap.rotate(recenter=True) for smap in map_] # Keep this afrer filter because images resize
     else:
         map_ = []
 
@@ -128,7 +118,7 @@ def maps_process(session_state, imagers_list, image_mode):
         else:
             session_state.map[imager] = map_diff(session_state.map_[imager], image_mode=image_mode)
             session_state.imagers_list_.append(imager)
-    
+
     return session_state
 
 def maps_clims(session_state, imagers_list):
@@ -139,15 +129,15 @@ def maps_clims(session_state, imagers_list):
         else:
             map_ = session_state.map[imager][0]
             session_state.map_clim[imager] = [np.nanquantile(map_.data, 0.20), np.nanquantile(map_.data, 0.80)]
-    
+
     return session_state
 
 def filter_maps(map_sequence, extra):
-    
+
     indices = []
     # TODO: This has been added because VSO search returns duplicates for WISPR
     #       so we manualy filter the dublicates until this problem is solved https://github.com/sunpy/sunpy/issues/5481
-    if 'dublicates' in extra: 
+    if 'dublicates' in extra:
         map_sequence.sort(key=attrgetter('date'))
         for i in range(0,len(map_sequence)-1):
             if map_sequence[i].date == map_sequence[i+1].date:
@@ -212,16 +202,16 @@ def mask_occulter(smap, apply_mask = True, mask_value = 0):
             return smap
         else:
             return []
-    
+
     inner_distance = in_fac * smap.dimensions.x
     outer_distance = out_fac * smap.dimensions.x
-    
+
     x, y = np.meshgrid(*[np.arange(v.value) for v in smap.dimensions]) * u.pixel
     xprime_sq = (x-xcen* u.pixel) ** 2
     yprime_sq = (y-ycen* u.pixel) ** 2
     mask_inner = np.sqrt( xprime_sq + yprime_sq ) < inner_distance
     mask_outer = np.sqrt( xprime_sq + yprime_sq ) > outer_distance
-    
+
     if apply_mask:
         smap.data[mask_inner+mask_outer] = mask_value
         return sunpy.map.Map(smap.data, smap.meta)
@@ -256,7 +246,7 @@ class model_fittings:
 
 def plot_fitting_model(model, fit_args, plt_type='HeightT'):
     palete = sns.color_palette("deep")
-    parameters = {'Spheroid': 
+    parameters = {'Spheroid':
                              {'height': ['+', '', palete[3], 'h-apex'],
                               'orthoaxis1': ['x', '', palete[0], 'r-axis1'],
                               },
@@ -323,11 +313,11 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT'):
 def parameter_fit(x, y, fit_args):
     def fit_func(x, a, b, c):
         return a * x**2 + b * x + c
-        
+
     xx = (mdates.date2num(x) - mdates.date2num(x[0]))
     xxx = np.linspace(xx.min(), xx.max(), 120)
     dd = mdates.num2date(xxx + mdates.date2num(x[0]))
-    
+
     if fit_args['type'] == 'poly':
         ## scipy.optimize.curve_fit and numpy.polyfit
         popt, pcov = np.polyfit(xx, y, fit_args['order'], full=False, cov=True) #curve_fit(fit_func, xx, y)
@@ -351,7 +341,7 @@ def parameter_fit(x, y, fit_args):
         best_fit = spl(xxx)
         sigma_bound_up = best_fit + sigma
         sigma_bound_low = best_fit - sigma
-        
+
         sv_bound_up, sv_bound_low, sv_bound_dup, sv_bound_dlow = best_fit, best_fit, np.gradient(best_fit, xxx), np.gradient(best_fit, xxx)
         for i in range(0,100):
             spl = UnivariateSpline(xx, y, s=i/100, k=fit_args['order']);
@@ -359,7 +349,7 @@ def parameter_fit(x, y, fit_args):
             sv_bound_low = np.minimum(sv_bound_low, spl(xxx))
             sv_bound_dup = np.maximum(sv_bound_dup, np.gradient(spl(xxx), xxx))
             sv_bound_dlow = np.minimum(sv_bound_dlow, np.gradient(spl(xxx), xxx))
-            
+
         fitting = {'spl': spl,
                    'sigma': sigma,
                    'best_fit_x_num': xxx,

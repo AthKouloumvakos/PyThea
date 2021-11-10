@@ -18,46 +18,22 @@
 """
 
 
+import astropy.units as u
 import numpy as np
 import streamlit as st
-
-from sunpy.coordinates import frames
-import astropy.units as u
-from astropy.coordinates import (
-    SkyCoord,
-    Distance,
-    SphericalRepresentation,
-)
-
-from extensions.stqdm import stqdm  # See also https://github.com/tqdm/tqdm
-
-from sunpy_dev.map.maputils import get_closest
-from modules import (
-    date_and_event_selection,
-    fitting_and_slider_options_container,
-    fitting_sliders,
-    final_parameters_gmodel
-)
-from callbacks import (
-    load_or_delete_fittings
-)
-from utils import (
-    download_fits,
-    maps_process,
-    maps_clims,
-    make_figure,
-    plot_bodies,
-    model_fittings,
-    plot_fitting_model
-)
-from geometrical_models import (
-    spheroid,
-    ellipsoid,
-    gcs
-)
-from config.selected_imagers import imager_dict
+from astropy.coordinates import Distance, SkyCoord, SphericalRepresentation
+from callbacks import load_or_delete_fittings
 from config.selected_bodies import bodies_dict
+from config.selected_imagers import imager_dict
 from extensions.buttons import download_button
+from extensions.stqdm import stqdm  # See also https://github.com/tqdm/tqdm
+from geometrical_models import ellipsoid, gcs, spheroid
+from modules import (date_and_event_selection, final_parameters_gmodel,
+                     fitting_and_slider_options_container, fitting_sliders)
+from sunpy.coordinates import frames
+from sunpy_dev.map.maputils import get_closest
+from utils import (download_fits, make_figure, maps_clims, maps_process,
+                   model_fittings, plot_bodies, plot_fitting_model)
 
 
 def delete_from_state(state, var):
@@ -69,12 +45,11 @@ def delete_from_state(state, var):
 
 
 def footer_text():
-    from PIL import Image
     st.subheader('About this application:')
     st.markdown("""
                    _PyThea_  is an open-source software package that can be used to
                    reconstruct the 3D structure of Coronal Mass Ejections (CMEs) and
-                   shock waves and determine their kinematics using remote-sensing observations. 
+                   shock waves and determine their kinematics using remote-sensing observations.
                    The tool implements the Graduate Cylindrical Shell (GCS) model that can be used
                    to reconstruct CMEs and two geometrical models, namely a spheroid and ellipsoid model
                    to reconstruct shock waves. It also implements remote-sensing observations
@@ -83,7 +58,7 @@ def footer_text():
                 """)
     right, left = st.columns((2,1))
     right.markdown("""
-                   **Github**: You can find the latest version of PyThea here 
+                   **Github**: You can find the latest version of PyThea here
                                [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AthKouloumvakos/PyThea)
 
                    **Citation**: Please cite this software as [![TBD](https://zenodo.org/badge/DOI/TBD/TBD.svg)](https://doi.org/TBD/TBD)
@@ -321,7 +296,7 @@ def run():
         rcenter, height, alpha, kappa, tilt = final_parameters_gmodel(st)
 
     Spher_rep = SphericalRepresentation(longit, latitu,
-                                        Distance(np.abs(rcenter)))     
+                                        Distance(np.abs(rcenter)))
     if st.session_state.coord_system == 'HGC':
         center = SkyCoord(np.sign(rcenter) * Spher_rep.to_cartesian(),
                           frame=frames.HeliographicCarrington,
@@ -426,7 +401,7 @@ def run():
             splinefit_order = col3.slider('Spline order', 1, 5, 3, 1, key='splinefit_order')
             splinefit_smooth = st.slider('Spline smooth', 0., 1., 0.5, 0.01, key='splinefit_smooth')
             fit_args_ = {'type':'spline','order':splinefit_order, 'smooth':splinefit_smooth}
-            
+
 
         if plt_kinematics_select == 'All':
             col1, col2 = st.columns(2)

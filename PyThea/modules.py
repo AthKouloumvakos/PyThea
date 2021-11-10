@@ -1,18 +1,13 @@
 import datetime
+import json
+
 import astropy.units as u
 import pandas as pd
-import json
-from utils import get_hek_flare, model_fittings
-from callbacks import (
-    load_or_delete_fittings,
-    change_long_lat_sliders
-)
+from callbacks import change_long_lat_sliders
 from config.config_sliders import sliders_dict as sd
-from geometrical_models import (
-    spheroid,
-    ellipsoid,
-    gcs
-)
+from geometrical_models import ellipsoid, gcs, spheroid
+from utils import get_hek_flare, model_fittings
+
 
 def date_and_event_selection(st):
     st.sidebar.markdown('## Date and event selection')
@@ -67,7 +62,7 @@ def fitting_and_slider_options_container(st):
     container = st.sidebar.container()
     with container.expander('Options'):
         col1, col2 = st.columns(2)
-        col1.radio('Coordinate system', options=['HGS', 'HGC'], 
+        col1.radio('Coordinate system', options=['HGS', 'HGC'],
                    on_change=change_long_lat_sliders, args=[st], key='coord_system')
 
         if st.session_state.geometrical_model == 'Spheroid':
@@ -99,9 +94,9 @@ def fitting_sliders(st):
                'GCS':{'h, a, k, t': ['height', 'alpha', 'kappa', 'tilt'],
                       },
                }
-    
+
     adjustments = st.session_state.sliders_adjustment_mode
-    
+
     if st.session_state.geometrical_model=='Spheroid' or \
        st.session_state.geometrical_model=='Ellipsoid' or \
        st.session_state.geometrical_model=='GCS':

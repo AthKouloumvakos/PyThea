@@ -1,5 +1,6 @@
-from sunpy.coordinates import frames
 import astropy.units as u
+from sunpy.coordinates import frames
+
 
 def load_or_delete_fittings(st):
     selected_row = str(st.session_state.fitting_select)
@@ -13,7 +14,7 @@ def load_or_delete_fittings(st):
         elif st.session_state.coord_system == 'HGC':
             st.session_state.longit = float(dataframe.loc[selected_row,'crln'])
             st.session_state.latitu = float(dataframe.loc[selected_row,'crlt'])
-        
+
         if st.session_state.model_fittings.geometrical_model == 'Spheroid':
             keys = ['height', 'kappa', 'epsilon', 'rcenter', 'radaxis', 'orthoaxis1']
         elif st.session_state.model_fittings.geometrical_model == 'Ellipsoid':
@@ -32,12 +33,12 @@ def load_or_delete_fittings(st):
         if len(st.session_state.model_fittings.parameters)<1:
             del st.session_state.model_fittings
         del st.session_state.fit_action
-    
+
 
 def change_long_lat_sliders(st):
     if st.session_state.coord_system == 'HGS':
-        center_ = st.session_state.center.transform_to(frames.HeliographicStonyhurst) 
+        center_ = st.session_state.center.transform_to(frames.HeliographicStonyhurst)
     elif st.session_state.coord_system == 'HGC':
-        center_ = st.session_state.center.transform_to(frames.HeliographicCarrington) 
+        center_ = st.session_state.center.transform_to(frames.HeliographicCarrington)
     st.session_state.longit = float(center_.lon.to_value(u.degree))
     st.session_state.latitu = float(center_.lat.to_value(u.degree))

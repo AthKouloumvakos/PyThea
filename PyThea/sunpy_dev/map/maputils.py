@@ -3,10 +3,10 @@ This submodule provides utility functions to act on `sunpy.map.GenericMap` insta
 """
 
 import copy
-import sunpy.map
+
 import astropy.units as u
 import numpy as np
-
+import sunpy.map
 
 __all__ = ['get_closest', 'normalize_exposure', 'difference_maps', 'mask_occulter']
 
@@ -20,7 +20,7 @@ def get_closest(smap, date):
     ----------
     smap : `~sunpy.map.GenericMap`
         A SunPy map.
-    
+
     date : '~'
 
     Returns
@@ -48,7 +48,7 @@ def normalize_exposure(smap):
     """
     if smap.exposure_time == 1*u.second:
         return smap
-    exp_time = smap.exposure_time
+    smap.exposure_time
     new_meta = copy.deepcopy(smap.meta)
     if 'exptime' in new_meta:
         new_meta['exptime'] = 1.0
@@ -67,7 +67,7 @@ def difference_maps(smapi, smapm):
     ----------
     smapi : `~sunpy.map.GenericMap`
         A SunPy map.
-    
+
     smapm : `~sunpy.map.GenericMap`
         A SunPy map.
 
@@ -75,7 +75,7 @@ def difference_maps(smapi, smapm):
     -------
     `~sunpy.map.GenericMap`
         A SunPy map.
-    
+
     Note
     -------
     The two maps have to be coalligned.
@@ -109,16 +109,16 @@ def mask_occulter(smap, apply_mask = True, mask_value = 0):
             return smap
         else:
             return []
-    
+
     inner_distance = in_fac * smap.dimensions.x
     outer_distance = out_fac * smap.dimensions.x
-    
+
     x, y = np.meshgrid(*[np.arange(v.value) for v in smap.dimensions]) * u.pixel
     xprime_sq = (x-xcen* u.pixel) ** 2
     yprime_sq = (y-ycen* u.pixel) ** 2
     mask_inner = np.sqrt( xprime_sq + yprime_sq ) < inner_distance
     mask_outer = np.sqrt( xprime_sq + yprime_sq ) > outer_distance
-    
+
     if apply_mask:
         smap.data[mask_inner+mask_outer] = mask_value
         return sunpy.map.Map(smap.data, smap.meta)

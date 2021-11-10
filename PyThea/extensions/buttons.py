@@ -3,7 +3,9 @@ import json
 import pickle
 import re
 import uuid
+
 import pandas as pd
+
 
 # Define Download button, from https://discuss.streamlit.io/t/a-download-button-with-custom-css/4220
 def download_button(object_to_download, download_filename, button_text, pickle_it=False):
@@ -48,13 +50,13 @@ def download_button(object_to_download, download_filename, button_text, pickle_i
         # some strings <-> bytes conversions necessary here
         b64 = base64.b64encode(object_to_download.encode()).decode()
 
-    except AttributeError as e:
+    except AttributeError:
         b64 = base64.b64encode(object_to_download).decode()
 
     button_uuid = str(uuid.uuid4()).replace('-', '')
     button_id = re.sub('\d+', '', button_uuid)
 
-    custom_css = f""" 
+    custom_css = f"""
         <style>
             #{button_id} {{
                 display: inline-flex;
@@ -71,7 +73,7 @@ def download_button(object_to_download, download_filename, button_text, pickle_i
                 border-style: solid;
                 border-color: rgb(230, 234, 241);
                 border-image: initial;
-            }}             
+            }}
             #{button_id}:hover {{
                 border-color: rgb(246, 51, 102);
                 color: rgb(246, 51, 102);

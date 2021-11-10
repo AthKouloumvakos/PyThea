@@ -11,13 +11,13 @@ _PyThea_ is an open-source software package that can be used to reconstruct the 
 
 ## 💾 Installation
 
-_PyThea_ is written in Python >=3.8 and has some package requirements, which are listed in the requirements.txt and environment.yml files. 
+_PyThea_ is written in Python >=3.8 and has some package requirements, which are listed in the requirements.txt and environment.yml files.
 To run localy this application we recomend to create its own virtual enviroment in Python.
 
 **Recomended (conda)**
 
-Because of a range of dependencies that packages have, the simplest way to work with _PyThea_ 
-is in conda and to create its own environment using the ```conda env create```. 
+Because of a range of dependencies that packages have, the simplest way to work with _PyThea_
+is in conda and to create its own environment using the ```conda env create```.
 If you already have conda installed, then ```cd``` the root directory of _PyThea_ and in your terminal do:
 
 ```python
@@ -63,7 +63,7 @@ export PYTHONPATH="${PYTHONPATH}:<PyTheaRootDir>/PyThea"
 For a premanent solution, if you're using bash (on a Mac or GNU/Linux distribution), add the above line to your ```~/.bashrc``` file (changing the \<PyTheaRootDir\> with your path first).
 
 ## 🐾 Run localy the _PyThea_ application
-Install the required Python packages, activate the enviroment as shown above, and then run the application with streamlit. 
+Install the required Python packages, activate the enviroment as shown above, and then run the application with streamlit.
 ```
 # cd into the package directory and run,
 streamlit run PyThea_app.py
@@ -75,7 +75,7 @@ The application should now open in the default browser!
 Complete documentation of the _PyThea_ can be found in (under construction)
 
 ## 📦 Usefull Python packages
-        
+
 - [SunPy](https://sunpy.org/): The community-developed, free and open-source solar data analysis environment for Python.
 - [AstroPy](https://www.astropy.org/): The Astropy Project is a community effort to develop a single core package for Astronomy in Python.
 

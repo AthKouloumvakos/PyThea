@@ -1,6 +1,6 @@
 bodies_dict = {'Mercury': ['199', 'darkturquoise'],
                'Venus': ['299', 'darkorchid'],
-               'Earth': ['399', 'green'], 
+               'Earth': ['399', 'green'],
                'Mars': ['499', 'maroon'],
                'Jupiter': ['599', 'navy'],
                'STEREO B': ['-235', 'b'],
