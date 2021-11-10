@@ -2,14 +2,59 @@
 This submodule provides utility functions to act on `sunpy.map.GenericMap` instances.
 """
 
+import numpy as np
 import copy
 
 import astropy.units as u
-import numpy as np
+import warnings
 import sunpy.map
 
-__all__ = ['get_closest', 'normalize_exposure', 'difference_maps', 'mask_occulter']
+import sunpy_dev.extern.sunkit_instruments.stereo.utils
 
+__all__ = ['maps_sequence_processing', 'get_closest', 'normalize_exposure',
+           'prepare_maps', 'difference_maps', 'mask_occulter']
+
+def maps_sequence_processing(map_sequence, seq_type='Plain'):
+    """
+    Returns a sequence of maps which is processed as running difference or base difference or plain images.
+
+    Parameters
+    ----------
+    map_sequence : `~sunpy.map.GenericMap`
+        A list SunPy maps.
+    
+    seq_type : '~str'
+        The type of sequence processing
+
+    Returns
+    -------
+    `~sunpy.map.GenericMap`
+        A SunPy map.
+    """
+    
+    normalized = True if True in [tmap.exposure_time == 1.0*u.second for tmap in map_sequence] else False
+    if not normalized:
+        warnings.warn("Warning [maps_sequence_processing]: The exposure time of the maps is not normalized.")
+    
+    smap = []
+    if seq_type == 'Running Diff.':
+        for i in range(1,len(map_sequence)):
+            smap_diff = difference_maps(map_sequence[i], map_sequence[i-1])
+            smap.append(smap_diff)
+    if seq_type == 'Base Diff.':
+        for i in range(1,len(map_sequence)):
+            smap_diff = difference_maps(map_sequence[i], map_sequence[0])
+            smap.append(smap_diff)
+    if seq_type == 'Plain':
+        for i in range(0,len(map_sequence)):
+            smap.append(map_sequence[i])
+
+    if len(smap)!=0:
+        sequence_final = sunpy.map.Map(smap, sequence=True)
+    else:
+        sequence_final = []
+
+    return sequence_final
 
 def get_closest(smap, date):
     """
@@ -20,8 +65,9 @@ def get_closest(smap, date):
     ----------
     smap : `~sunpy.map.GenericMap`
         A SunPy map.
-
-    date : '~'
+    
+    date : 'astropy.time.Time'
+        A time object.
 
     Returns
     -------
@@ -59,9 +105,97 @@ def normalize_exposure(smap):
         raise Exception('Could not normalize Maps exposure time.')
     return smap_new
 
+def filter_maps(map_sequence, extra):
+    '''
+    Returns filtered maps.
+    
+    For a map (or a sequence of maps) it performs a filtering, namely: 
+    removes map dublicates, maps with non-default exposure or dimensions, or polarized maps,
+    combine the polarization images to total brightness, 
+   
+    Parameters
+    ----------
+    map_sequence : `~sunpy.map.GenericMap`
+        A SunPy map.
+    
+    extra : A list with with the preparation arguments
+
+    Returns
+    -------
+    `~sunpy.map.GenericMap`
+        A SunPy map.
+    
+    '''
+    indices = []
+    # TODO: This has been added because VSO search returns duplicates for WISPR
+    #       so we manualy filter the dublicates until this problem is solved https://github.com/sunpy/sunpy/issues/5481
+    if 'dublicates' in extra:
+        map_sequence.sort(key=attrgetter('date'))
+        for i in range(0,len(map_sequence)-1):
+            if map_sequence[i].date == map_sequence[i+1].date:
+                indices.append(i)
+        for i in sorted(indices, reverse=True):
+            map_sequence.pop(i)
+
+    if 'exposure' in extra:
+        map_sequence = [tmap for tmap in map_sequence if tmap.exposure_time > extra['exposure']*u.second]
+
+    if 'dimensions' in extra:
+        map_sequence = [tmap for tmap in map_sequence if (tmap.dimensions[0], tmap.dimensions[1]) == extra['dimensions']]
+
+    if 'polar' in extra:
+        map_sequence = [tmap for tmap in map_sequence if tmap.meta['polar'] == extra['polar']]
+
+    if len(map_sequence)!=0:
+        sequence_final = sunpy.map.Map(map_sequence, sequence=True)
+    else:
+        sequence_final = []
+    return sequence_final
+
+def prepare_maps(map_sequence, extra):
+    '''
+    Returns prepared maps.
+    
+    For a map (or a sequence of maps) it performs basic preparations, namely: 
+    exposure time normalization, mask the occulters, downsample with superpixel,
+    combine the polarization images to total brightness, 
+   
+    Parameters
+    ----------
+    map_sequence : `~sunpy.map.GenericMap`
+        A SunPy map.
+    
+    extra : A list with with the preparation arguments
+
+    Returns
+    -------
+    `~sunpy.map.GenericMap`
+        A SunPy map.
+    
+    '''
+    if len(map_sequence)==0:
+        return []
+
+    map_sequence = [normalize_exposure(tmap) for tmap in map_sequence]
+    map_ = [mask_occulter(tmap) for tmap in map_sequence]
+
+    if 'superpixel' in extra:
+        nsuper = extra['superpixel']
+        super_dim = u.Quantity([nsuper, nsuper] * u.pixel)
+        map_ = [tmap.superpixel(super_dim) for tmap in map_sequence]
+
+    # map_sequence = [tmap.rotate(recenter=True) for tmap in map_sequence]
+        
+    if map_sequence[0].detector == 'COR1':
+        if 'polar' not in extra:
+            sequence_final = sunpy_dev.extern.sunkit_instruments.stereo.utils.cor_polariz(map_sequence)
+    else:
+        sequence_final = map_sequence
+    return sequence_final
+
 def difference_maps(smapi, smapm):
     """
-    Make a running or base difference map.
+    Returns a running or base difference map.
 
     Parameters
     ----------
@@ -81,14 +215,28 @@ def difference_maps(smapi, smapm):
     The two maps have to be coalligned.
     This is something that it is not checked here.
     """
-    smapi = normalize_exposure(smapi)
-    smapm = normalize_exposure(smapm)
+    if smapi.exposure_time != 1*u.second:
+        smapi = normalize_exposure(smapi)
+    if smapm.exposure_time != 1*u.second:
+        smapm = normalize_exposure(smapm)
     smap_difference = smapi.data - smapm.data
     return sunpy.map.Map(smap_difference, smapi.meta)
 
 def mask_occulter(smap, apply_mask = True, mask_value = 0):
     """
-    Returns a mask of the coronagraphic occulters
+    For a given map it produces a mask for the coronagraphic occulters
+    and returns the map with the mash applied or the mask. If the map
+    is not from coronagraphs or it is not registered returns the initial map
+
+    Parameters
+    ----------
+    smap : `~sunpy.map.GenericMap`
+        A SunPy map.
+
+    Returns
+    -------
+    `~sunpy.map.GenericMap`
+        A SunPy map.
     """
     if smap.detector == 'COR1':
         xcen, ycen = smap.meta['crpix1'], smap.meta['crpix2']

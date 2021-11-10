@@ -38,7 +38,9 @@ from sunpy.coordinates import get_horizons_coord
 from sunpy.map.maputils import contains_coordinate
 from sunpy.net import Fido
 from sunpy.net import attrs as a
-from sunpy_dev.map.maputils import difference_maps, normalize_exposure
+from sunpy_dev.map.maputils import (prepare_maps, filter_maps,
+                                    difference_maps, normalize_exposure,
+                                    maps_sequence_processing)
 
 
 def get_hek_flare(day):
@@ -85,25 +87,17 @@ def plot_bodies(axis, bodies_list, smap):
             axis.plot_coord(body_coo, 'o', color=bodies_dict[body][1],
                 fillstyle='none', markersize=6, label=body)
 
-
 def download_fits(date_process, imager, time_range=[-1,1]):
     timerange = a.Time(date_process + datetime.timedelta(hours=time_range[0]),
                        date_process + datetime.timedelta(hours=time_range[1]))
 
     map_ = {}
     args = imager_dict[imager][0]
-    extra = imager_dict[imager][1]
     result = Fido.search(timerange, *args)
     print(result)
     if len(result['vso'])!=0:
-        nsuper = 2; # Superpixel by x2
-        super_dim = u.Quantity([nsuper, nsuper] * u.pixel)
         downloaded_files = Fido.fetch(result)
         map_ = sunpy.map.Map(downloaded_files)
-        map_ = [mask_occulter(smap) for smap in map_]
-        map_ = [smap.superpixel(super_dim) for smap in map_]
-        map_ = filter_maps(map_, extra)
-        #map_ = [smap.rotate(recenter=True) for smap in map_] # Keep this afrer filter because images resize
     else:
         map_ = []
 
@@ -113,10 +107,14 @@ def maps_process(session_state, imagers_list, image_mode):
     session_state.map = {}
     session_state.imagers_list_ = []
     for imager in imagers_list:
+        extra = imager_dict[imager][1]
         if imager not in session_state.map_ or session_state.map_[imager]==[]:
             pass
         else:
-            session_state.map[imager] = map_diff(session_state.map_[imager], image_mode=image_mode)
+            session_state.map[imager] = filter_maps(session_state.map_[imager], extra)
+            session_state.map[imager] = prepare_maps(session_state.map[imager], extra)
+            session_state.map[imager] = maps_sequence_processing(session_state.map[imager],
+                                                                 seq_type=image_mode)
             session_state.imagers_list_.append(imager)
 
     return session_state
@@ -131,92 +129,6 @@ def maps_clims(session_state, imagers_list):
             session_state.map_clim[imager] = [np.nanquantile(map_.data, 0.20), np.nanquantile(map_.data, 0.80)]
 
     return session_state
-
-def filter_maps(map_sequence, extra):
-
-    indices = []
-    # TODO: This has been added because VSO search returns duplicates for WISPR
-    #       so we manualy filter the dublicates until this problem is solved https://github.com/sunpy/sunpy/issues/5481
-    if 'dublicates' in extra:
-        map_sequence.sort(key=attrgetter('date'))
-        for i in range(0,len(map_sequence)-1):
-            if map_sequence[i].date == map_sequence[i+1].date:
-                indices.append(i)
-        for i in sorted(indices, reverse=True):
-            map_sequence.pop(i)
-
-    if 'dimensions' in extra:
-        map_sequence = [tmap for tmap in map_sequence if (2*tmap.dimensions[0],2*tmap.dimensions[1]) == extra['dimensions']]
-
-    if 'polar' in extra:
-        map_sequence = [tmap for tmap in map_sequence if tmap.meta['polar'] == extra['polar']]
-
-    if len(map_sequence)!=0:
-        sequence_final = sunpy.map.Map(map_sequence, sequence=True)
-    else:
-        sequence_final = []
-
-    return sequence_final
-
-def map_diff(map_sequence, image_mode='Plain'):
-    smap = []
-    if image_mode == 'Running Diff.':
-        for i in range(1,len(map_sequence)):
-            smap_diff = difference_maps(map_sequence[i], map_sequence[i-1])
-            smap.append(smap_diff)
-    if image_mode == 'Base Diff.':
-        for i in range(1,len(map_sequence)):
-            smap_diff = difference_maps(map_sequence[i], map_sequence[0])
-            smap.append(smap_diff)
-    if image_mode == 'Plain':
-        for i in range(0,len(map_sequence)):
-            smap.append(normalize_exposure(map_sequence[i]))
-
-    if len(smap)!=0:
-        sequence_final = sunpy.map.Map(smap, sequence=True)
-    else:
-        sequence_final = []
-
-    return sequence_final
-
-def mask_occulter(smap, apply_mask = True, mask_value = 0):
-    """
-    Returns a mask of the coronagraphic occulters
-    """
-    if smap.detector == 'COR1':
-        xcen, ycen = smap.meta['crpix1'], smap.meta['crpix2']
-        in_fac, out_fac = (100/512), (280/512)
-    elif smap.detector == 'COR2':
-        xcen, ycen = smap.meta['crpix1'], smap.meta['crpix2']
-        in_fac, out_fac = (150/2048), (1030/2048)
-    elif smap.detector == 'C2':
-        xcen = smap.meta['crval1'] / smap.meta['cdelt1'] + ( smap.meta['crpix1'])
-        ycen = smap.meta['crval2'] / smap.meta['cdelt2'] + ( smap.meta['crpix2'])
-        in_fac, out_fac = (170/1024), (670/1024)
-    elif smap.detector == 'C3':
-        xcen = smap.meta['crval1'] / smap.meta['cdelt1'] + ( smap.meta['crpix1'])
-        ycen = smap.meta['crval2'] / smap.meta['cdelt2'] + ( smap.meta['crpix2'])
-        in_fac, out_fac = (60/1024), (560/1024)
-    else:
-        if apply_mask:
-            return smap
-        else:
-            return []
-
-    inner_distance = in_fac * smap.dimensions.x
-    outer_distance = out_fac * smap.dimensions.x
-
-    x, y = np.meshgrid(*[np.arange(v.value) for v in smap.dimensions]) * u.pixel
-    xprime_sq = (x-xcen* u.pixel) ** 2
-    yprime_sq = (y-ycen* u.pixel) ** 2
-    mask_inner = np.sqrt( xprime_sq + yprime_sq ) < inner_distance
-    mask_outer = np.sqrt( xprime_sq + yprime_sq ) > outer_distance
-
-    if apply_mask:
-        smap.data[mask_inner+mask_outer] = mask_value
-        return sunpy.map.Map(smap.data, smap.meta)
-    else:
-        return mask_inner+mask_outer
 
 # TODO: Implement units here
 class model_fittings:

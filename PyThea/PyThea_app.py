@@ -227,7 +227,7 @@ def run():
         if 'imagers_list_' not in st.session_state:
             # imagers_list_ is used later when we download or filter the images
             st.session_state['imagers_list_'] = []
-        image_mode = procoption_container.selectbox('Image processing',
+        image_mode = procoption_container.selectbox('Map sequence processing',
                                                  options=['Running Diff.', 'Base Diff.', 'Plain'], key='image_mode',
                                                  on_change=delete_from_state, args=[st], kwargs={'var': 'map'})
 
