@@ -1,0 +1,28 @@
+# This is a basic workflow that is manually triggered
+
+name: PyTest
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8.12
+      - name: Checkout PyTorch
+        uses: actions/checkout@master
+      - name: Create a virtual environment
+        run: python3 -m venv env
+      - name: Activate the enviroment
+        run: source env/bin/activate
+      - name: Install requirements
+        run: pip3 install -r requirements.txt
+      - name: pytest
+        run: python -m pytest

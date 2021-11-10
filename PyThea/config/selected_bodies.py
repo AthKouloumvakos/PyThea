@@ -1,3 +1,7 @@
+'''
+Configuration for the seleced bodies.
+'''
+
 bodies_dict = {'Mercury': ['199', 'darkturquoise'],
                'Venus': ['299', 'darkorchid'],
                'Earth': ['399', 'green'],

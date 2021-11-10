@@ -56,16 +56,15 @@ def footer_text():
                    from multiple viewpoints such as the SOlar and Heliospheric Observatory (SOHO)
                    and Solar Terrestrial Relations Observatory (STEREO).
                 """)
-    right, left = st.columns((2,1))
+    right, left = st.columns((2, 1))
     right.markdown("""
                    **Github**: You can find the latest version of PyThea here
                                [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AthKouloumvakos/PyThea)
 
-                   **Citation**: Please cite this software as [![TBD](https://zenodo.org/badge/DOI/TBD/TBD.svg)](https://doi.org/TBD/TBD)
+                   **Citation**: Please cite this software as [![https://doi.org/10.5281/zenodo.5683556](https://zenodo.org/badge/DOI/10.5281/zenodo.5683557.svg)](https://doi.org/10.5281/zenodo.5683556)
                 """)
     left.image('https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_logo.png?raw=true')
     st.markdown('---')
-
 
 
 def run():
@@ -75,8 +74,8 @@ def run():
 
     #############################################################
     # set page config
-    st.set_page_config(page_title='PyThea', page_icon=":rocket:",
-                       initial_sidebar_state="expanded")
+    st.set_page_config(page_title='PyThea', page_icon=':rocket:',
+                       initial_sidebar_state='expanded')
 
     #############################################################
     # Styles
@@ -162,13 +161,13 @@ def run():
 
     if 'geometrical_model' not in st.session_state:
         geometrical_model = st.sidebar.selectbox('Geometrical model to fit',
-                                   options=['Select a model', 'Spheroid', 'Ellipsoid', 'GCS'])
+                                                 options=['Select a model', 'Spheroid', 'Ellipsoid', 'GCS'])
         if geometrical_model != 'Select a model':
             st.session_state.geometrical_model = geometrical_model
             st.experimental_rerun()
     else:
         st.sidebar.info(f'Geometrical Model: \
-                          {st.session_state.geometrical_model}')
+                        {st.session_state.geometrical_model}')
 
     if 'geometrical_model' not in st.session_state:
         footer_text()
@@ -183,19 +182,21 @@ def run():
     elif st.session_state.coord_system == 'HGS':
         long_val = [-180., 180.]
 
-    if 'longit' not in st.session_state: st.session_state.longit = 0
+    if 'longit' not in st.session_state:
+        st.session_state.longit = 0
     longit = st.sidebar.slider(f'{st.session_state.coord_system} \
-                                     Longitude [deg.]:',
-                                     min_value=long_val[0],
-                                     max_value=long_val[1],
-                                     step=0.01, key='longit') * u.degree
+                               Longitude [deg.]:',
+                               min_value=long_val[0],
+                               max_value=long_val[1],
+                               step=0.01, key='longit') * u.degree
 
-    if 'latitu' not in st.session_state: st.session_state.latitu = 0
+    if 'latitu' not in st.session_state:
+        st.session_state.latitu = 0
     latitu = st.sidebar.slider(f'{st.session_state.coord_system} \
-                                 Latitude [deg.]:',
-                                 min_value=-90.,
-                                 max_value=90.,
-                                 step=0.01, key='latitu') * u.degree
+                               Latitude [deg.]:',
+                               min_value=-90.,
+                               max_value=90.,
+                               step=0.01, key='latitu') * u.degree
 
     fitting_sliders(st)
 
@@ -208,19 +209,19 @@ def run():
     with st.sidebar.expander('Download Options'):
         select_imagers_form = st.form(key='select_imagers_form')
         imagers_list = select_imagers_form.multiselect('Select Imagers',
-                                      options=imager_dict.keys(),
-                                      default=['LC2', 'LC3', 'COR2A'],
-                                      key='imagers_list')
-        submit_button = select_imagers_form.form_submit_button(label='Submit',
-                                                   on_click=delete_from_state,
-                                                   args=[st], kwargs={'var': 'map'})
+                                                       options=imager_dict.keys(),
+                                                       default=['LC2', 'LC3', 'COR2A'],
+                                                       key='imagers_list')
+        select_imagers_form.form_submit_button(label='Submit',
+                                               on_click=delete_from_state,
+                                               args=[st], kwargs={'var': 'map'})
         select_timerange_form = st.form(key='select_timerange_form')
         imaging_time_range = select_timerange_form.slider('Time Range [hours]',
-                                                       -1., 6., [-1., 1.], 0.5,
-                                                       key='imaging_time_range')
-        submit_button = select_timerange_form.form_submit_button(label='Submit',
-                                                      on_click=delete_from_state,
-                                                      args=[st], kwargs={'var': 'map_'})
+                                                          -1., 6., [-1., 1.], 0.5,
+                                                          key='imaging_time_range')
+        select_timerange_form.form_submit_button(label='Submit',
+                                                 on_click=delete_from_state,
+                                                 args=[st], kwargs={'var': 'map_'})
 
     with st.sidebar.expander('Processing Options'):
         procoption_container = st.container()
@@ -228,24 +229,24 @@ def run():
             # imagers_list_ is used later when we download or filter the images
             st.session_state['imagers_list_'] = []
         image_mode = procoption_container.selectbox('Map sequence processing',
-                                                 options=['Running Diff.', 'Base Diff.', 'Plain'], key='image_mode',
-                                                 on_change=delete_from_state, args=[st], kwargs={'var': 'map'})
+                                                    options=['Running Diff.', 'Base Diff.', 'Plain'], key='image_mode',
+                                                    on_change=delete_from_state, args=[st], kwargs={'var': 'map'})
 
     with st.sidebar.expander('Plot/View Options'):
         plotviewopt_container = st.container()
-        clip_model = plotviewopt_container.checkbox("Clip plot on image limits", value=True)
-        plt_supp_imagers = plotviewopt_container.checkbox("Supplementary Imaging", value=False)
-        star_field = plotviewopt_container.checkbox("View Bodies or s/c")
+        clip_model = plotviewopt_container.checkbox('Clip plot on image limits', value=True)
+        plt_supp_imagers = plotviewopt_container.checkbox('Supplementary Imaging', value=False)
+        star_field = plotviewopt_container.checkbox('View Bodies or s/c')
         if star_field is True:
             bodies_list = plotviewopt_container.multiselect('Select Bodies', options=bodies_dict.keys(),
-                                                        default=['Mercury', 'Venus', 'Jupiter'])
+                                                            default=['Mercury', 'Venus', 'Jupiter'])
 
     #############################################################
     # Download and Process the Images
     # This part runs only if the map_ doesn't exits or the session_state.map_ does not contain all the imagers requested
     if 'map_' not in st.session_state or [False for lst in imagers_list if lst not in st.session_state.map_]:
         st.session_state.map_ = {} if 'map_' not in st.session_state else st.session_state.map_
-        progress_bar = stqdm.stqdm(imagers_list, desc="Preparing to Download data")
+        progress_bar = stqdm.stqdm(imagers_list, desc='Preparing to Download data')
         for imager in progress_bar:
             if imager in st.session_state.map_:
                 pass
@@ -255,7 +256,9 @@ def run():
                                                               imager, time_range=imaging_time_range)
 
     if 'map' not in st.session_state:
-        st.session_state = maps_process(st.session_state, imagers_list, image_mode)
+        st.session_state.map, st.session_state.imagers_list_ = maps_process(st.session_state.map_,
+                                                                            imagers_list,
+                                                                            image_mode)
         st.session_state = maps_clims(st.session_state, imagers_list)
 
     if not st.session_state.imagers_list_:
@@ -270,20 +273,21 @@ def run():
                                    options=st.session_state.imagers_list_)
 
     maps_date = [maps.date for maps in st.session_state.map[imager_select]]
-    if len(maps_date)>1:
-        running_map_date = col2.select_slider("Slide to the image time",
+    if len(maps_date) > 1:
+        running_map_date = col2.select_slider('Slide to the image time',
                                               options=maps_date, key='running_map_date')
     else:
         running_map_date = maps_date[0]
 
     running_map = st.session_state.map[imager_select][maps_date.index(running_map_date)]
 
-    qmin = st.session_state.map_clim[imager_select][0] #np.nanquantile(running_map.data, 0.20)
-    qmax = st.session_state.map_clim[imager_select][1] #np.nanquantile(running_map.data, 0.80)
-    col1, col2 = st.columns((1,3))
-    clim = plotviewopt_container.slider('Images climits:', float(qmin-20),
-                                    float(qmax+20), (float(qmin-5),
-                                    float(qmax+5)), key='clim')
+    qmin = st.session_state.map_clim[imager_select][0]  # np.nanquantile(running_map.data, 0.20)
+    qmax = st.session_state.map_clim[imager_select][1]  # np.nanquantile(running_map.data, 0.80)
+    col1, col2 = st.columns((1, 3))
+    clim = plotviewopt_container.slider('Images climits:',
+                                        float(qmin-20), float(qmax+20),
+                                        (float(qmin-5), float(qmax+5)),
+                                        key='clim')
 
     #############################################################
     # Finalize the geometrical model
@@ -292,7 +296,7 @@ def run():
         rcenter, radaxis, orthoaxis1 = final_parameters_gmodel(st)
     elif st.session_state.geometrical_model == 'Ellipsoid':
         rcenter, radaxis, orthoaxis1, orthoaxis2, tilt = final_parameters_gmodel(st)
-    elif st.session_state.geometrical_model=='GCS':
+    elif st.session_state.geometrical_model == 'GCS':
         rcenter, height, alpha, kappa, tilt = final_parameters_gmodel(st)
 
     Spher_rep = SphericalRepresentation(longit, latitu,
@@ -333,10 +337,10 @@ def run():
     st.pyplot(fig)
 
     if plt_supp_imagers and len(st.session_state.imagers_list_) > 2:
-        supl_imagers = st.select_slider("Select supplement imagers",
+        supl_imagers = st.select_slider('Select supplement imagers',
                                         options=st.session_state.imagers_list_,
                                         value=(st.session_state.imagers_list_[1],
-                                        st.session_state.imagers_list_[-1]),
+                                               st.session_state.imagers_list_[-1]),
                                         key='supl_imagers')
         col1, col2 = st.columns(2)
         fig, axis = make_figure(get_closest(st.session_state.map[supl_imagers[0]],
@@ -356,7 +360,7 @@ def run():
     if store_fit_button_pressed:
         if 'model_fittings' not in st.session_state:
             st.session_state.model_fittings = model_fittings(st.session_state.event_selected,
-                                                             st.session_state.date_process.strftime("%Y-%m-%dT%H:%M:%S.%f"),
+                                                             st.session_state.date_process.strftime('%Y-%m-%dT%H:%M:%S.%f'),
                                                              st.session_state.geometrical_model,
                                                              single_fit)
         else:
@@ -373,15 +377,15 @@ def run():
             st.markdown('**Stored Fitting Table:**')
             st.dataframe(st.session_state.model_fittings.parameters)
             col1, col2 = st.columns((2, 2))
-            col2.selectbox("Select a fitting",
-                options=st.session_state.model_fittings.parameters.index,
-                key='fitting_select')
-            if "fit_action" not in st.session_state:
+            col2.selectbox('Select a fitting',
+                           options=st.session_state.model_fittings.parameters.index,
+                           key='fitting_select')
+            if 'fit_action' not in st.session_state:
                 st.session_state.fit_action = 'Select'
             col1.selectbox('Action',
-                options=['Select', 'Load', 'Delete'],
-                on_change=load_or_delete_fittings, args=[st],
-                key='fit_action')
+                           options=['Select', 'Load', 'Delete'],
+                           on_change=load_or_delete_fittings, args=[st],
+                           key='fit_action')
 
     #############################################################
     # Plot the kinematics
@@ -396,12 +400,11 @@ def run():
                                   options=['Polynomial', 'Spline'])
         if fit_mode == 'Polynomial':
             polyfit_order = col3.slider('Polynomial order', 1, 4, 2, 1, key='polyfit_order')
-            fit_args_ = {'type':'poly','order':polyfit_order}
+            fit_args_ = {'type': 'poly', 'order': polyfit_order}
         else:
             splinefit_order = col3.slider('Spline order', 1, 5, 3, 1, key='splinefit_order')
             splinefit_smooth = st.slider('Spline smooth', 0., 1., 0.5, 0.01, key='splinefit_smooth')
-            fit_args_ = {'type':'spline','order':splinefit_order, 'smooth':splinefit_smooth}
-
+            fit_args_ = {'type': 'spline', 'order': splinefit_order, 'smooth': splinefit_smooth}
 
         if plt_kinematics_select == 'All':
             col1, col2 = st.columns(2)
@@ -425,14 +428,14 @@ def run():
     if 'model_fittings' in st.session_state:
         json_buffer = st.session_state.model_fittings.to_jsonbuffer()
         download_button_str = download_button(json_buffer.getvalue(),
-            st.session_state.model_fittings.model_id()+'.json',
-            'Download Fitting as .json file')
+                                              st.session_state.model_fittings.model_id()+'.json',
+                                              'Download Fitting as .json file')
         st.sidebar.markdown(download_button_str, unsafe_allow_html=True)
     else:
         st.sidebar.info('Store a fit to enable this feature.')
     st.markdown('---')
-    #footer_text()
+    # footer_text()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     run()

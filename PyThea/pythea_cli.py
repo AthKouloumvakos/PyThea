@@ -9,7 +9,7 @@ def main():
     pass
 
 
-@main.command("streamlit")
+@main.command('streamlit')
 def main_streamlit():
     """Run the main program in browser."""
     dirname = os.path.dirname(__file__)
@@ -18,29 +18,29 @@ def main_streamlit():
     streamlit.cli._main_run(filename, args)
 
 
-@main.command("help")
+@main.command('help')
 @click.pass_context
 def help(ctx):
     """Print this help message."""
     # For 'pythea --help' instead of 'pythea help'.
     import sys
-    sys.argv[1] = "--help"
+    sys.argv[1] = '--help'
     main()
 
 
-@main.command("version")
+@main.command('version')
 def main_version():
     """Print PyThea's version number."""
-    print("Showing version is not implemented yet.")
+    print('Showing version is not implemented yet.')
 
 
-@main.command("docs")
+@main.command('docs')
 def docs():
     """Show documents in browser."""
-    print("Showing document page in browser is not implemented yet.")
+    print('Showing document page in browser is not implemented yet.')
 
 # TODO Include the test here.
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

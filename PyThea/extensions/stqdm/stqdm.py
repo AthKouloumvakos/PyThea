@@ -16,7 +16,7 @@ class stqdm(tqdm):
         miniters=None,
         ascii=None,
         disable=False,
-        unit="it",
+        unit='it',
         unit_scale=False,
         dynamic_ncols=False,
         smoothing=0.3,
@@ -85,7 +85,7 @@ class stqdm(tqdm):
 
     def st_display(self, n, total, **kwargs):
         if total is not None and total > 0:
-            self.st_text.write(self.format_meter(n, total, **{**kwargs, "ncols": 0}))
+            self.st_text.write(self.format_meter(n, total, **{**kwargs, 'ncols': 0}))
             self.st_progress_bar.progress(n / total)
 
     def display(self, msg=None, pos=None):

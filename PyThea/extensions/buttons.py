@@ -5,6 +5,7 @@ import re
 import uuid
 
 import pandas as pd
+import streamlit as st
 
 
 # Define Download button, from https://discuss.streamlit.io/t/a-download-button-with-custom-css/4220

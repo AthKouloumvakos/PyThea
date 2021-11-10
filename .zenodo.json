@@ -1,0 +1,22 @@
+{
+    "title": "PyThea: A software package to reconstruct the 3D structure of CMEs and shock waves",
+    "description": "PyThea is an open-source software package that can be used to reconstruct the 3D structure of Coronal Mass Ejections (CMEs) and shock waves and determine their kinematics using remote-sensing observations. The tool implements the Graduated Cylindrical Shell (GCS) model that can be used to reconstruct CMEs and two geometrical models, namely a spheroid and ellipsoid model to reconstruct shock waves. It also implements remote-sensing observations from multiple viewpoints such as the Solar and Heliospheric Observatory (SoHO) and Solar Terrestrial Relations Observatory (STEREO).",
+    "license": "GPL-3.0+",
+    "upload_type": "software",
+    "creators": [
+        {
+            "name": "Athanasios Kouloumvakos",
+            "orcid": "0000-0001-6589-4509",
+            "affiliation": "Institut de Recherche en Astrophysique et Planétologie, Toulouse, France"
+        }
+    ],
+    "related_identifiers": [
+        {
+            "scheme": "doi",
+            "identifier": "10.5281/zenodo.5683557",
+            "relation": "isNewVersionOf",
+            "resource_type": "software"
+        },
+    ],
+    "access_right": "open"
+}

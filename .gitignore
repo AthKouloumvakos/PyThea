@@ -2,14 +2,15 @@
 __pycache__/
 *.py[cod]
 
-_old/
-
+# Enviroment files for testing
 env/
 
-# Setuptools distribution folder.
-/dist/
+# Distribution / packaging and Python egg metadata, generated from source files by setuptools.
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
 
-# Python egg metadata, regenerated from source files by setuptools.
-/*.egg-info
-/.eggs
-/build
+# PyThea specific files
+PyThea/_version.py

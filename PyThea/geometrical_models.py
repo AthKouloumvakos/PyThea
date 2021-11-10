@@ -31,26 +31,23 @@ from scipy.spatial.transform import Rotation
 from sunpy.coordinates import frames
 
 
-def sphere(n= 20, plot = 0):
+def sphere(n=20):
     """
     Returns the (x,y,z) coordinates of a unit sphere centred at the origin.
     The coordinates are (n+1)-by-(n+1) matrices.
     """
 
-    theta = np.linspace( -np.pi, np.pi, n+1)
+    theta = np.linspace(-np.pi, np.pi, n+1)
     phi = np.linspace(-1*np.pi/2, 1 * np.pi/2, n+1)
     cosphi = np.cos(phi)
-    #cosphi[0]=0
-    #cosphi[n]=0;
     sintheta = np.sin(theta)
-    #sintheta[0] = 0
-    #sintheta[n]=0
 
     x =  np.outer(cosphi, np.cos(theta))
     y =  np.outer(cosphi, sintheta)
     z =  np.outer(np.sin(phi), np.ones_like(theta))
 
     return [x, y, z]
+
 
 class spheroid:
     '''
@@ -82,7 +79,7 @@ class spheroid:
     '''
     @u.quantity_input
     def __init__(self, center, radaxis: (u.R_sun), orthoaxis1: (u.R_sun), n=40):
-        self.center = center.transform_to(frames.HeliographicStonyhurst) # This is the SkyCoord of the ellipsoid center
+        self.center = center.transform_to(frames.HeliographicStonyhurst)  # This is the SkyCoord of the ellipsoid center
         self.rcenter = center.radius
         self.radaxis = radaxis
         self.orthoaxis1 = orthoaxis1
@@ -90,11 +87,11 @@ class spheroid:
         self.height = radaxis + self.rcenter
         self.kappa = orthoaxis1 / (self.height-1.*u.R_sun)
 
-        if radaxis<orthoaxis1:
+        if radaxis < orthoaxis1:
             self.epsilon = -1. * np.sqrt(1. - (radaxis/orthoaxis1)**2)
-        elif radaxis>orthoaxis1:
+        elif radaxis > orthoaxis1:
             self.epsilon = 1. * np.sqrt(1. - (orthoaxis1/radaxis)**2)
-        elif radaxis==orthoaxis1:
+        elif radaxis == orthoaxis1:
             self.epsilon = 0.
 
         self.tilt = 0 * u.degree
@@ -132,7 +129,7 @@ class spheroid:
         theta = np.linspace(0, 2*np.pi, step)
         x_ = np.ones_like(theta) * (d**2 - r**2 + R**2) / (2 * d)
         # y_**2 - z_**2 = R**2 - x_**2
-        alpha = np.sqrt(4 * d**2 * R**2 - (d**2 - r**2 + R**2)**2 ) / (2 * d)
+        alpha = np.sqrt(4 * d**2 * R**2 - (d**2 - r**2 + R**2)**2) / (2 * d)
         y_ = alpha * np.sin(theta)
         z_ = alpha * np.cos(theta)
         x, y, z = self.rotate(x_, y_, z_)
@@ -145,14 +142,17 @@ class spheroid:
     @staticmethod
     @u.quantity_input
     def hek_from_rab(rc: (u.R_sun), radaxis: (u.R_sun), orthoaxis1: (u.R_sun)):
+        '''
+        Returns the semi-axis length from the height, epsilon, and kappa parameters
+        '''
         height = rc + radaxis
-        kappa = orthoaxis1 / (height - 1* u.R_sun)
+        kappa = orthoaxis1 / (height - 1 * u.R_sun)
 
-        if radaxis<orthoaxis1:
-            epsilon = -1. * np.sqrt(1 - (radaxis/orthoaxis1)**2)
-        elif radaxis>orthoaxis1:
-            epsilon = np.sqrt(1. - (orthoaxis1/radaxis)**2)
-        elif radaxis==orthoaxis1:
+        if radaxis < orthoaxis1:
+            epsilon = -1. * np.sqrt(1 - (radaxis / orthoaxis1)**2)
+        elif radaxis > orthoaxis1:
+            epsilon = np.sqrt(1. - (orthoaxis1 / radaxis)**2)
+        elif radaxis == orthoaxis1:
             epsilon = 0.
         else:
             height, kappa, epsilon = np.nan * u.R_sun, np.nan, np.nan
@@ -162,12 +162,15 @@ class spheroid:
     @staticmethod
     @u.quantity_input
     def rab_from_hek(height: (u.R_sun), epsilon, kappa):
+        '''
+        Returns the height, epsilon, and kappa parameters from the semi-axis length
+        '''
         s = kappa * (height - 1. * u.R_sun)
-        if epsilon<0:
+        if epsilon < 0:
             d = s * np.sqrt(1. - epsilon**2)
-        elif epsilon>0:
+        elif epsilon > 0:
             d = s / np.sqrt(1. - epsilon**2)
-        elif epsilon==0:
+        elif epsilon == 0:
             d = s
         else:
             rc, radaxis, orthoaxis1 = np.nan * u.R_sun, np.nan * u.R_sun, np.nan * u.R_sun
@@ -190,15 +193,16 @@ class spheroid:
                         frame=frames.HeliographicStonyhurst,
                         obstime=self.center.obstime,
                         observer=self.center.observer)
+
     @property
     def base(self):
         """
         Returns the coordinates of the spheroid base as `~astropy.coordinates.SkyCoord`.
         """
-        rbase = (- self.center.radius + self.radaxis)
+        rbase = (-self.center.radius + self.radaxis)
         Spher_rep = SphericalRepresentation(self.center.lon, self.center.lat,
                                             Distance(np.abs(rbase)))
-        return SkyCoord( - np.sign(rbase) * Spher_rep.to_cartesian(),
+        return SkyCoord(-np.sign(rbase) * Spher_rep.to_cartesian(),
                         frame=frames.HeliographicStonyhurst,
                         obstime=self.center.obstime,
                         observer=self.center.observer)
@@ -217,29 +221,32 @@ class spheroid:
         v = np.transpose([x_.flatten(), y_.flatten(), z_.flatten()])
         v = Rotation.from_euler('xyz', [tilt, -Latc, Longc]).apply(v)
 
-        x = np.reshape(v[:,0], x_.shape) * x_.unit
-        y = np.reshape(v[:,1], y_.shape) * y_.unit
-        z = np.reshape(v[:,2], z_.shape) * z_.unit
+        x = np.reshape(v[:, 0], x_.shape) * x_.unit
+        y = np.reshape(v[:, 1], y_.shape) * y_.unit
+        z = np.reshape(v[:, 2], z_.shape) * z_.unit
         return x, y, z
 
     def plot(self, axis, mode='Skeleton', only_surface=False):
+        '''
+        Plots the spheroid model at the provided axes
+        '''
         if mode == 'Full':
             axis.plot_coord(self.coordinates, color='red', linestyle='-', linewidth=0.2)
         elif (mode == 'Skeleton') and (only_surface is False):
             lw = 1.
             n = self.n
-            palete = sns.color_palette("colorblind")
+            palete = sns.color_palette('colorblind')
 
             # Plot the part of the spheroid mesh but filter lines bellow the solar surface
-            axis.plot_coord(self.coordinates[:,int(n/2)], color=palete[0],linestyle='-', linewidth=lw)
-            my_plot_coord(self.coordinates[:,0], axis, color=palete[6], linestyle='-', linewidth=lw)
-            axis.plot_coord(self.coordinates[0:int(n/2)+1,int(n/4)], color=palete[1], linestyle='-', linewidth=lw)
-            axis.plot_coord(self.coordinates[int(n/2):n+1,int(n/4)], color=palete[1], linestyle='-', linewidth=lw)
-            axis.plot_coord(self.coordinates[0:int(n/2)+1,int(3*n/4)], color=palete[1], linestyle='-', linewidth=lw)
-            axis.plot_coord(self.coordinates[int(n/2):n+1,int(3*n/4)], color=palete[1], linestyle='-', linewidth=lw)
-            my_plot_coord(self.coordinates[int(n/2),0:int(n/4)+1], axis, color=palete[2],linestyle='-', linewidth=lw)
-            my_plot_coord(self.coordinates[int(n/2),int(3*n/4):n+1], axis, color=palete[2],linestyle='-', linewidth=lw)
-            axis.plot_coord(self.coordinates[int(n/2),int(n/4):int(3*n/4)+1], color=palete[3],linestyle='-', linewidth=lw)
+            axis.plot_coord(self.coordinates[:, int(n/2)], color=palete[0], linestyle='-', linewidth=lw)
+            my_plot_coord(self.coordinates[:, 0], axis, color=palete[6], linestyle='-', linewidth=lw)
+            axis.plot_coord(self.coordinates[0:int(n/2)+1, int(n/4)], color=palete[1], linestyle='-', linewidth=lw)
+            axis.plot_coord(self.coordinates[int(n/2):n+1, int(n/4)], color=palete[1], linestyle='-', linewidth=lw)
+            axis.plot_coord(self.coordinates[0:int(n/2)+1, int(3*n/4)], color=palete[1], linestyle='-', linewidth=lw)
+            axis.plot_coord(self.coordinates[int(n/2):n+1, int(3*n/4)], color=palete[1], linestyle='-', linewidth=lw)
+            my_plot_coord(self.coordinates[int(n/2), 0:int(n/4)+1], axis, color=palete[2], linestyle='-', linewidth=lw)
+            my_plot_coord(self.coordinates[int(n/2), int(3*n/4):n+1], axis, color=palete[2], linestyle='-', linewidth=lw)
+            axis.plot_coord(self.coordinates[int(n/2), int(n/4):int(3*n/4)+1], color=palete[3], linestyle='-', linewidth=lw)
 
         if (mode == 'Skeleton') or (only_surface is True):
             # Plot the part of the intersecting curve at the solar surface
@@ -252,24 +259,24 @@ class spheroid:
                 reference_distance = np.sqrt(axes_frame.observer.radius**2 - rsun**2)
                 is_visible = coord_in_axes.spherical.distance <= reference_distance
                 if np.any(is_visible):
-                    axis.plot_coord(coords[is_visible], linestyle='',  marker='+',  markersize=3, color=(0.9,0.24,0.38,1))
-                    #coord_ = coords[is_visible]
-                    #s = ''.join('X' if p else 'O' for p in np.diff(np.diff(coord_.lat))<5*u.deg)
-                    #clist = list([m.span()[0], abs(operator.sub(*m.span()))] for m in re.finditer('X+', s))
-                    #for c in clist:
-                    #   axis.plot_coord(coord_[c[0]:(c[0]+c[1])], linestyle='-', linewidth=0.8, color=(0,0,0,1))
+                    axis.plot_coord(coords[is_visible], linestyle='', marker='+', markersize=3, color=(0.9, 0.24, 0.38, 1))
+                    # coord_=coords[is_visible]
+                    # s=''.join('X' if p else 'O' for p in np.diff(np.diff(coord_.lat))<5*u.deg)
+                    # clist = list([m.span()[0], abs(operator.sub(*m.span()))] for m in re.finditer('X+', s))
+                    # for c in clist:
+                    #   axis.plot_coord(coord_[c[0]:(c[0]+c[1])], linestyle='-', linewidth=0.8, color=(0, 0, 0, 1))
                 if np.any(~is_visible):
-                    axis.plot_coord(coords[~is_visible], linestyle='',  marker="+",  markersize=3, color=(0,0,0,1))
-                    #coord_ = coords[~is_visible]
-                    #s = ''.join('X' if p else 'O' for p in np.diff(np.diff(coord_.lat))<5*u.deg)
-                    #clist = list([m.span()[0], abs(operator.sub(*m.span()))] for m in re.finditer('X+', s))
-                    #for c in clist:
-                    #    axis.plot_coord(coord_[c[0]:(c[0]+c[1])], linestyle='--', linewidth=0.8, color=(0,0,0,1))
+                    axis.plot_coord(coords[~is_visible], linestyle='', marker='+', markersize=3, color=(0, 0, 0, 1))
+                    # coord_ = coords[~is_visible]
+                    # s = ''.join('X' if p else 'O' for p in np.diff(np.diff(coord_.lat))<5*u.deg)
+                    # clist = list([m.span()[0], abs(operator.sub(*m.span()))] for m in re.finditer('X+', s))
+                    # for c in clist:
+                    #    axis.plot_coord(coord_[c[0]:(c[0]+c[1])], linestyle='--', linewidth=0.8, color=(0, 0, 0, 1))
 
-        axis.plot_coord(self.apex, marker = 'o',color=(0,0,0,1))
-        axis.plot_coord(self.base, marker = 'x',color=(0,0,0,1))
-        axis.plot_coord(self.center, marker = '+',color=(0,0,0,1))
-        axis.plot_coord(concatenate((self.apex, self.base)),linestyle='-', linewidth=0.5, color=(0,0,0,1))
+        axis.plot_coord(self.apex, marker='o', color=(0, 0, 0, 1))
+        axis.plot_coord(self.base, marker='x', color=(0, 0, 0, 1))
+        axis.plot_coord(self.center, marker='+', color=(0, 0, 0, 1))
+        axis.plot_coord(concatenate((self.apex, self.base)), linestyle='-', linewidth=0.5, color=(0, 0, 0, 1))
 
     def to_dataframe(self):
         """
@@ -277,21 +284,24 @@ class spheroid:
         """
         center_ = self.center.transform_to(frames.HeliographicCarrington)
         data_dict = {
-                     'hgln': self.center.lon.to_value(u.degree),
-                     'hglt': self.center.lat.to_value(u.degree),
-                     'crln': center_.lon.to_value(u.degree),
-                     'crlt': center_.lat.to_value(u.degree),
-                     'rcenter': self.rcenter.to_value(u.R_sun),
-                     'radaxis': self.radaxis.to_value(u.R_sun),
-                     'orthoaxis1': self.orthoaxis1.to_value(u.R_sun),
-                     'height': self.height.to_value(u.R_sun),
-                     'kappa': self.kappa,
-                     'epsilon': self.epsilon,
-                    }
+            'hgln': self.center.lon.to_value(u.degree),
+            'hglt': self.center.lat.to_value(u.degree),
+            'crln': center_.lon.to_value(u.degree),
+            'crlt': center_.lat.to_value(u.degree),
+            'rcenter': self.rcenter.to_value(u.R_sun),
+            'radaxis': self.radaxis.to_value(u.R_sun),
+            'orthoaxis1': self.orthoaxis1.to_value(u.R_sun),
+            'height': self.height.to_value(u.R_sun),
+            'kappa': self.kappa,
+            'epsilon': self.epsilon,
+        }
 
         return pd.DataFrame(data_dict, index=[self.center.obstime.to_datetime()])
 
     def __str__(self):
+        '''
+        Returns the Spheroid object and parameters in a printable sting array.
+        '''
         center_ = self.center.transform_to(frames.HeliographicCarrington)
         output = '<Spheroid object \n'
         output += 'HGLN = %3.2f degrees \n'%self.center.lon.to_value(u.degree)
@@ -305,6 +315,7 @@ class spheroid:
         output += 'epsilon = %3.2f '%self.epsilon
         output += '>'
         return output
+
 
 class ellipsoid(spheroid):
     '''
@@ -355,10 +366,10 @@ class ellipsoid(spheroid):
         ell = Ellipsoid(pos=(self.rcenter.to_value(1*u.R_sun), 0, 0),
                         axis1=(2*self.radaxis.to_value(1*u.R_sun), 0, 0),
                         axis2=(0, 2*self.orthoaxis1.to_value(1*u.R_sun), 0),
-                        axis3=(0, 0, 2*self.orthoaxis2.to_value(1*u.R_sun)) )
+                        axis3=(0, 0, 2*self.orthoaxis2.to_value(1*u.R_sun)))
         sic = sph.intersectWith(ell)
         poi = sic.points()
-        x, y, z = self.rotate(poi[:,0]*u.R_sun, poi[:,1]*u.R_sun, poi[:,2]*u.R_sun)
+        x, y, z = self.rotate(poi[:, 0]*u.R_sun, poi[:, 1]*u.R_sun, poi[:, 2]*u.R_sun)
 
         return SkyCoord(CartesianRepresentation(x, y, z),
                         frame=frames.HeliographicStonyhurst,
@@ -389,35 +400,38 @@ class ellipsoid(spheroid):
         """
         center_ = self.center.transform_to(frames.HeliographicCarrington)
         data_dict = {
-                     'hgln': self.center.lon.to_value(u.degree),
-                     'hglt': self.center.lat.to_value(u.degree),
-                     'crln': center_.lon.to_value(u.degree),
-                     'crlt': center_.lat.to_value(u.degree),
-                     'rcenter': self.rcenter.to_value(u.R_sun),
-                     'radaxis': self.radaxis.to_value(u.R_sun),
-                     'orthoaxis1': self.orthoaxis1.to_value(u.R_sun),
-                     'orthoaxis2': self.orthoaxis2.to_value(u.R_sun),
-                     'tilt': self.tilt.to_value(u.degree),
-                     'height': self.height.to_value(u.R_sun),
-                     'kappa': self.kappa,
-                     'epsilon': self.epsilon,
-                     'alpha': self.alpha,
-                    }
+            'hgln': self.center.lon.to_value(u.degree),
+            'hglt': self.center.lat.to_value(u.degree),
+            'crln': center_.lon.to_value(u.degree),
+            'crlt': center_.lat.to_value(u.degree),
+            'rcenter': self.rcenter.to_value(u.R_sun),
+            'radaxis': self.radaxis.to_value(u.R_sun),
+            'orthoaxis1': self.orthoaxis1.to_value(u.R_sun),
+            'orthoaxis2': self.orthoaxis2.to_value(u.R_sun),
+            'tilt': self.tilt.to_value(u.degree),
+            'height': self.height.to_value(u.R_sun),
+            'kappa': self.kappa,
+            'epsilon': self.epsilon,
+            'alpha': self.alpha,
+        }
 
         return pd.DataFrame(data_dict, index=[self.center.obstime.to_datetime()])
 
     @staticmethod
     @u.quantity_input
     def heka_from_rabc(rc: (u.R_sun), radaxis: (u.R_sun), orthoaxis1: (u.R_sun), orthoaxis2: (u.R_sun)):
+        '''
+        Returns the semi-axis length from the height, epsilon, kappa, and alpha parameters
+        '''
         height = rc + radaxis
-        kappa = orthoaxis1 / (height - 1* u.R_sun)
+        kappa = orthoaxis1 / (height - 1 * u.R_sun)
         alpha = orthoaxis1 / orthoaxis2
 
-        if radaxis<orthoaxis1:
+        if radaxis < orthoaxis1:
             epsilon = -1. * np.sqrt(1 - (radaxis/orthoaxis1)**2)
-        elif radaxis>orthoaxis1:
+        elif radaxis > orthoaxis1:
             epsilon = np.sqrt(1. - (orthoaxis1/radaxis)**2)
-        elif radaxis==orthoaxis1:
+        elif radaxis == orthoaxis1:
             epsilon = 0.
         else:
             height, kappa, epsilon, alpha = np.nan * u.R_sun, np.nan, np.nan, np.nan
@@ -427,12 +441,15 @@ class ellipsoid(spheroid):
     @staticmethod
     @u.quantity_input
     def rabc_from_heka(height: (u.R_sun), epsilon, kappa, alpha):
+        '''
+        Returns the height, epsilon, kappa, and alpha parameters from the semi-axis length
+        '''
         s = kappa * (height - 1. * u.R_sun)
-        if epsilon<0:
+        if epsilon < 0:
             d = s * np.sqrt(1. - epsilon**2)
-        elif epsilon>0:
+        elif epsilon > 0:
             d = s / np.sqrt(1. - epsilon**2)
-        elif epsilon==0:
+        elif epsilon == 0:
             d = s
         else:
             rc, radaxis, orthoaxis1, orthoaxis2 = np.nan * u.R_sun, np.nan * u.R_sun, np.nan * u.R_sun, np.nan * u.R_sun
@@ -445,6 +462,9 @@ class ellipsoid(spheroid):
         return rc, radaxis, orthoaxis1, orthoaxis2
 
     def __str__(self):
+        '''
+        Returns the Ellipsoid object and parameters in a printable sting array.
+        '''
         center_ = self.center.transform_to(frames.HeliographicCarrington)
         output = '<Ellipsoid object \n'
         output += 'HGLN = %3.2f degrees \n'%self.center.lon.to_value(u.degree)
@@ -462,6 +482,7 @@ class ellipsoid(spheroid):
         output += '>'
         return output
 
+
 class gcs():
     """
     A class of the GCS CME model.
@@ -473,16 +494,16 @@ class gcs():
     """
     def __init__(self, center, height: (u.R_sun), alpha: (u.degree), kappa, tilt: (u.degree),
                  nbvertsl=10, nbvertcirc=20, nbvertcircshell=90):
-        self.center = center.transform_to(frames.HeliographicStonyhurst) # This is the SkyCoord of the center of cyrcle at the apex
-        self.rcenter = center.radius # rcenter = height-rappex
-        self.height = height # GCS height in appex
-        self.alpha = alpha # GCS CME width (in half angle)
-        self.kappa = kappa # ratio
+        self.center = center.transform_to(frames.HeliographicStonyhurst)  # This is the SkyCoord of the center of cyrcle at the apex
+        self.rcenter = center.radius  # rcenter = height-rappex
+        self.height = height  # GCS height in appex
+        self.alpha = alpha  # GCS CME width (in half angle)
+        self.kappa = kappa  # ratio
         self.tilt = tilt
 
         self.distjunc = height * (1-kappa) * np.cos(alpha) / (1.+np.sin(alpha))
-        self.rappex = self.kappa * (self.distjunc / np.cos(self.alpha) + \
-                      self.distjunc * np.tan(self.alpha)) / (1 - self.kappa ** 2)
+        self.rappex = self.kappa * (self.distjunc / np.cos(self.alpha) +
+                                    self.distjunc * np.tan(self.alpha)) / (1 - self.kappa ** 2)
 
         self.nbvertsl = nbvertsl
         self.nbvertcirc = nbvertcirc
@@ -497,8 +518,11 @@ class gcs():
 
     @property
     def coordinates(self):
+        """
+        Returns the coordinates of the ellipsoid cloud of points as `~astropy.coordinates.SkyCoord`.
+        """
         x_, y_, z_ = self.cloud()
-        x, y, z = self.rotate(x_* u.R_sun, y_* u.R_sun, z_* u.R_sun)
+        x, y, z = self.rotate(x_ * u.R_sun, y_ * u.R_sun, z_ * u.R_sun)
 
         return SkyCoord(CartesianRepresentation(x, y, z),
                         frame=frames.HeliographicStonyhurst,
@@ -506,6 +530,12 @@ class gcs():
                         obstime=self.center.obstime)
 
     def rotate(self, x_, y_, z_):
+        """
+        Rotates the (x,y,z) coordinates from the geometrical model's coordinate system
+        to the Heliospheric coordinates.
+
+        Returns the coordinates as `~astropy.coordinates.SkyCoord`.
+        """
         Longc = self.center.lon.to_value(u.rad)
         Latc = self.center.lat.to_value(u.rad)
         tilt = self.tilt.to_value(u.rad)
@@ -513,9 +543,9 @@ class gcs():
         v = np.transpose([x_.flatten(), y_.flatten(), z_.flatten()])
         v = Rotation.from_euler('zyz', [tilt, -Latc+np.pi/2, Longc]).apply(v)
 
-        x = np.reshape(v[:,0], x_.shape) * x_.unit
-        y = np.reshape(v[:,1], y_.shape) * y_.unit
-        z = np.reshape(v[:,2], z_.shape) * z_.unit
+        x = np.reshape(v[:, 0], x_.shape) * x_.unit
+        y = np.reshape(v[:, 1], y_.shape) * y_.unit
+        z = np.reshape(v[:, 2], z_.shape) * z_.unit
 
         return x, y, z
 
@@ -571,10 +601,6 @@ class gcs():
         https://hesperia.gsfc.nasa.gov/ssw/stereo/secchi/idl/scraytrace/cmecloud.pro
         https://gitlab.physik.uni-kiel.de/ET/gcs_python/-/blob/master/gcs/geometry.py
         """
-        self.height.to_value(u.R_sun)
-        self.alpha.to_value(u.rad)
-        self.kappa
-        self.distjunc.to_value(u.R_sun)
 
         # Compute the shell's skeleton axis
         p, r, ca = self.shell_skeleton()
@@ -587,30 +613,56 @@ class gcs():
         uv, vv = uv.flatten(), vv.flatten()
         mesh = r[vv, np.newaxis] * np.array([np.cos(uv), np.sin(uv) * np.cos(ca[vv]), np.sin(uv) * np.sin(ca[vv])]).T + p[vv]
 
-        return mesh[:,0], mesh[:,1], mesh[:,2]
+        return mesh[:, 0], mesh[:, 1], mesh[:, 2]
 
     def plot(self, axis, mode=False, only_surface=False):
+        '''
+        Plots the GCS model at the provided axes
+        '''
         axis.plot_coord(self.coordinates, color='green', linestyle='-', linewidth=0.4)
 
     def to_dataframe(self):
+        """
+        Returns the GCS parameters as `~pandas.DataFrame`.
+        """
         center_ = self.center.transform_to(frames.HeliographicCarrington)
         data_dict = {
-                     'hgln': self.center.lon.to_value(u.degree),
-                     'hglt': self.center.lat.to_value(u.degree),
-                     'crln': center_.lon.to_value(u.degree),
-                     'crlt': center_.lat.to_value(u.degree),
-                     'rcenter': self.rcenter.to_value(u.R_sun),
-                     'height': self.height.to_value(u.R_sun),
-                     'rappex': self.rappex.to_value(u.R_sun),
-                     'alpha': self.alpha.to_value(u.degree),
-                     'kappa': self.kappa,
-                     'tilt': self.tilt.to_value(u.degree),
-                    }
+            'hgln': self.center.lon.to_value(u.degree),
+            'hglt': self.center.lat.to_value(u.degree),
+            'crln': center_.lon.to_value(u.degree),
+            'crlt': center_.lat.to_value(u.degree),
+            'rcenter': self.rcenter.to_value(u.R_sun),
+            'height': self.height.to_value(u.R_sun),
+            'rappex': self.rappex.to_value(u.R_sun),
+            'alpha': self.alpha.to_value(u.degree),
+            'kappa': self.kappa,
+            'tilt': self.tilt.to_value(u.degree),
+        }
 
         return pd.DataFrame(data_dict, index=[self.center.obstime.to_datetime()])
 
+    def __str__(self):
+        '''
+        Returns the GCS object and parameters in a printable sting array.
+        '''
+        center_ = self.center.transform_to(frames.HeliographicCarrington)
+        output = '<GCS object \n'
+        output += 'HGLN = %3.2f degrees \n'%self.center.lon.to_value(u.degree)
+        output += 'HGLT = %3.2f degrees \n'%self.center.lat.to_value(u.degree)
+        output += 'CRLN = %3.2f degrees \n'%center_.lon.to_value(u.degree)
+        output += 'CRLT = %3.2f degrees \n'%center_.lat.to_value(u.degree)
+        output += 'rcenter = %3.2f Rsun \n'%self.rcenter.to_value(u.R_sun)
+        output += 'height = %3.2f Rsun \n'%self.radaxis.to_value(u.R_sun)
+        output += 'alpha = %3.2f \n'%self.alpha
+        output += 'kappa = %3.2f \n'%self.kappa
+        output += 'tilt = %3.2f '%self.tilt
+        output += '>'
+        return output
+
+
 def my_plot_coord(coord, axis, **kargs):
-    ass = coord.spherical.distance > 1*u.R_sun # above solar surface
+
+    ass = coord.spherical.distance > 1*u.R_sun  # above solar surface
     s = ''.join('X' if p else 'O' for p in ass)
     clist = list([m.span()[0], abs(operator.sub(*m.span()))] for m in re.finditer('X+', s))
     for c in clist:

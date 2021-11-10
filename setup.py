@@ -1,8 +1,9 @@
 import os
 
 from setuptools import find_packages, setup
+from setuptools.config import read_configuration
 
-# extras = read_configuration("setup.cfg")
+extras = read_configuration('setup.cfg')
 
 # create home directory
 if not os.path.isdir(os.path.join(os.environ['HOME'], '.PyThea')):
@@ -16,19 +17,20 @@ with open('requirements.txt') as f:
     requirements=f.read().splitlines()
 
 setup(
-    name="PyThea",
-    version="0.4.0",
-    description="PyThea: A software package to reconstruct the 3D structure of CMEs and shock waves",
-    url="https://github.com/AthKouloumvakos/PyThea",
+    name='PyThea',
+    use_scm_version={'write_to': os.path.join('PyThea', '_version.py')},
+    # version="0.4.0",
+    description='PyThea: A software package to reconstruct the 3D structure of CMEs and shock waves',
+    url='https://github.com/AthKouloumvakos/PyThea',
     # long_description=long_description,
     long_description_content_type='text/markdown',
 
-    author="Athanasios Kouloumvakos",
-    author_email="athkouloumvakos@gmail.com",
-    license="GPL-3.0",
-    license_file="LICENSE.md",
+    author='Athanasios Kouloumvakos',
+    author_email='athkouloumvakos@gmail.com',
+    license='GPL-3.0',
+    #license_file="LICENSE.md",
 
-    python_requires=">=3.8",
+    python_requires='>=3.8',
     install_requires=requirements,
     packages=find_packages(),
     include_package_data=True,
@@ -37,5 +39,6 @@ setup(
         'console_scripts': [
             'pythea = PyThea.pythea_cli:main'
         ]
-    }
+    },
+    extras_require=extras,
 )
