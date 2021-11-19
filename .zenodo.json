@@ -10,13 +10,5 @@
             "affiliation": "Institut de Recherche en Astrophysique et Planétologie, Toulouse, France"
         }
     ],
-    "related_identifiers": [
-        {
-            "scheme": "doi",
-            "identifier": "10.5281/zenodo.5683557",
-            "relation": "isNewVersionOf",
-            "resource_type": "software"
-        }
-    ],
     "access_right": "open"
 }

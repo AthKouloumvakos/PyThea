@@ -61,7 +61,7 @@ def footer_text():
                    **Github**: You can find the latest version of PyThea here
                                [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AthKouloumvakos/PyThea)
 
-                   **Citation**: Please cite this software as [![https://doi.org/10.5281/zenodo.5683556](https://zenodo.org/badge/DOI/10.5281/zenodo.5683557.svg)](https://doi.org/10.5281/zenodo.5683556)
+                   **Citation**: Please cite this software as [![https://doi.org/10.5281/zenodo.5713659](https://zenodo.org/badge/DOI/10.5281/zenodo.5713659.svg)](https://doi.org/10.5281/zenodo.5713659)
                 """)
     left.image('https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_logo.png?raw=true')
     st.markdown('---')
