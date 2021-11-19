@@ -258,6 +258,7 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT'):
     plt.title(title)
     plt.gca().set_ylim(bottom=0)
     axis.xaxis.set_major_formatter(mdates.DateFormatter('%Y\n%b-%d\n%H:%M'))
+    axis.minorticks_on()
     fig.autofmt_xdate(bottom=0, rotation=0, ha='center')
     plt.legend(loc='lower right')
 
