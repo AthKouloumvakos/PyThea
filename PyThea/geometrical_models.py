@@ -343,6 +343,8 @@ class ellipsoid(spheroid):
          semi-axis.
     epsilon : `~astropy.units.Quantity`
         The eccentricity of the ellipsoid.
+    tilt : `~astropy.units.Quantity`
+        The tilt angle of the ellipsoid. The axis of rotation is the first (radial) semi-axis.
 
     Notes
     -----

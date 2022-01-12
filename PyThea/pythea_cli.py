@@ -1,3 +1,9 @@
+'''
+When PyThea is installed in an enviroment,
+with this script you can directry call the package as an excecutable.
+$ python3 -m pip install ./ --use-feature=in-tree-build
+$ pythea streamlit
+'''
 import os
 
 import click

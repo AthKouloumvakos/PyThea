@@ -29,7 +29,7 @@ conda env create -f environment.yml
 conda info --envs
 
 # Activate the enviroment
-conda activate pythea
+conda activate PyThea
 
 # When you are done you can deactivate a virtual environment
 conda deactivate
