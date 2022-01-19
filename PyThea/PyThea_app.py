@@ -136,22 +136,24 @@ def run():
     #############################################################
     # Main page information text
     st.title('PyThea: Reconstruct CMEs & Shocks')
-    st.markdown("""
-                ** ⏻ Select a day & solar event and then the
-                geometrical model you want to fit.**
-                """)
-    st.markdown('---')
+
+    #############################################################
+    # Startup Variables
+    if 'startup' not in st.session_state:
+        st.session_state.startup = {'fitting': True}
 
     #############################################################
     # Date and Event selection
 
     if 'date_process' not in st.session_state:
         date_and_event_selection(st)
+        st.markdown(""" ** ⏻ Select a day & solar event. ** """)
     else:
         st.sidebar.markdown('## Processing Event|Date:')
         st.sidebar.info(f'{st.session_state.event_selected}')
 
     if 'date_process' not in st.session_state:
+        st.markdown('---')
         footer_text()
         st.stop()
 
@@ -160,6 +162,7 @@ def run():
     st.sidebar.markdown('## 3D Fitting and Reconstruction')
 
     if 'geometrical_model' not in st.session_state:
+        st.markdown(""" ** ⏻ Select the geometrical model you want to fit. ** """)
         geometrical_model = st.sidebar.selectbox('Geometrical model to fit',
                                                  options=['Select a model', 'Spheroid', 'Ellipsoid', 'GCS'])
         if geometrical_model != 'Select a model':
@@ -170,11 +173,13 @@ def run():
                         {st.session_state.geometrical_model}')
 
     if 'geometrical_model' not in st.session_state:
+        st.markdown('---')
         footer_text()
         st.stop()
 
     #############################################################
     # 3D Fitting and Reconstruction
+    st.markdown('---')
     fitting_and_slider_options_container(st)
 
     if st.session_state.coord_system == 'HGC':
@@ -396,14 +401,24 @@ def run():
         col1, col2, col3 = st.columns(3)
         plt_kinematics_select = col1.selectbox('Select Plots',
                                                options=['All', 'HeightT', 'SpeedT'])
+
+        if 'fit_mode' not in st.session_state:
+            st.session_state.fit_mode = 'polynomial'
         fit_mode = col2.selectbox('Select Fitting Mode',
-                                  options=['Polynomial', 'Spline'])
-        if fit_mode == 'Polynomial':
-            polyfit_order = col3.slider('Polynomial order', 1, 4, 2, 1, key='polyfit_order')
-            fit_args_ = {'type': 'poly', 'order': polyfit_order}
-        else:
-            splinefit_order = col3.slider('Spline order', 1, 5, 3, 1, key='splinefit_order')
-            splinefit_smooth = st.slider('Spline smooth', 0., 1., 0.5, 0.01, key='splinefit_smooth')
+                                  options=['polynomial', 'spline'],
+                                  key='fit_mode')
+        if fit_mode == 'polynomial':
+            if 'polyfit_order' not in st.session_state:
+                st.session_state.polyfit_order = 2
+            polyfit_order = col3.slider('Polynomial order', min_value=1, max_value=4, step=1, key='polyfit_order')
+            fit_args_ = {'type': 'polynomial', 'order': polyfit_order}
+        elif fit_mode == 'spline':
+            if 'splinefit_order' not in st.session_state:
+                st.session_state.splinefit_order = 3
+            splinefit_order = col3.slider('Spline order', min_value=1, max_value=5, step=1, key='splinefit_order')
+            if 'splinefit_smooth' not in st.session_state:
+                st.session_state.splinefit_smooth = 0.5
+            splinefit_smooth = st.slider('Spline smooth', min_value=0., max_value=1., step=0.01, key='splinefit_smooth')
             fit_args_ = {'type': 'spline', 'order': splinefit_order, 'smooth': splinefit_smooth}
 
         if plt_kinematics_select == 'All':
@@ -421,7 +436,9 @@ def run():
                                      fit_args=fit_args_,
                                      plt_type=plt_kinematics_select)
             st.pyplot(fig)
-
+        st.session_state.model_fittings.kinematics['fit_method'] = fit_args_
+    else:
+        st.session_state.startup['fitting'] = True
     #############################################################
     # Download Fitting and Figures
     st.sidebar.markdown('## Finalize and save results')

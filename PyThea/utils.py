@@ -159,30 +159,37 @@ class model_fittings:
     '''
     A class to store the fittings of the geometrical model.
     '''
-    def __init__(self, event_selected, date_process, geometrical_model, model_parameters):
+    def __init__(self, event_selected, date_process, geometrical_model, model_parameters, kinematics={'fit_method': None}):
         self.event_selected = event_selected
         self.date_process = date_process
         self.geometrical_model = geometrical_model
         self.parameters = model_parameters
+        self.kinematics = kinematics
 
     def model_id(self):
         str_id = self.event_selected.replace('-', '').replace(':', '').replace('|', 'D').replace('.', 'p') + 'M' + self.geometrical_model
         return str_id
 
+    def to_dict(self):
+        parameters = copy(self.parameters)
+        parameters['time'] = parameters.index.strftime('%Y-%m-%dT%H:%M:%S.%f')
+        parameters = parameters.to_dict(orient='list')
+        model_fittings_dict = {'event_selected': self.event_selected,
+                               'date_process': self.date_process,
+                               'geometrical_model': {'type': self.geometrical_model,
+                                                     'parameters': parameters},
+                               'kinematics': self.kinematics
+                              }
+        return model_fittings_dict
+
     def to_jsonbuffer(self):
         '''
         Returns the fittings of the geometrical model as a json format
         '''
-        parameters = copy(self.parameters)
-        parameters['time'] = parameters.index.strftime('%Y-%m-%dT%H:%M:%S.%f')
-        parameters = parameters.to_dict(orient='list')
-        fitting_full_file = {'event_selected': self.event_selected,
-                             'date_process': self.date_process,
-                             'geometrical_model': {'type': self.geometrical_model,
-                                                   'parameters': parameters},
-                             }
         json_buffer = io.BytesIO()
-        json_buffer.write(json.dumps(fitting_full_file, indent=' ').encode())
+        model_dict = self.to_dict()
+        model_dict.update({'date_created': (datetime.datetime.utcnow()).strftime('%Y-%m-%dT%H:%M:%S')})
+        json_buffer.write(json.dumps(model_dict, indent=' ').encode())
 
         return json_buffer
 
@@ -273,7 +280,7 @@ def parameter_fit(x, y, fit_args):
     xxx = np.linspace(xx.min(), xx.max(), 120)
     dd = mdates.num2date(xxx + mdates.date2num(x[0]))
 
-    if fit_args['type'] == 'poly':
+    if fit_args['type'] == 'polynomial':
         # scipy.optimize.curve_fit and numpy.polyfit
         popt, pcov = np.polyfit(xx, y, fit_args['order'], full=False, cov=True)
         sigma = np.sqrt(np.diagonal(pcov))  # calculate sigma from covariance matrix

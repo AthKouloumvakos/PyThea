@@ -52,15 +52,28 @@ def date_and_event_selection(st):
             table_indx = [datetime.datetime.strptime(t, '%Y-%m-%dT%H:%M:%S.%f') for t in fitting['geometrical_model']['parameters']['time']]
             parameters = pd.DataFrame(fitting['geometrical_model']['parameters'], index=table_indx)
             parameters = parameters.drop(['time'], axis=1)
+
+            if 'kinematics' in fitting:
+                kinematics = fitting['kinematics']
+            else:
+                # TODO: Remove this in version 1.0.0
+                st.warning('**Warning:** The .json fitting file does not contain the "kinematics" information. \
+                            This means that the file was prodused using Pythea with <V0.6.0. \
+                            **To resolve this:** Just do a save of the loaded fitting now and replace \
+                            the old file with the new one. This will not alter your fittings.')
+                kinematics = {'fit_method': {'type': 'polynomial', 'order': 1}}
+
             st.session_state.model_fittings = model_fittings(fitting['event_selected'],
                                                              fitting['date_process'],
                                                              fitting['geometrical_model']['type'],
-                                                             parameters)
+                                                             parameters,
+                                                             kinematics=kinematics)
             st.experimental_rerun()
 
 
 def fitting_and_slider_options_container(st):
     container = st.sidebar.container()
+
     with container.expander('Options'):
         col1, col2 = st.columns(2)
         col1.radio('Coordinate system', options=['HGS', 'HGC'],
@@ -86,6 +99,24 @@ def fitting_and_slider_options_container(st):
         st.checkbox('View Fitting Table', value=False, key='fitting_table')
 
         st.checkbox('View Kinematics Plot', value=False, key='plt_kinematics')
+
+        if 'fit_args_prime' not in st.session_state and\
+           'model_fittings' in st.session_state:
+            st.session_state.fit_args_prime = st.session_state.model_fittings.kinematics['fit_method']
+
+        if (('model_fittings' in st.session_state) and
+           (st.session_state.plt_kinematics is True) and
+           st.button('Load Fitting Parameters', key='load_kinematics_param')) or\
+           (st.session_state.startup['fitting'] and
+           'fit_args_prime' in st.session_state):
+            st.session_state.startup['fitting'] = False
+            fit_opt = st.session_state.fit_args_prime
+            st.session_state.fit_mode = fit_opt['type']
+            if fit_opt['type'] == 'polynomial':
+                st.session_state.polyfit_order = fit_opt['order']
+            elif fit_opt['type'] == 'spline':
+                st.session_state.splinefit_order = fit_opt['order']
+                st.session_state.splinefit_smooth = fit_opt['smooth']
 
 
 def fitting_sliders(st):
