@@ -179,7 +179,7 @@ class model_fittings:
                                'geometrical_model': {'type': self.geometrical_model,
                                                      'parameters': parameters},
                                'kinematics': self.kinematics
-                              }
+                               }
         return model_fittings_dict
 
     def to_jsonbuffer(self):
@@ -205,7 +205,7 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT'):
              'orthoaxis1': ['x', '', palete[0], 'r-axis1'],
              },
         'Ellipsoid':
-            {'height': ['+', '', palete[3], 'r-apex'],
+            {'height': ['+', '', palete[3], 'h-apex'],
              'orthoaxis1': ['x', '', palete[0], 'r-axis1'],
              'orthoaxis2': ['x', '', palete[2], 'r-axis2'],
              },
@@ -218,8 +218,8 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT'):
     # Height vs time
     fig = plt.figure(figsize=(5.5, 5.5), tight_layout=True)
     axis = plt.subplot()
-    for p in parameters.keys():
-        if plt_type == 'HeightT':
+    if plt_type == 'HeightT':
+        for p in parameters.keys():
             plt.plot(model.parameters.index,
                      model.parameters[p],
                      marker=parameters[p][0],
@@ -237,8 +237,10 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT'):
                                      color=parameters[p][2], alpha=0.05)
             else:
                 plt.plot(model.parameters.index, model.parameters[p], '--', color=parameters[p][2])
-            ylabel = 'Height or Length [Rsun]'
-        elif plt_type == 'SpeedT':
+        ylabel = 'Height or Length [Rsun]'
+        plt.gca().set_ylim(bottom=0)
+    elif plt_type == 'SpeedT':
+        for p in parameters.keys():
             if len(model.parameters[p])-1 > fit_args['order']:
                 # How to get confidence intervals from curve_fit?
                 fit = parameter_fit(model.parameters.index, model.parameters[p], fit_args)
@@ -255,15 +257,34 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT'):
                                      color=parameters[p][2], alpha=0.05)
             else:
                 pass
-            ylabel = 'Speed [km/s]'
+        ylabel = 'Speed [km/s]'
+        plt.gca().set_ylim(bottom=0)
+    if plt_type == 'LongT' or plt_type == 'LatT':
+        parameters = {'LongT': ['hgln', '+', palete[3], 'Longitude'],
+                      'LatT': ['hglt', '+', palete[2], 'Latitude']}
+        plt.plot(model.parameters.index,
+                 model.parameters[parameters[plt_type][0]],
+                 marker=parameters[plt_type][1],
+                 linestyle='',
+                 color=parameters[plt_type][2],
+                 label=parameters[plt_type][3])
+        if len(model.parameters[parameters[plt_type][0]])-1 > 3:
+            fit = parameter_fit(model.parameters.index, model.parameters[parameters[plt_type][0]], fit_args)
+            plt.plot(fit['best_fit_x'], fit['best_fit_y'], '-', color=parameters[plt_type][2])
+            plt.fill_between(fit['best_fit_x'], fit['sigma_bounds']['up'], fit['sigma_bounds']['low'],
+                             color=parameters[plt_type][2], alpha=0.05)
+        ylabel = parameters[plt_type][3] + ' [degrees]'
+
     plt.xlabel('Time [UT]')
     plt.ylabel(ylabel)
-    if fit_args['type'] == 'spline':
-        title = 'Event: '+model.event_selected+' | ' + fit_args['type'] + str(fit_args['order']) + ' (' + str(fit_args['smooth']) + ')'
-    else:
-        title = 'Event: '+model.event_selected+' | ' + fit_args['type'] + str(fit_args['order'])
+    if fit_args['type'] == 'polynomial':
+        title = 'Event: ' + model.event_selected + ' | ' + fit_args['type'] + str(fit_args['order'])
+    elif fit_args['type'] == 'spline':
+        title = 'Event: ' + model.event_selected + ' | ' + fit_args['type'] + str(fit_args['order']) + ' (' + str(fit_args['smooth']) + ')'
+    elif fit_args['type'] == 'custom':
+        title = 'Event: ' + model.event_selected + ' | Funct: ' + fit_args['expression']
+
     plt.title(title)
-    plt.gca().set_ylim(bottom=0)
     axis.xaxis.set_major_formatter(mdates.DateFormatter('%Y\n%b-%d\n%H:%M'))
     axis.minorticks_on()
     fig.autofmt_xdate(bottom=0, rotation=0, ha='center')
@@ -323,5 +344,28 @@ def parameter_fit(x, y, fit_args):
                                    'low': sv_bound_low,
                                    'dup': sv_bound_dup,
                                    'dlow': sv_bound_dlow},
+                   }
+    elif fit_args['type'] == 'custom':
+        import numexpr
+        from scipy.optimize import curve_fit
+
+        expression = fit_args['expression']  # 'a * exp(-b * x) + c'
+
+        def func(x, a, b, c):
+            return numexpr.evaluate(expression)
+
+        popt, pcov = curve_fit(func, xx, y, bounds=fit_args['bounds'], maxfev=2500)
+        sigma = np.sqrt(np.diagonal(pcov))  # calculate sigma from covariance matrix
+        best_fit = func(xxx, *popt)
+        sigma_bound_up = func(xxx, *(popt + sigma))
+        sigma_bound_low = func(xxx, *(popt - sigma))
+        fitting = {'popt': popt,
+                   'pcov': pcov,
+                   'sigma': sigma,
+                   'best_fit_x_num': xxx,
+                   'best_fit_x': dd,
+                   'best_fit_y': best_fit,
+                   'sigma_bounds': {'up': sigma_bound_up,
+                                    'low': sigma_bound_low},
                    }
     return fitting

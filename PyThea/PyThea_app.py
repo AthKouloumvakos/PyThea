@@ -400,12 +400,12 @@ def run():
         st.markdown('### Plots of kinematics ')
         col1, col2, col3 = st.columns(3)
         plt_kinematics_select = col1.selectbox('Select Plots',
-                                               options=['All', 'HeightT', 'SpeedT'])
+                                               options=['All', 'HeightT', 'SpeedT', 'Long-LatT'])
 
         if 'fit_mode' not in st.session_state:
             st.session_state.fit_mode = 'polynomial'
         fit_mode = col2.selectbox('Select Fitting Mode',
-                                  options=['polynomial', 'spline'],
+                                  options=['polynomial', 'spline', 'custom'],
                                   key='fit_mode')
         if fit_mode == 'polynomial':
             if 'polyfit_order' not in st.session_state:
@@ -420,6 +420,15 @@ def run():
                 st.session_state.splinefit_smooth = 0.5
             splinefit_smooth = st.slider('Spline smooth', min_value=0., max_value=1., step=0.01, key='splinefit_smooth')
             fit_args_ = {'type': 'spline', 'order': splinefit_order, 'smooth': splinefit_smooth}
+        elif fit_mode == 'custom':
+            if 'splinefit_smooth' not in st.session_state:
+                st.session_state.fitcustexpres_select = 'a*exp(-b*x)+c'
+            fitcustexpres_select = col3.selectbox('Select a custom function',
+                                                  options=['a*exp(-b*x)+c'],  # 'a*sqrt(b*x)+c',  '((x+a)/(x+b))+c'
+                                                  key='plt_fitcustexpres_select')
+            fit_args_ = {'type': 'custom', 'expression': fitcustexpres_select,
+                         'bounds': ([-np.inf, -np.inf, -np.inf], [np.inf, np.inf, np.inf]), 'order': 3}
+            st.info(f'A custom function {fit_args_["expression"]} was fitted when processing parameters.')
 
         if plt_kinematics_select == 'All':
             col1, col2 = st.columns(2)
@@ -431,6 +440,17 @@ def run():
                                         fit_args=fit_args_,
                                         plt_type='SpeedT')
             col2.pyplot(fig_vt)
+        elif plt_kinematics_select == 'Long-LatT':
+            fit_args_['bounds'] = ([-np.inf, 0, -np.inf], [np.inf, np.inf, np.inf])
+            col1, col2 = st.columns(2)
+            fig_loT = plot_fitting_model(st.session_state.model_fittings,
+                                         fit_args=fit_args_,
+                                         plt_type='LongT')
+            col1.pyplot(fig_loT)
+            fig_laT = plot_fitting_model(st.session_state.model_fittings,
+                                         fit_args=fit_args_,
+                                         plt_type='LatT')
+            col2.pyplot(fig_laT)
         else:
             fig = plot_fitting_model(st.session_state.model_fittings,
                                      fit_args=fit_args_,

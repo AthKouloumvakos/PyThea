@@ -117,6 +117,9 @@ def fitting_and_slider_options_container(st):
             elif fit_opt['type'] == 'spline':
                 st.session_state.splinefit_order = fit_opt['order']
                 st.session_state.splinefit_smooth = fit_opt['smooth']
+            elif fit_opt['type'] == 'custom':
+                st.session_state.fitcustexpres_select = fit_opt['expression']
+                st.session_state.splinefit_order = fit_opt['order']
 
 
 def fitting_sliders(st):
