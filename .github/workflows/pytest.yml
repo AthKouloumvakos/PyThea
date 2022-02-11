@@ -6,6 +6,11 @@ name: PyTest
 # or API.
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+  release:
+    types: [published]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
