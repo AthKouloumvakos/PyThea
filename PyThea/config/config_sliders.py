@@ -1,6 +1,9 @@
 '''
-Configuration for the geometrical models sliders
+Configuration for the sliders
 '''
+
+############################################################
+# Geometrical Models
 
 sliders_Spheroid = {
     'height': {'Standard': {'min': 1., 'max': 30., 'step': 0.01, 'def': 2.},
@@ -79,3 +82,13 @@ sliders_GCS = {
 sliders_dict = {'Spheroid': sliders_Spheroid,
                 'Ellipsoid': {**sliders_Spheroid, **sliders_Ellipsoid},
                 'GCS': sliders_GCS}
+
+
+############################################################
+# Plus and minus to the images c-limits
+
+slider_image_pmclims = {
+    'Running Diff.': [-50, 50],
+    'Base Diff.': [-100, 100],
+    'Plain': [-5, 5],
+}

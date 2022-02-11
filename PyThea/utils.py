@@ -141,19 +141,6 @@ def maps_process(ninstr_map_in, imagers_list_in, image_mode):
     return ninstr_map_out, imagers_list_out
 
 
-def maps_clims(session_state, imagers_list):
-    # TODO I will move this into the maputils.
-    session_state.map_clim = {}
-    for imager in imagers_list:
-        if imager not in session_state.map or session_state.map[imager] == []:
-            pass
-        else:
-            map_ = session_state.map[imager][0]
-            session_state.map_clim[imager] = [np.nanquantile(map_.data, 0.20), np.nanquantile(map_.data, 0.80)]
-
-    return session_state
-
-
 # TODO: Implement units here
 class model_fittings:
     '''

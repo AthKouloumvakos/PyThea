@@ -23,16 +23,17 @@ import numpy as np
 import streamlit as st
 from astropy.coordinates import Distance, SkyCoord, SphericalRepresentation
 from callbacks import load_or_delete_fittings
-from config.selected_bodies import bodies_dict
-from config.selected_imagers import imager_dict
+from config import (app_styles, config_sliders, selected_bodies,
+                    selected_imagers)
 from extensions.stqdm import stqdm  # See also https://github.com/tqdm/tqdm
 from geometrical_models import ellipsoid, gcs, spheroid
 from modules import (date_and_event_selection, final_parameters_gmodel,
-                     fitting_and_slider_options_container, fitting_sliders)
+                     fitting_and_slider_options_container, fitting_sliders,
+                     maps_clims)
 from sunpy.coordinates import frames
 from sunpy_dev.map.maputils import get_closest
-from utils import (download_fits, make_figure, maps_clims, maps_process,
-                   model_fittings, plot_bodies, plot_fitting_model)
+from utils import (download_fits, make_figure, maps_process, model_fittings,
+                   plot_bodies, plot_fitting_model)
 
 
 def delete_from_state(state, var):
@@ -161,7 +162,7 @@ def run():
     with st.sidebar.expander('Download Options'):
         select_imagers_form = st.form(key='select_imagers_form')
         imagers_list = select_imagers_form.multiselect('Select Imagers',
-                                                       options=imager_dict.keys(),
+                                                       options=selected_imagers.imager_dict.keys(),
                                                        default=['LC2', 'LC3', 'COR2A'],
                                                        key='imagers_list')
         select_imagers_form.form_submit_button(label='Submit',
@@ -190,7 +191,7 @@ def run():
         plt_supp_imagers = plotviewopt_container.checkbox('Supplementary Imaging', value=False)
         star_field = plotviewopt_container.checkbox('View Bodies or s/c')
         if star_field is True:
-            bodies_list = plotviewopt_container.multiselect('Select Bodies', options=bodies_dict.keys(),
+            bodies_list = plotviewopt_container.multiselect('Select Bodies', options=selected_bodies.bodies_dict.keys(),
                                                             default=['Mercury', 'Venus', 'Jupiter'])
 
     #############################################################
@@ -211,7 +212,7 @@ def run():
         st.session_state.map, st.session_state.imagers_list_ = maps_process(st.session_state.map_,
                                                                             imagers_list,
                                                                             image_mode)
-        st.session_state = maps_clims(st.session_state, imagers_list)
+        maps_clims(st, imagers_list)
 
     if not st.session_state.imagers_list_:
         st.error('No images have been downloaded or processed.')  # TODO: Explain better
@@ -236,9 +237,10 @@ def run():
     qmin = st.session_state.map_clim[imager_select][0]  # np.nanquantile(running_map.data, 0.20)
     qmax = st.session_state.map_clim[imager_select][1]  # np.nanquantile(running_map.data, 0.80)
     col1, col2 = st.columns((1, 3))
+    cmmin, cpmax = config_sliders.slider_image_pmclims[image_mode]
     clim = plotviewopt_container.slider('Images climits:',
-                                        float(qmin-20), float(qmax+20),
-                                        (float(qmin-5), float(qmax+5)),
+                                        float(cmmin), float(cpmax),
+                                        (float(qmin-10), float(qmax+10)),
                                         key='clim')
 
     #############################################################
@@ -411,9 +413,9 @@ def run():
     st.sidebar.markdown('## Finalize and save results')
     if 'model_fittings' in st.session_state:
         json_buffer = st.session_state.model_fittings.to_jsonbuffer()
-        download_button_str = st.sidebar.download_button('Download Fitting as .json file',
-                                                         json_buffer.getvalue(),
-                                                         st.session_state.model_fittings.model_id()+'.json')
+        st.sidebar.download_button('Download Fitting as .json file',
+                                   json_buffer.getvalue(),
+                                   st.session_state.model_fittings.model_id()+'.json')
     else:
         st.sidebar.info('Store a fit to enable this feature.')
     st.markdown('---')
