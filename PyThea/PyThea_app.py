@@ -25,7 +25,6 @@ from astropy.coordinates import Distance, SkyCoord, SphericalRepresentation
 from callbacks import load_or_delete_fittings
 from config.selected_bodies import bodies_dict
 from config.selected_imagers import imager_dict
-from extensions.buttons import download_button
 from extensions.stqdm import stqdm  # See also https://github.com/tqdm/tqdm
 from geometrical_models import ellipsoid, gcs, spheroid
 from modules import (date_and_event_selection, final_parameters_gmodel,
@@ -78,60 +77,8 @@ def run():
                        initial_sidebar_state='expanded')
 
     #############################################################
-    # Styles
-
-    # Hide the menu button
-    st.markdown(""" <style>
-                #MainMenu {visibility: hidden;}
-                footer {visibility: hidden;}
-                </style> """, unsafe_allow_html=True)
-    # Do some css styling tricks here (e.g. remove the padding)
-    # https://medium.com/ssense-tech/streamlit-tips-tricks-and-hacks-for-data-scientists-d928414e0c16
-    padding = 1
-    st.markdown(f""" <style>
-                .reportview-container .main .block-container{{
-                padding-top: {padding}rem;
-                margin-top: -3.5rem;
-                max-width: 50rem;
-                padding-right: {padding}rem;
-                padding-left: {padding}rem;
-                padding-bottom: {padding}rem;
-                }} </style> """, unsafe_allow_html=True)
-    st.markdown(f""" <style>
-                .reportview-container .css-1lcbmhc .block-container{{
-                margin-top: -3.0rem;
-                }} </style> """, unsafe_allow_html=True)
-    # Reduce the space in horizontal component
-    st.markdown(f""" <style>
-                hr {{
-                margin: 10px 0px;
-                }} </style> """, unsafe_allow_html=True)
-    # Custom button appearance
-    st.markdown('''
-                <style>
-                div.stButton > button:first-child {
-               display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                min-width: 100%;
-                background-color: rgb(255, 255, 255);
-                color: rgb(38, 39, 48);
-                padding: .25rem .75rem;
-                position: relative;
-                text-decoration: none;
-                border-radius: 4px;
-                border-width: 1px;
-                border-style: solid;
-                border-color: rgb(230, 234, 241);
-                border-image: initial; }
-                div.stButton > button:hover {
-                border-color: rgb(246, 51, 102);
-                color: rgb(246, 51, 102);}
-                div.stButton > button:active{
-                box-shadow: none;
-                background-color: rgb(246, 51, 102);
-                color: white; }
-                </style>''', unsafe_allow_html=True)
+    # HTML Styles
+    app_styles.apply(st)
 
     #############################################################
     # Main page information text
@@ -464,10 +411,9 @@ def run():
     st.sidebar.markdown('## Finalize and save results')
     if 'model_fittings' in st.session_state:
         json_buffer = st.session_state.model_fittings.to_jsonbuffer()
-        download_button_str = download_button(json_buffer.getvalue(),
-                                              st.session_state.model_fittings.model_id()+'.json',
-                                              'Download Fitting as .json file')
-        st.sidebar.markdown(download_button_str, unsafe_allow_html=True)
+        download_button_str = st.sidebar.download_button('Download Fitting as .json file',
+                                                         json_buffer.getvalue(),
+                                                         st.session_state.model_fittings.model_id()+'.json')
     else:
         st.sidebar.info('Store a fit to enable this feature.')
     st.markdown('---')
