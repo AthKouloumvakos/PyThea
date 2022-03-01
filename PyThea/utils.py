@@ -86,6 +86,14 @@ def make_figure(map, image_mode, clim=[-20, 20], clip_model=True):
         axis.set_xlim([0, map.data.shape[0]])
         axis.set_ylim([0, map.data.shape[1]])
 
+    # TODO: When LASCO maps have crota \ne 0 the image is reversed so north is down.
+    # This is a temporary fix. The best is to derotate the images from the begining.
+    cref = map.pixel_to_world(0*u.pix, 0*u.pix)
+    if cref.Tx > 0:
+        axis.invert_xaxis()
+    if cref.Ty > 0:
+        axis.invert_yaxis()
+
     return fig, axis
 
 
