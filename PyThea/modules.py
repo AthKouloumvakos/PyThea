@@ -34,7 +34,9 @@ def date_and_event_selection(st):
     st.sidebar.markdown('## Date and event selection')
     col1, col2 = st.sidebar.columns(2)
     day = col1.date_input('Select a day to process',
-                          datetime.date.today() - datetime.timedelta(days=1))
+                          value=datetime.date.today() - datetime.timedelta(days=1),
+                          min_value=datetime.datetime(2010,1,1,0,0,0),
+                          max_value=datetime.date.today())
     initialisation = col2.select_slider('How to initialise?',
                                         options=('Manual', 'Event', 'File'), value='Event')
     if initialisation == 'Event':
