@@ -103,6 +103,10 @@ def fitting_and_slider_options_container(st):
 
         if 'fit_args_prime' not in st.session_state and\
            'model_fittings' in st.session_state:
+            if st.session_state.model_fittings.kinematics['fit_method'] is None:
+                # TODO: When initialization is 'Event' or 'Manual' the st.session_state.model_fittings.kinematics
+                # does not take a default value. Explore if I can move this earlier.
+                st.session_state.model_fittings.kinematics = {'fit_method': {'type': 'polynomial', 'order': 1}}
             st.session_state.fit_args_prime = st.session_state.model_fittings.kinematics['fit_method']
 
         if (('model_fittings' in st.session_state) and
