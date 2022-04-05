@@ -13,23 +13,26 @@ _PyThea_ is an open-source software package that can be used to reconstruct the 
 
 ## 💾 Installation
 
-_PyThea_ is written in Python >=3.8 and has some package requirements, which are listed in the requirements.txt and environment.yml files.
-To run localy this application we recomend to create its own virtual enviroment in Python.
+_PyThea_ is written in Python >=3.8 and has some package requirements to run. These are listed in the requirements.txt and environment.yml files located in the main repository. To run this application locally, we recommend to create its own virtual environment in Python and install the dependent packages. Because of a range of dependencies that the different packages have, the simplest way to work with _PyThea_ is installing the packages with _conda_ and creating its own environment. Alternatively, you can create a virtual environment in Python inside the project folder and install the packages using ```pip```. Both ways are explained below.
 
-**Recomended (conda)**
+First, download the latest release of _PyThea_ and unzip the file. Navigate (e.g., ```cd```) to the root directory of _PyThea_ which is the unzipped folder and follow the instructions to create the virtual environment and install the dependent packages:
 
-Because of a range of dependencies that packages have, the simplest way to work with _PyThea_
-is in conda and to create its own environment using the ```conda env create```.
-If you already have conda installed, then ```cd``` the root directory of _PyThea_ and in your terminal do:
+**Recommended (conda)**
+
+We create the virtual environment (see [here](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)) and install the dependent packages by doing the following in the terminal,
 
 ```python
-# Create a virtual environment in python using conda
-#  see https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html
 conda env create -f environment.yml
 conda info --envs
+```
 
+Then every time before using _PyThea_, you have to activate the environment and when finishing your work deactivate it using the following commands,
+
+```python
 # Activate the enviroment
 conda activate PyThea
+
+# Here you run _PyThea_ (see Run locally section)
 
 # When you are done you can deactivate a virtual environment
 conda deactivate
@@ -37,12 +40,13 @@ conda deactivate
 
 **Alternative (pip)**
 
+You can create a virtual environment in Python inside the _PyThea_ project (root) folder using ```pip``` and by doing the following in the terminal,
+
 ```python
-# You can create a virtual environment in Python inside the project folder.
-#  see https://docs.python.org/3/library/venv.html
+# Create the virtual environment in PyThea's root folder
 python3 -m venv env
 
-# Activate the enviroment
+# Activate the environment
 source env/bin/activate
 
 # install the required packages using pip3
@@ -52,9 +56,9 @@ pip3 install -r requirements.txt
 deactivate
 ```
 
-Now you can run any part of the _PyThea_ (see Usage section).
+Now you can run any part of the _PyThea_ (see Run locally section).
 
-You may also add your _PyThea_ directory to the environment variable ```PYTHONPATH```. This is usefull if you need to run _PyThea_ tests or when you need to run some of the package modules out of streamlit.
+You may also add your _PyThea_ directory to the environment variable ```PYTHONPATH```. This is useful if you need to run _PyThea_ tests or when you need to run some of the package modules out of streamlit.
 
 In the terminal use the following and change the \<PyTheaRootDir\> with your path.
 
@@ -62,21 +66,27 @@ In the terminal use the following and change the \<PyTheaRootDir\> with your pat
 export PYTHONPATH="${PYTHONPATH}:<PyTheaRootDir>/PyThea"
 ```
 
-For a premanent solution, if you're using bash (on a Mac or GNU/Linux distribution), add the above line to your ```~/.bashrc``` file (changing the \<PyTheaRootDir\> with your path first).
+For a permanent solution, if you're using bash (on a Mac or GNU/Linux distribution), add the above line to your ```~/.bashrc``` file (changing the \<PyTheaRootDir\> with your path first).
 
-## 🐾 Run localy the _PyThea_ application
-Install the required Python packages, activate the enviroment as shown above, and then run the application with streamlit.
+## 🐾 Run locally the _PyThea_ application
+Install the required Python packages and activate the environment as shown above for each case.
+
+Note that: For the ```pip``` method the ```source env/bin/activate``` is done in the root directory the ```conda activate PyThea``` can be done everywhere.
+
+Then navigate into the _PyThea_ package directory (e.g. ```cd <PyTheaRootDir>/PyThea```) and run the application with streamlit.
+
 ```
-# cd into the package directory and run,
 streamlit run PyThea_app.py
 ```
 The application should now open in the default browser!
+
+When you finish the work deactivate the environment as shown above for each case.
 
 ## 📙 Usage
 
 Complete documentation of the _PyThea_ can be found in (under construction)
 
-## 📦 Usefull Python packages
+## 📦 Useful Python packages
 
 - [SunPy](https://sunpy.org/): The community-developed, free and open-source solar data analysis environment for Python.
 - [AstroPy](https://www.astropy.org/): The Astropy Project is a community effort to develop a single core package for Astronomy in Python.
