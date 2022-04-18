@@ -198,7 +198,7 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT'):
              },
         'GCS':
             {'height': ['+', '', palete[3], 'h-apex'],
-             'rappex': ['x', '', palete[0], 'r-apex'],
+             'rapex': ['x', '', palete[0], 'r-apex'],
              },
     }
     parameters = parameters[model.geometrical_model]

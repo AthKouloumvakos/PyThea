@@ -186,9 +186,9 @@ class spheroid:
         """
         Returns the coordinates of the spheroid apex as `~astropy.coordinates.SkyCoord`.
         """
-        rappex = self.center.radius + self.radaxis
+        rapex = self.center.radius + self.radaxis
         Spher_rep = SphericalRepresentation(self.center.lon, self.center.lat,
-                                            Distance(np.abs(rappex)))
+                                            Distance(np.abs(rapex)))
         return SkyCoord(Spher_rep.to_cartesian(),
                         frame=frames.HeliographicStonyhurst,
                         obstime=self.center.obstime,
@@ -338,7 +338,7 @@ class ellipsoid(spheroid):
     kappa : `~astropy.units.Quantity`
         Ellipsoid self-similar constant, defined as the ratio of the apex height to the length
         of the orthoaxis1. (This is proportional to the first aspect ratio of the ellipsoid)
-   alpha : `~astropy.units.Quantity`
+    alpha : `~astropy.units.Quantity`
         The ellipsoid's second aspect ratio, namely the ratio between the second and the third
          semi-axis.
     epsilon : `~astropy.units.Quantity`
@@ -423,7 +423,7 @@ class ellipsoid(spheroid):
     @u.quantity_input
     def heka_from_rabc(rc: (u.R_sun), radaxis: (u.R_sun), orthoaxis1: (u.R_sun), orthoaxis2: (u.R_sun)):
         '''
-        Returns the semi-axis length from the height, epsilon, kappa, and alpha parameters
+        Returns the height, epsilon, kappa, and alpha parameters from the semi-axis length
         '''
         height = rc + radaxis
         kappa = orthoaxis1 / (height - 1 * u.R_sun)
@@ -444,7 +444,7 @@ class ellipsoid(spheroid):
     @u.quantity_input
     def rabc_from_heka(height: (u.R_sun), epsilon, kappa, alpha):
         '''
-        Returns the height, epsilon, kappa, and alpha parameters from the semi-axis length
+        Returns the semi-axis length from the height, epsilon, kappa, and alpha parameters
         '''
         s = kappa * (height - 1. * u.R_sun)
         if epsilon < 0:
@@ -489,23 +489,38 @@ class gcs():
     """
     A class of the GCS CME model.
 
+    Parameters
+    ----------
+    center : `~astropy.coordinates.SkyCoord`
+        The coordinates of the GCS center (defined at the apex circle center).
+    rcenter : `~astropy.units.Quantity`
+        The radial distance of the GCS center from the solar center.
+    height : `~astropy.units.Quantity`
+        The radial distance of the GCS apex from the solar center (e.g., rcenter+rapex).
+    kappa : `~astropy.units.Quantity`
+        Aspect ratio of the GCS.
+    alpha : `~astropy.units.Quantity`
+        Half angular width of the GCS model.
+    tilt : `~astropy.units.Quantity`
+        The tilt angle of the GCS.
+
     Notes
     -----
     This is based on IDL script in here: https://hesperia.gsfc.nasa.gov/ssw/stereo/secchi/idl/scraytrace/shellskeleton.pro
     and with some additions from here: https://gitlab.physik.uni-kiel.de/ET/gcs_python/-/blob/master/gcs/geometry.py
+    A full description of the GCS model is given in Thernisien et al. (2006) and Thernisien (2011).
     """
     def __init__(self, center, height: (u.R_sun), alpha: (u.degree), kappa, tilt: (u.degree),
                  nbvertsl=10, nbvertcirc=20, nbvertcircshell=90):
-        self.center = center.transform_to(frames.HeliographicStonyhurst)  # This is the SkyCoord of the center of cyrcle at the apex
-        self.rcenter = center.radius  # rcenter = height-rappex
-        self.height = height  # GCS height in appex
+        self.center = center.transform_to(frames.HeliographicStonyhurst)  # This is the SkyCoord of the center of circle at the apex
+        self.rcenter = center.radius  # rcenter = height-rapex
+        self.height = height  # GCS height in apex
         self.alpha = alpha  # GCS CME width (in half angle)
-        self.kappa = kappa  # ratio
-        self.tilt = tilt
+        self.kappa = kappa  # Aspect ratio
+        self.tilt = tilt  # Tilt angle
 
-        self.distjunc = height * (1-kappa) * np.cos(alpha) / (1.+np.sin(alpha))
-        self.rappex = self.kappa * (self.distjunc / np.cos(self.alpha) +
-                                    self.distjunc * np.tan(self.alpha)) / (1 - self.kappa ** 2)
+        self.h = self.h_()  # Height of the cone (CME legs)
+        self.rapex = self.rapex_()  # Cross-section radius at the apex
 
         self.nbvertsl = nbvertsl
         self.nbvertcirc = nbvertcirc
@@ -514,9 +529,27 @@ class gcs():
     @staticmethod
     @u.quantity_input
     def rcenter_(height: (u.R_sun), alpha: (u.degree), kappa):
+        """
+        Returns the distance of the GCS center from the solar center (OC1 in T2011, see eq. 20).
+        """
         h = height * (1. - kappa) * np.cos(alpha) / (1. + np.sin(alpha))
-        rappex = kappa * (h / np.cos(alpha) +  h * np.tan(alpha)) / (1 - kappa ** 2)
-        return height-rappex
+        rapex = kappa * (h / np.cos(alpha) +  h * np.tan(alpha)) / (1 - kappa ** 2)
+        return height-rapex
+
+    def h_(self):
+        """
+        Returns the full height (h) of the cone (OD distance in T2011, see eq. 2).
+        We use eq. 3 in T2006 to derive the h from height, kappa, and alpha parameters
+        """
+        h = self.height * (1. - self.kappa) * np.cos(self.alpha) / (1. + np.sin(self.alpha))
+        return h
+
+    def rapex_(self):
+        """
+        Returns the cross-section radius at the apex (see eq. 29 in T2011).
+        """
+        rapex = self.kappa * (self.h_() / np.cos(self.alpha) +  self.h_() * np.tan(self.alpha)) / (1 - self.kappa ** 2)
+        return rapex
 
     @property
     def coordinates(self):
@@ -543,7 +576,7 @@ class gcs():
         tilt = self.tilt.to_value(u.rad)
 
         v = np.transpose([x_.flatten(), y_.flatten(), z_.flatten()])
-        v = Rotation.from_euler('zyz', [tilt, -Latc+np.pi/2, Longc]).apply(v)
+        v = Rotation.from_euler('zyz', [tilt, -Latc + np.pi/2, Longc]).apply(v)
 
         x = np.reshape(v[:, 0], x_.shape) * x_.unit
         y = np.reshape(v[:, 1], y_.shape) * y_.unit
@@ -560,13 +593,13 @@ class gcs():
         self.height.to_value(u.R_sun)
         alpha = self.alpha.to_value(u.rad)
         kappa = self.kappa
-        distjunc = self.distjunc.to_value(u.R_sun)
+        h = self.h.to_value(u.R_sun)
         gamma = np.arcsin(self.kappa)
 
         # calculate the points of the straight line part
         pRstart = np.array([0, np.sin(alpha), np.cos(alpha)])
         pLstart = np.array([0, -np.sin(alpha), np.cos(alpha)])
-        vertsl = np.linspace(0, distjunc, self.nbvertsl)
+        vertsl = np.linspace(0, h, self.nbvertsl)
         pslR = np.outer(vertsl, pRstart)
         pslL = np.outer(vertsl, pLstart)
         rsl = np.tan(gamma) * norm(pslR, axis=1)
@@ -574,7 +607,7 @@ class gcs():
 
         # calculate the points of the circular part
         beta = np.linspace(-alpha, np.pi/2, self.nbvertcirc)
-        hf = distjunc
+        hf = h
         h = hf / np.cos(alpha)
         rho = hf * np.tan(alpha)
 
@@ -635,7 +668,7 @@ class gcs():
             'crlt': center_.lat.to_value(u.degree),
             'rcenter': self.rcenter.to_value(u.R_sun),
             'height': self.height.to_value(u.R_sun),
-            'rappex': self.rappex.to_value(u.R_sun),
+            'rapex': self.rapex.to_value(u.R_sun),
             'alpha': self.alpha.to_value(u.degree),
             'kappa': self.kappa,
             'tilt': self.tilt.to_value(u.degree),
