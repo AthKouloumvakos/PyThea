@@ -30,6 +30,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import sunpy.map
+from _version import version
 from config.selected_bodies import bodies_dict
 from config.selected_imagers import imager_dict
 from scipy.interpolate import UnivariateSpline
@@ -146,6 +147,7 @@ class model_fittings:
     '''
     A class to store the fittings of the geometrical model.
     '''
+
     def __init__(self, event_selected, date_process, geometrical_model, model_parameters, kinematics={'fit_method': None}):
         self.event_selected = event_selected
         self.date_process = date_process
@@ -169,16 +171,18 @@ class model_fittings:
                                }
         return model_fittings_dict
 
-    def to_jsonbuffer(self):
+    def to_json(self, buffer=False):
         '''
         Returns the fittings of the geometrical model as a json format
         '''
-        json_buffer = io.BytesIO()
         model_dict = self.to_dict()
         model_dict.update({'date_created': (datetime.datetime.utcnow()).strftime('%Y-%m-%dT%H:%M:%S')})
-        json_buffer.write(json.dumps(model_dict, indent=' ').encode())
-
-        return json_buffer
+        model_dict.update({'version': version})
+        if buffer:
+            json_buffer = io.BytesIO()
+            return json_buffer.write(json.dumps(model_dict, indent=' ').encode())
+        else:
+            return json.dumps(model_dict, indent=' ')
 
 
 def plot_fitting_model(model, fit_args, plt_type='HeightT'):

@@ -408,13 +408,13 @@ def run():
         st.session_state.model_fittings.kinematics['fit_method'] = fit_args_
     else:
         st.session_state.startup['fitting'] = True
+
     #############################################################
     # Download Fitting and Figures
     st.sidebar.markdown('## Finalize and save results')
     if 'model_fittings' in st.session_state:
-        json_buffer = st.session_state.model_fittings.to_jsonbuffer()
         st.sidebar.download_button('Download Fitting as .json file',
-                                   json_buffer.getvalue(),
+                                   st.session_state.model_fittings.to_json(),
                                    st.session_state.model_fittings.model_id()+'.json')
     else:
         st.sidebar.info('Store a fit to enable this feature.')
