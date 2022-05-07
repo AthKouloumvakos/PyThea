@@ -21,6 +21,7 @@
 import astropy.units as u
 import numpy as np
 import streamlit as st
+from _version import version
 from astropy.coordinates import Distance, SkyCoord, SphericalRepresentation
 from callbacks import load_or_delete_fittings
 from config import (app_styles, config_sliders, selected_bodies,
@@ -56,13 +57,15 @@ def footer_text():
                    from multiple viewpoints such as the SOlar and Heliospheric Observatory (SOHO)
                    and Solar Terrestrial Relations Observatory (STEREO).
                 """)
-    right, left = st.columns((2, 1))
+    right, left = st.columns((1, 1))
     right.markdown("""
-                   **Github**: You can find the latest version of PyThea here
-                               [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AthKouloumvakos/PyThea)
-
-                   **Citation**: Please cite this software as [![https://doi.org/10.5281/zenodo.5713659](https://zenodo.org/badge/DOI/10.5281/zenodo.5713659.svg)](https://doi.org/10.5281/zenodo.5713659)
-                """)
+                   **Github**: Find the latest version here
+                               [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AthKouloumvakos/PyThea) \n
+                   **Citation**: Cite PyThea as [![https://doi.org/10.5281/zenodo.5713659](https://zenodo.org/badge/DOI/10.5281/zenodo.5713659.svg)](https://doi.org/10.5281/zenodo.5713659) \n
+                   """ +
+                   f"""
+                   **Version**: {version} (latest release [![Version](https://img.shields.io/github/v/release/AthKouloumvakos/PyThea)](https://github.com/AthKouloumvakos/PyThea/releases))
+                   """)
     left.image('https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_logo.png?raw=true')
     st.markdown('---')
 

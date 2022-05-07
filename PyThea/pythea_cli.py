@@ -9,6 +9,8 @@ import os
 import click
 import streamlit.cli
 
+from ._version import version
+
 
 @click.group()
 def main():
@@ -37,13 +39,19 @@ def help(ctx):
 @main.command('version')
 def main_version():
     """Print PyThea's version number."""
-    print('Showing version is not implemented yet.')
+    print(f'PyThea installed version is: {version}')
 
 
 @main.command('docs')
 def docs():
     """Show documents in browser."""
     print('Showing document page in browser is not implemented yet.')
+
+
+@main.command('update')
+def main_version():
+    """Update PyThea."""
+    print('Not implemented yet.')
 
 # TODO Include the test here.
 
