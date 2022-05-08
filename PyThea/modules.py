@@ -45,7 +45,6 @@ def date_and_event_selection(st):
         event_selected = st.sidebar.selectbox('Solar Events', options=selectbox_list)
         if event_selected != 'Select event' and event_selected != 'No events returned':
             st.session_state.date_process = flare_list_['event_peaktime'][selectbox_list.index(event_selected)-1]
-            st.session_state.date_process = datetime.datetime.strptime(st.session_state.date_process, '%Y-%m-%dT%H:%M:%S')
             st.session_state.event_selected = event_selected
             st.experimental_rerun()
         elif event_selected == 'No events returned':

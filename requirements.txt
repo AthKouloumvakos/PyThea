@@ -3,7 +3,7 @@ pandas
 scipy
 astropy
 astroquery
-sunpy==3.1.3
+sunpy==4.0.0
 matplotlib
 seaborn
 streamlit==1.9.0

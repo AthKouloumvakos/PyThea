@@ -21,3 +21,5 @@ def test_hek_client():
     h = hek.HEKClient()
     hek_query = h.search(hekTime, hekEvent)
     assert type(hek_query) == hek.hek.HEKTable
+
+    # Test that the hek_query['event_peaktime'] is <class 'astropy.time.core.Time'>
