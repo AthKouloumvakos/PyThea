@@ -1,0 +1,5 @@
+matplotlib
+jupyter_sphinx
+sphinx-rtd-theme
+numpydoc
+sphinx-automodapi
