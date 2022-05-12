@@ -111,7 +111,14 @@ def download_fits(date_process, imager, time_range=[-1, 1]):
     print(result)
     if len(result['vso']) != 0:
         downloaded_files = Fido.fetch(result)
-        map_ = sunpy.map.Map(downloaded_files)
+        try:
+            map_ = sunpy.map.Map(downloaded_files)
+        except RuntimeError as err:
+            print('Handling RuntimeError error:', err)
+            map_ = []
+        except OSError as err:
+            print('Handling OSError error:', err)
+            map_ = []
     else:
         map_ = []
 
