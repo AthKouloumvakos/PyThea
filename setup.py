@@ -32,7 +32,10 @@ setup(
     license_file='LICENSE.md',
     keywords=['science', 'solar physics', 'solar', 'sun', 'shock waves'],
     classifiers=[
+        'Programming Language :: Python',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Development Status :: 4 - Beta',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: OS Independent',
@@ -40,7 +43,7 @@ setup(
         'Topic :: Scientific/Engineering :: Physics',
     ],
 
-    python_requires='>=3.8',
+    python_requires='>=3.8, <3.10',
     install_requires=requirements,
 
     packages=find_packages(),
