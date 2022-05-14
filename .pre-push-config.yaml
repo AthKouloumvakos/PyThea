@@ -3,7 +3,7 @@ repos:
     hooks:
       - id: pytest
         name: pytest
-        entry: env/bin/pytest
-        language: script
+        entry: pytest
+        language: system
         pass_filenames: false
         always_run: true

@@ -59,7 +59,9 @@ def get_hek_flare(day):
                                         'fl_peakflux', 'hgs_x', 'hgs_y', 'ar_noaanum']
         selectbox_list = []
         for flares in flare_list_:
-            selectbox_list.append((f'FL{flares["fl_goescls"]}|{flares["event_peaktime"]}'))
+            fl_ = flares['fl_goescls']
+            t_ = flares['event_peaktime'].strftime('%Y-%m-%dT%H:%M:%S')
+            selectbox_list.append((f'FL{fl_}|{t_}'))
 
     return selectbox_list, flare_list_
 
