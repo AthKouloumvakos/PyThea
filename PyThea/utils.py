@@ -30,7 +30,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import sunpy.map
-from _version import version
 from config.selected_bodies import bodies_dict
 from config.selected_imagers import imager_dict
 from scipy.interpolate import UnivariateSpline
@@ -40,6 +39,7 @@ from sunpy.net import Fido
 from sunpy.net import attrs as a
 from sunpy_dev.map.maputils import (filter_maps, maps_sequence_processing,
                                     prepare_maps)
+from version import version
 
 
 def get_hek_flare(day):

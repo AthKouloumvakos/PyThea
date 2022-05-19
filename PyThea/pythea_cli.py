@@ -9,7 +9,7 @@ import os
 import click
 import streamlit.cli
 
-from ._version import version
+from .version import version
 
 
 @click.group()
@@ -37,7 +37,7 @@ def help(ctx):
 
 
 @main.command('version')
-def main_version():
+def version():
     """Print PyThea's version number."""
     print(f'PyThea installed version is: {version}')
 
@@ -49,7 +49,7 @@ def docs():
 
 
 @main.command('update')
-def main_version():
+def update():
     """Update PyThea."""
     print('Not implemented yet.')
 

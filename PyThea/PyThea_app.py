@@ -21,7 +21,6 @@
 import astropy.units as u
 import numpy as np
 import streamlit as st
-from _version import version
 from astropy.coordinates import Distance, SkyCoord, SphericalRepresentation
 from callbacks import load_or_delete_fittings
 from config import (app_styles, config_sliders, selected_bodies,
@@ -35,6 +34,7 @@ from sunpy.coordinates import frames
 from sunpy_dev.map.maputils import get_closest
 from utils import (download_fits, make_figure, maps_process, model_fittings,
                    plot_bodies, plot_fitting_model)
+from version import version
 
 
 def delete_from_state(state, var):
@@ -98,7 +98,7 @@ def run():
 
     if 'date_process' not in st.session_state:
         date_and_event_selection(st)
-        st.markdown(""" ** ⏻ Select a day & solar event. ** """)
+        st.markdown(""" #### ⏻ Select a day & solar event. """)
     else:
         st.sidebar.markdown('## Processing Event|Date:')
         st.sidebar.info(f'{st.session_state.event_selected}')
@@ -113,7 +113,7 @@ def run():
     st.sidebar.markdown('## 3D Fitting and Reconstruction')
 
     if 'geometrical_model' not in st.session_state:
-        st.markdown(""" ** ⏻ Select the geometrical model you want to fit. ** """)
+        st.markdown(""" #### ⏻ Select the geometrical model you want to fit. """)
         geometrical_model = st.sidebar.selectbox('Geometrical model to fit',
                                                  options=['Select a model', 'Spheroid', 'Ellipsoid', 'GCS'])
         if geometrical_model != 'Select a model':

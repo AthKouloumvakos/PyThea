@@ -1,9 +1,10 @@
-# NOTE: First try _dev.scm_version if it exists and setuptools_scm is installed
-# This file is not included in astropy wheels/tarballs, so otherwise it will
-# fall back on the generated _version module.
+# Try to import _version or else go to default
+# The modification is made so during the cli call of PyThea the version
+# the version imports correctly. I will explore this in the future.
+# This is a modified script from sunpy
 try:
     try:
-        from ._dev.scm_version import version
+        from _version import version
     except ImportError:
         from ._version import version
 except Exception:
