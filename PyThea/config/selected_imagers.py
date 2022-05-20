@@ -4,6 +4,7 @@
 
 '''
 import astropy.units as u
+import sunpy_soar  # noqa
 from sunpy.net import attrs as a
 
 imager_dict = {}
@@ -71,3 +72,7 @@ imager_dict['WISPR1'] = {'fido': (a.Instrument.wispr, a.Detector.inner),
 imager_dict['WISPR2'] = {'fido': (a.Instrument.wispr, a.Detector.outer),
                          'process': {'dimensions': (960*u.pixel, 1024*u.pixel), 'processing_level': 3, 'superpixel': 2},
                          'source': 'PSP', 'instrument': 'WISPR', 'detector': 'Outer'}
+
+imager_dict['EUI-FSI'] = {'fido': (a.Instrument('EUI'), a.soar.Product('EUI-FSI174-IMAGE'), a.Level(2)),
+                          'process': {'superpixel': 1},
+                          'source': 'SOLO', 'instrument': 'EUI-FSI', 'wavelength': '174'}

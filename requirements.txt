@@ -7,6 +7,7 @@ astroquery
 jplephem
 numexpr
 sunpy==5.1.2
+sunpy_soar
 parfive==2.1.0
 pooch
 matplotlib

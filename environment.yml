@@ -27,3 +27,4 @@ dependencies:
   - pip:
       - pooch
       - jplephem
+      - sunpy_soar
