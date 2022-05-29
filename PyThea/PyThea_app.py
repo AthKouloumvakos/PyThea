@@ -37,12 +37,10 @@ from utils import (download_fits, make_figure, maps_process, model_fittings,
 from version import version
 
 
-def delete_from_state(state, var):
-    if var == 'map_':
-        del st.session_state['map_']
-        del st.session_state['map']
-    elif var == 'map':
-        del st.session_state['map']
+def delete_from_state(vars):
+    for var in vars:
+        if var in st.session_state:
+            del st.session_state[var]
 
 
 def footer_text():
@@ -170,14 +168,14 @@ def run():
                                                        key='imagers_list')
         select_imagers_form.form_submit_button(label='Submit',
                                                on_click=delete_from_state,
-                                               args=[st], kwargs={'var': 'map'})
+                                               kwargs={'vars': ['map', ]})
         select_timerange_form = st.form(key='select_timerange_form')
         imaging_time_range = select_timerange_form.slider('Time Range [hours]',
                                                           -1., 6., [-1., 1.], 0.5,
                                                           key='imaging_time_range')
         select_timerange_form.form_submit_button(label='Submit',
                                                  on_click=delete_from_state,
-                                                 args=[st], kwargs={'var': 'map_'})
+                                                 kwargs={'vars': ['map', 'map_']})
 
     with st.sidebar.expander('Processing Options'):
         procoption_container = st.container()
@@ -186,7 +184,7 @@ def run():
             st.session_state['imagers_list_'] = []
         image_mode = procoption_container.selectbox('Map sequence processing',
                                                     options=['Running Diff.', 'Base Diff.', 'Plain'], key='image_mode',
-                                                    on_change=delete_from_state, args=[st], kwargs={'var': 'map'})
+                                                    on_change=delete_from_state, kwargs={'vars': ['map', ]})
 
     with st.sidebar.expander('Plot/View Options'):
         plotviewopt_container = st.container()
