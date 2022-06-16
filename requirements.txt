@@ -15,6 +15,6 @@ lxml
 zeep
 drms
 tqdm
-vedo
+pyvista
 pytest-astropy
 pytest-sugar

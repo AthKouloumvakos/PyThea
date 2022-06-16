@@ -23,6 +23,7 @@ import re
 import astropy.units as u
 import numpy as np
 import pandas as pd
+import pyvista as pv
 import seaborn as sns
 from astropy.coordinates import (CartesianRepresentation, Distance, SkyCoord,
                                  SphericalRepresentation, concatenate)
@@ -362,17 +363,17 @@ class ellipsoid(spheroid):
         """
         Returns the coordinates of intersection of the ellipsoid with a unit sphere
          centred at the origin as `~astropy.coordinates.SkyCoord`.
-        We use vedo package for this calculation.
+        We use pyvista package for this calculation.
         """
-        from vedo import Ellipsoid, Sphere
-        sph = Sphere(pos=(0, 0, 0), r=1)
-        ell = Ellipsoid(pos=(self.rcenter.to_value(1*u.R_sun), 0, 0),
-                        axis1=(2*self.radaxis.to_value(1*u.R_sun), 0, 0),
-                        axis2=(0, 2*self.orthoaxis1.to_value(1*u.R_sun), 0),
-                        axis3=(0, 0, 2*self.orthoaxis2.to_value(1*u.R_sun)))
-        sic = sph.intersectWith(ell)
-        poi = sic.points()
-        x, y, z = self.rotate(poi[:, 0]*u.R_sun, poi[:, 1]*u.R_sun, poi[:, 2]*u.R_sun)
+        ellipsoid = pv.ParametricEllipsoid(self.radaxis.to_value(1*u.R_sun),
+                                           self.orthoaxis1.to_value(1*u.R_sun),
+                                           self.orthoaxis2.to_value(1*u.R_sun),
+                                           u_res=20, v_res=20, w_res=20)
+        ellipsoid = ellipsoid.translate((self.rcenter.to_value(1*u.R_sun), 0, 0), inplace=False)
+        sphere = pv.Sphere(radius=1, center=(0, 0, 0))
+        sic, _, _ = sphere.intersection(ellipsoid)
+
+        x, y, z = self.rotate(sic.points[:, 0]*u.R_sun, sic.points[:, 1]*u.R_sun, sic.points[:, 2]*u.R_sun)
 
         return SkyCoord(CartesianRepresentation(x, y, z),
                         frame=frames.HeliographicStonyhurst,
