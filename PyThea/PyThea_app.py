@@ -171,7 +171,7 @@ def run():
                                                kwargs={'vars': ['map', ]})
         select_timerange_form = st.form(key='select_timerange_form')
         imaging_time_range = select_timerange_form.slider('Time Range [hours]',
-                                                          -1., 6., [-1., 1.], 0.5,
+                                                          -3., 6., [-1., 1.], 0.5,
                                                           key='imaging_time_range')
         select_timerange_form.form_submit_button(label='Submit',
                                                  on_click=delete_from_state,
