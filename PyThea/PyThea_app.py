@@ -20,12 +20,12 @@
 
 import astropy.units as u
 import numpy as np
+import stqdm  # See also https://github.com/tqdm/tqdm
 import streamlit as st
 from astropy.coordinates import Distance, SkyCoord, SphericalRepresentation
 from callbacks import load_or_delete_fittings
 from config import (app_styles, config_sliders, selected_bodies,
                     selected_imagers)
-from extensions.stqdm import stqdm  # See also https://github.com/tqdm/tqdm
 from geometrical_models import ellipsoid, gcs, spheroid
 from modules import (date_and_event_selection, final_parameters_gmodel,
                      fitting_and_slider_options_container, fitting_sliders,
