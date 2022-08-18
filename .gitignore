@@ -16,7 +16,7 @@ dist/
 PyThea/_version.py
 
 # PyThea doc files
-docs/_build
+docs/source/_build
 
 .DS_Store
 
