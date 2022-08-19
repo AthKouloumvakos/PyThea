@@ -29,15 +29,6 @@ PyThea's Documentation
 
 PyThea is an open-source software package that can be used to reconstruct the 3D structure of Coronal Mass Ejections (CMEs) and shock waves and determine their kinematics using remote-sensing observations. The tool implements the Graduated Cylindrical Shell (GCS) model that can be used to reconstruct CMEs and two geometrical models, namely a spheroid and ellipsoid model to reconstruct shock waves. It also implements remote-sensing observations from multiple viewpoints such as the Solar and Heliospheric Observatory (SoHO) and Solar Terrestrial Relations Observatory (STEREO).
 
-Content
-========
-
-.. toctree::
-   :maxdepth: 1
-
-   quick_start
-   users_guide
-
 Acknowledging or Citing PyThea
 ==============================
 
@@ -65,3 +56,15 @@ The mythology of Thea
 =====================
 
 In Greek mythology, Thea, also called Euryphaessa "wide-shining", is the Titaness of sight and the shining light of the clear blue sky. Her brother/consort is Hyperion, a Titan and god of the sun, and together they are the parents of Helios (the Sun), Selene (the Moon), and Eos (the Dawn).
+
+.. toctree::
+   :caption: Quick Start Guide
+   :maxdepth: 1
+
+   quick_start
+
+.. toctree::
+   :caption: User’s Guide
+   :maxdepth: 3
+
+   users_guide

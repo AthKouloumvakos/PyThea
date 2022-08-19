@@ -1,7 +1,10 @@
-User’s Guide
-============
+Installing PyThea
+=================
 
-Run the Application
--------------------
+Installing Python
+-----------------
 
 Under Construction!
+
+PyThea Application
+==================

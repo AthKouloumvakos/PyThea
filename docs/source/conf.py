@@ -94,6 +94,7 @@ html_theme_options = {
     'logo_only': False,
     'display_version': True,
 }
+# html_favicon = "./_static/icon.ico"
 
 nitpicky = True
 nitpick_ignore = [('py:class', "Unit('deg')"),
@@ -113,5 +114,3 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3/', None),
 # default_role = 'any'
 # automodapi_inheritance_diagram = False
 # automodsumm_inherited_members = True
-
-nitpicky = True

@@ -1,5 +1,5 @@
-Quick Start Guide
-=================
+Getting Started
+===============
 
 Requirements
 ------------
@@ -11,7 +11,7 @@ We recommend using `Anaconda <https://www.anaconda.com>`_ or `Miniconda <https:/
 Installation
 ------------
 
-.. warning::
+.. tip::
 
   We recommend to create a virtual environment before installing ``PyThea``.
 
@@ -32,7 +32,7 @@ In the terminal this is done as follows:
   # install the required packages using pip
   pip install PyThea
 
-.. note::
+.. warning::
 
   Currently install with ``conda install PyThea`` is not suppoted.
 
