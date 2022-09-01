@@ -111,7 +111,7 @@ def download_fits(date_process, imager, time_range=[-1, 1]):
     args = imager_dict[imager][0]
     result = Fido.search(timerange, *args)
     print(result)
-    if len(result['vso']) != 0:
+    if result:
         downloaded_files = Fido.fetch(result)
         try:
             map_ = sunpy.map.Map(downloaded_files)
