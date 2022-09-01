@@ -11,9 +11,9 @@ _PyThea_ is an open-source software package that can be used to reconstruct the 
 
 ## 💾 Installation
 
-We recommend, to create a virtual environment for _PyThea_ and installing the package from PyPI using ```pip```.
+We recommend, creating a virtual environment for _PyThea_ and installing the package from PyPI using ```pip```.
 
-If you use Anaconda or Miniconda (which we also recommend) you can make an create a virtual environment using ```conda``` and then install _PyThea_ using from PyPI using ```pip```. In the terminal do the following:
+If you use Anaconda or Miniconda (which we also recommend) you can create a virtual environment using ```conda``` and then install _PyThea_ using from PyPI using ```pip```. In the terminal do the following:
 
 ```python
 # Create a virtual environment. Use python=3.8 or 3.9
@@ -32,7 +32,7 @@ PyThea streamlit
 conda deactivate
 ```
 
-If ```conda``` is not your favorite way of creating a virtual environment in python, then you can manually create it and install _PyThea_ with ```pip``` as previously shown. For example you can do the following:
+If ```conda``` is not your favorite way of creating a virtual environment in python, then you can manually create it and install _PyThea_ with ```pip``` as previously shown. For example, you can do the following:
 
 ```python
 # Create a virtual environment.
@@ -57,7 +57,7 @@ At the directory where the terminal is open, this method will create a folder na
 
 After installing _PyThea_ software package you can run the application using the terminal.
 
-If the environment is not active then use ```conda activate PyThea``` to activate this and then run _PyThea_ with
+If the environment is not active then use ```conda activate PyThea``` or ```source PyThea/bin/activate``` to activate this and then run _PyThea_ with
 
 ```
 PyThea streamlit
@@ -66,6 +66,12 @@ PyThea streamlit
 The application should now open in the default browser!
 
 Deactivate the environment when you finish.
+
+If there is an error when running ```PyThea streamlit``` then you can manually run PyThea following these steps:
+
+1) Locate where PyThea_app.py have been instaled. This is usually inside the anaconda3 enviroment folder. For example here ```~/opt/anaconda3/envs/PyThea/lib/python3.9/site-packages/PyThea```
+
+2) Then run the PyThea_app.py using: ```streamlit run <PyTheaRootDir>/PyThea_app.py``` replacing  \<PyTheaRootDir\> with your path first.
 
 ## 📙 Usage
 
@@ -78,7 +84,7 @@ Complete documentation of the _PyThea_ is under construction.
 
 ## 📜 Acknowledging or Citing PyThea [![https://doi.org/10.5281/zenodo.5713659](https://zenodo.org/badge/DOI/10.5281/zenodo.5713659.svg)](https://doi.org/10.5281/zenodo.5713659)
 
-If you use _PyThea_ for scientific work or research presented in a publication, please mention it in the main text and cite the package using the following: "Athanasios Kouloumvakos (2022). PyThea: A software package to reconstruct the 3D structure of CMEs and shock waves. (Zenodo: [https://doi.org/10.5281/zenodo.5713659](https://doi.org/10.5281/zenodo.5713659))". Additionally, add the in the methods or acknowledgements section the following: "This research has made use of PyThea v?.?.?, an open-source and free Python package to reconstruct the 3D structure of CMEs and shock waves (Zenodo: [https://doi.org/10.5281/zenodo.5713659](https://doi.org/10.5281/zenodo.5713659)).". To acknowledge _PyThea_ in posters or talks include the project [logo](https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_logo.png) or [icon](https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_icon.png). _PyThea_ has a strong dependency to SunPy and AstroPy Python packages, consider citing these packages as well.
+If you use _PyThea_ for scientific work or research presented in a publication, please mention it in the main text and cite _PyThea_ paper (see [Paper](https://www.frontiersin.org/articles/10.3389/fspas.2022.974137/) or ADS). Additionally, add in the methods or acknowledgements section the following: "This research has made use of PyThea v?.?.?, an open-source and free Python package to reconstruct the 3D structure of CMEs and shock waves (Zenodo: [https://doi.org/10.5281/zenodo.5713659](https://doi.org/10.5281/zenodo.5713659))." and changing the v?.?.? to the version you have used. To acknowledge _PyThea_ in posters or talks include the project [logo](https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_logo.png) or [icon](https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_icon.png). _PyThea_ has a strong dependency on SunPy and AstroPy Python packages, consider citing these packages as well.
 
 ## ⓘ The mythology of Thea:
 
