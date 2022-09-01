@@ -3,7 +3,8 @@ pandas
 scipy
 astropy
 astroquery
-sunpy==4.0.0
+sunpy==4.0.4
+parfive==1.5.1
 matplotlib
 seaborn
 streamlit

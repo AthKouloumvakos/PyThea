@@ -12,11 +12,14 @@ dependencies:
   - matplotlib
   - astropy
   - astroquery
-  - sunpy=4.0.0
+  - sunpy=4.0.4
+  - parfive==1.5.1 # With parfive>=2.0.0 there is an issue with streamlit and asyncio (see #)
   - streamlit
-  - stqdm
   - seaborn
   - vedo
 # - opencv-python-headless > Introdused to solve a libGL library error and no longe needed. https://github.com/AthKouloumvakos/PyThea/commit/24fa8a46fd4c4ee33aa84ee617d6f3e6628ac8e8
   - pytest-astropy
   - pytest-sugar
+  - pip
+  - pip:
+      - stqdm
