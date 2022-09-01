@@ -137,7 +137,7 @@ def run():
         long_val = [-180., 180.]
 
     if 'longit' not in st.session_state:
-        st.session_state.longit = 0
+        st.session_state.longit = 0.
     longit = st.sidebar.slider(f'{st.session_state.coord_system} \
                                Longitude [deg.]:',
                                min_value=long_val[0],
@@ -145,7 +145,7 @@ def run():
                                step=0.01, key='longit') * u.degree
 
     if 'latitu' not in st.session_state:
-        st.session_state.latitu = 0
+        st.session_state.latitu = 0.
     latitu = st.sidebar.slider(f'{st.session_state.coord_system} \
                                Latitude [deg.]:',
                                min_value=-90.,
