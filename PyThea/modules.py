@@ -174,6 +174,7 @@ def fitting_sliders(st):
             st.sidebar.slider(f'{slider} {sd[gmodel][slider]["unit"]}:',  # Add units here
                               min_value=sd[gmodel][slider][adjustments]['min'],
                               max_value=sd[gmodel][slider][adjustments]['max'],
+                              value=sd[gmodel][slider][adjustments]['def'],
                               step=sd[gmodel][slider][adjustments]['step'], key=slider)  # * u.R_sun
 
 

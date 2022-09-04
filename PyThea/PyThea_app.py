@@ -142,6 +142,7 @@ def run():
                                Longitude [deg.]:',
                                min_value=long_val[0],
                                max_value=long_val[1],
+                               value=0.,
                                step=0.01, key='longit') * u.degree
 
     if 'latitu' not in st.session_state:
@@ -150,6 +151,7 @@ def run():
                                Latitude [deg.]:',
                                min_value=-90.,
                                max_value=90.,
+                               value=0.,
                                step=0.01, key='latitu') * u.degree
 
     fitting_sliders(st)
