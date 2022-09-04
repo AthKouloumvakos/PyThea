@@ -419,6 +419,8 @@ def run():
                                    st.session_state.model_fittings.model_id()+'.json')
     else:
         st.sidebar.info('Store a fit to enable this feature.')
+
+    st.sidebar.markdown('---')
     st.markdown('---')
     # footer_text()
 
