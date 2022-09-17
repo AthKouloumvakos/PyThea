@@ -63,7 +63,7 @@ repos:
   # W605 - Fix invalid escape sequence 'x'.
   # W690 - Fix various deprecated code (via lib2to3).
   - repo: https://github.com/PyCQA/flake8
-    rev: 4.0.1
+    rev: 5.0.4
     hooks:
       - id: flake8
         args:
@@ -73,7 +73,7 @@ repos:
           ]
         exclude: ".*(.fits|.fts|.fit|.txt|tca.*|extern.*|.rst|.md|PyThea/extensions)$"
   - repo: https://github.com/myint/autoflake
-    rev: v1.4
+    rev: v1.5.3
     hooks:
       - id: autoflake
         args:
@@ -84,7 +84,7 @@ repos:
           ]
         exclude: ".*(.fits|.fts|.fit|.txt|tca.*|extern.*|.rst|.md|PyThea/extensions)$"
   - repo: https://github.com/pre-commit/mirrors-autopep8
-    rev: v1.6.0
+    rev: v1.7.0
     hooks:
     -   id: autopep8
         args: ["--in-place","--max-line-length", "200"]
@@ -96,7 +96,7 @@ repos:
         args: ["--sp", "setup.cfg"]
         exclude: ".*(.fits|.fts|.fit|.txt|tca.*|extern.*|.rst|.md|PyThea/extensions)$"
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.2.0
+    rev: v4.3.0
     hooks:
       - id: check-ast
       - id: check-case-conflict

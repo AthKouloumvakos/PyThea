@@ -18,10 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
-      - name: Checkout PyTorch
+      - name: Checkout PyThea
         uses: actions/checkout@master
       - name: Create a virtual environment
         run: python3 -m venv env
