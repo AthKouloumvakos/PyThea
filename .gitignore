@@ -23,3 +23,5 @@ docs/source/_examples
 .DS_Store
 
 .vscode/
+
+*.tox
