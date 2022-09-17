@@ -10,7 +10,7 @@ from setuptools import find_packages, setup
 if not os.path.isdir(os.path.join(os.environ['HOME'], '.PyThea')):
     os.mkdir(os.path.join(os.environ['HOME'], '.PyThea'))
 
-with open('README_pypi.md', 'r') as f:
+with open('README_pypi.md', 'r', encoding='utf8') as f:
     long_description = f.read()
 
 # get requirements
