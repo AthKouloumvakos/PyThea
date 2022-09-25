@@ -84,6 +84,7 @@ Complete documentation of the _PyThea_ can be found in (under construction)
 
 - [SunPy](https://sunpy.org/): The community-developed, free and open-source solar data analysis environment for Python.
 - [AstroPy](https://www.astropy.org/): The Astropy Project is a community effort to develop a single core package for Astronomy in Python.
+- [gcs_python](https://github.com/johan12345/gcs_python/): An implementation of the Graduated Cylindrical Shell model in python.
 
 ## 📜 Acknowledging or Citing PyThea [![https://www.frontiersin.org/articles/10.3389/fspas.2022.974137/](https://img.shields.io/static/v1?label=Paper&message=Frontiers&color=red)](https://www.frontiersin.org/articles/10.3389/fspas.2022.974137/) [![https://doi.org/10.5281/zenodo.5713659](https://zenodo.org/badge/DOI/10.5281/zenodo.5713659.svg)](https://doi.org/10.5281/zenodo.5713659)
 

@@ -350,6 +350,7 @@ class ellipsoid(spheroid):
     -----
     Details about ellipsoids can be found here: https://en.wikipedia.org/wiki/Ellipsoid
     '''
+
     def __init__(self, center, radaxis: (u.R_sun), orthoaxis1: (u.R_sun), orthoaxis2: (u.R_sun), tilt: (u.degree), n=40):
         super().__init__(center, radaxis, orthoaxis1, n)
 
@@ -506,10 +507,16 @@ class gcs():
 
     Notes
     -----
-    This is based on IDL script in here: https://hesperia.gsfc.nasa.gov/ssw/stereo/secchi/idl/scraytrace/shellskeleton.pro
-    and with some additions from here: https://gitlab.physik.uni-kiel.de/ET/gcs_python/-/blob/master/gcs/geometry.py
-    A full description of the GCS model is given in Thernisien et al. (2006) and Thernisien (2011).
+    The GCS model is based on A. Thernisien's work and this class is a reworked and adapted code to python
+    of the IDL scripts cmecloud.pro and shellskeleton.pro that can be found here: https://hesperia.gsfc.nasa.gov/ssw/stereo/secchi/idl/scraytrace/
+    with additions from the GCS in Python package that can be found here: https://github.com/johan12345/gcs_python/
+    that are implemented under the MIT License of that package (https://github.com/johan12345/gcs_python/blob/master/LICENSE).
+    A copy of this license can be found in PyThea's extensions/ folder.
+
+    A full description of the GCS model is given in Thernisien et al. (2006; doi:10.1086/508254) and Thernisien (2011; doi:10.1088/0067-0049/194/2/33).
+    The IDL scripts cmecloud.pro and shellskeleton.pro are part of the scraytrace package of SolarSoft (https://www.lmsal.com/solarsoft/).
     """
+
     def __init__(self, center, height: (u.R_sun), alpha: (u.degree), kappa, tilt: (u.degree),
                  nbvertsl=10, nbvertcirc=20, nbvertcircshell=90):
         self.center = center.transform_to(frames.HeliographicStonyhurst)  # This is the SkyCoord of the center of circle at the apex
@@ -619,7 +626,7 @@ class gcs():
         pcL = np.array([np.zeros(beta.shape), -X0 * np.cos(beta), h + X0 * np.sin(beta)]).T
 
         # This part is from here
-        # https://gitlab.physik.uni-kiel.de/ET/gcs_python/-/blob/master/gcs/geometry.py
+        # https://github.com/johan12345/gcs_python/blob/master/gcs/geometry.py
         r = np.concatenate((rsl, rc[1:], np.flipud(rc)[1:], np.flipud(rsl)[1:]))
         ca = np.concatenate((casl, cac[1:], np.pi-np.flipud(cac)[1:], np.pi-np.flipud(casl)[1:]))
         p = np.concatenate((pslR, pcR[1:], np.flipud(pcL)[1:], np.flipud(pslL)[1:]))
@@ -634,14 +641,15 @@ class gcs():
         -----
         Converted and modified from the IDL script cmecloud.pro.
         https://hesperia.gsfc.nasa.gov/ssw/stereo/secchi/idl/scraytrace/cmecloud.pro
-        https://gitlab.physik.uni-kiel.de/ET/gcs_python/-/blob/master/gcs/geometry.py
+        with additions from
+        https://github.com/johan12345/gcs_python/blob/master/gcs/geometry.py
         """
 
         # Compute the shell's skeleton axis
         p, r, ca = self.shell_skeleton()
 
         # This part is from here
-        # https://gitlab.physik.uni-kiel.de/ET/gcs_python/-/blob/master/gcs/geometry.py
+        # https://github.com/johan12345/gcs_python/blob/master/gcs/geometry.py
         ptheta = np.linspace(0, 2*np.pi, self.nbvertcircshell)
         pphi = np.arange(0, 2*(self.nbvertcirc + self.nbvertsl) - 3)
         uv, vv = np.meshgrid(ptheta, pphi)
