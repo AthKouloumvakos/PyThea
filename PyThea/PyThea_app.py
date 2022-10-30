@@ -136,8 +136,6 @@ def run():
     elif st.session_state.coord_system == 'HGS':
         long_val = [-180., 180.]
 
-    if 'longit' not in st.session_state:
-        st.session_state.longit = 0.
     longit = st.sidebar.slider(f'{st.session_state.coord_system} \
                                Longitude [deg.]:',
                                min_value=long_val[0],
@@ -145,8 +143,6 @@ def run():
                                value=0.,
                                step=0.01, key='longit') * u.degree
 
-    if 'latitu' not in st.session_state:
-        st.session_state.latitu = 0.
     latitu = st.sidebar.slider(f'{st.session_state.coord_system} \
                                Latitude [deg.]:',
                                min_value=-90.,
@@ -173,7 +169,8 @@ def run():
                                                kwargs={'vars': ['map', ]})
         select_timerange_form = st.form(key='select_timerange_form')
         imaging_time_range = select_timerange_form.slider('Time Range [hours]',
-                                                          -3., 6., [-1., 1.], 0.5,
+                                                          min_value=-3., max_value=6.,
+                                                          value=[-1., 1.], step=0.5,
                                                           key='imaging_time_range')
         select_timerange_form.form_submit_button(label='Submit',
                                                  on_click=delete_from_state,
@@ -231,7 +228,8 @@ def run():
     maps_date = [maps.date for maps in st.session_state.map[imager_select]]
     if len(maps_date) > 1:
         running_map_date = col2.select_slider('Slide to the image time',
-                                              options=maps_date, key='running_map_date')
+                                              options=maps_date, value=maps_date[0],
+                                              key='running_map_date')
     else:
         running_map_date = maps_date[0]
 
@@ -242,8 +240,8 @@ def run():
     col1, col2 = st.columns((1, 3))
     cmmin, cpmax = config_sliders.slider_image_pmclims[image_mode]
     clim = plotviewopt_container.slider('Images climits:',
-                                        float(cmmin), float(cpmax),
-                                        (float(qmin-10), float(qmax+10)),
+                                        min_value=float(cmmin), max_value=float(cpmax),
+                                        value=(float(qmin-10), float(qmax+10)),
                                         key='clim')
 
     #############################################################
@@ -360,17 +358,12 @@ def run():
                                   options=['polynomial', 'spline', 'custom'],
                                   key='fit_mode')
         if fit_mode == 'polynomial':
-            if 'polyfit_order' not in st.session_state:
-                st.session_state.polyfit_order = 2
-            polyfit_order = col3.slider('Polynomial order', min_value=1, max_value=4, step=1, key='polyfit_order')
+            polyfit_order = col3.slider('Polynomial order', value=2, min_value=1, max_value=4, step=1, key='polyfit_order')
             fit_args_ = {'type': 'polynomial', 'order': polyfit_order}
+            print(polyfit_order, fit_args_)
         elif fit_mode == 'spline':
-            if 'splinefit_order' not in st.session_state:
-                st.session_state.splinefit_order = 3
-            splinefit_order = col3.slider('Spline order', min_value=1, max_value=5, step=1, key='splinefit_order')
-            if 'splinefit_smooth' not in st.session_state:
-                st.session_state.splinefit_smooth = 0.5
-            splinefit_smooth = st.slider('Spline smooth', min_value=0., max_value=1., step=0.01, key='splinefit_smooth')
+            splinefit_order = col3.slider('Spline order', value=3, min_value=1, max_value=5, step=1, key='splinefit_order')
+            splinefit_smooth = st.slider('Spline smooth', value=0.5, min_value=0., max_value=1., step=0.01, key='splinefit_smooth')
             fit_args_ = {'type': 'spline', 'order': splinefit_order, 'smooth': splinefit_smooth}
         elif fit_mode == 'custom':
             if 'splinefit_smooth' not in st.session_state:
