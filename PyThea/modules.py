@@ -24,7 +24,7 @@ import json
 import astropy.units as u
 import numpy as np
 import pandas as pd
-from callbacks import change_long_lat_sliders
+from callbacks import change_fitting_sliders, change_long_lat_sliders
 from config.config_sliders import sliders_dict as sd
 from geometrical_models import ellipsoid, gcs, spheroid
 from utils import get_hek_flare, model_fittings
@@ -131,21 +131,11 @@ def fitting_and_slider_options_container(st):
             st.session_state.fit_args_prime = st.session_state.model_fittings.kinematics['fit_method']
 
         if (('model_fittings' in st.session_state) and
-           (st.session_state.plt_kinematics is True) and
+           (st.session_state.plt_kinematics) and
            st.button('Load Fitting Parameters', key='load_kinematics_param')) or\
            (st.session_state.startup['fitting'] and
            'fit_args_prime' in st.session_state):
-            st.session_state.startup['fitting'] = False
-            fit_opt = st.session_state.fit_args_prime
-            st.session_state.fit_mode = fit_opt['type']
-            if fit_opt['type'] == 'polynomial':
-                st.session_state.polyfit_order = fit_opt['order']
-            elif fit_opt['type'] == 'spline':
-                st.session_state.splinefit_order = fit_opt['order']
-                st.session_state.splinefit_smooth = fit_opt['smooth']
-            elif fit_opt['type'] == 'custom':
-                st.session_state.fitcustexpres_select = fit_opt['expression']
-                st.session_state.splinefit_order = fit_opt['order']
+            change_fitting_sliders(st)
 
 
 def fitting_sliders(st):

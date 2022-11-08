@@ -42,3 +42,17 @@ def change_long_lat_sliders(st):
         center_ = st.session_state.center.transform_to(frames.HeliographicCarrington)
     st.session_state.longit = float(center_.lon.to_value(u.degree))
     st.session_state.latitu = float(center_.lat.to_value(u.degree))
+
+
+def change_fitting_sliders(st):
+    st.session_state.startup['fitting'] = False
+    fit_opt = st.session_state.fit_args_prime
+    st.session_state.fit_mode = fit_opt['type']
+    if fit_opt['type'] == 'polynomial':
+        st.session_state.polyfit_order = fit_opt['order']
+    elif fit_opt['type'] == 'spline':
+        st.session_state.splinefit_order = fit_opt['order']
+        st.session_state.splinefit_smooth = fit_opt['smooth']
+    elif fit_opt['type'] == 'custom':
+        st.session_state.fitcustexpres_select = fit_opt['expression']
+        st.session_state.splinefit_order = fit_opt['order']

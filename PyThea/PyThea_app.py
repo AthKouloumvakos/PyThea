@@ -190,7 +190,7 @@ def run():
         clip_model = plotviewopt_container.checkbox('Clip plot on image limits', value=True)
         plt_supp_imagers = plotviewopt_container.checkbox('Supplementary Imaging', value=False)
         star_field = plotviewopt_container.checkbox('View Bodies or s/c')
-        if star_field is True:
+        if star_field:
             bodies_list = plotviewopt_container.multiselect('Select Bodies', options=selected_bodies.bodies_dict.keys(),
                                                             default=['Mercury', 'Venus', 'Jupiter'])
 
@@ -286,7 +286,7 @@ def run():
     if st.session_state.plot_mesh_mode == 'Surface':
         model.plot(axis, only_surface=True)
 
-    if star_field is True:
+    if star_field:
         plot_bodies(axis, bodies_list, running_map)
         axis.legend()
     st.pyplot(fig)
@@ -323,7 +323,7 @@ def run():
 
     #############################################################
     # View the fittings table
-    if st.session_state.fitting_table is True:
+    if st.session_state.fitting_table:
         st.markdown('---')
         st.markdown('### Parameters Table')
         st.markdown('**Running Fitting Table:**')
@@ -344,30 +344,25 @@ def run():
 
     #############################################################
     # Plot the kinematics
-    if ('model_fittings' in st.session_state) and \
-       (st.session_state.plt_kinematics is True):
+    if st.session_state.plt_kinematics and \
+       ('model_fittings' in st.session_state):
         st.markdown('---')
         st.markdown('### Plots of kinematics ')
         col1, col2, col3 = st.columns(3)
         plt_kinematics_select = col1.selectbox('Select Plots',
                                                options=['All', 'HeightT', 'SpeedT', 'Long-LatT'])
 
-        if 'fit_mode' not in st.session_state:
-            st.session_state.fit_mode = 'polynomial'
         fit_mode = col2.selectbox('Select Fitting Mode',
                                   options=['polynomial', 'spline', 'custom'],
                                   key='fit_mode')
         if fit_mode == 'polynomial':
             polyfit_order = col3.slider('Polynomial order', value=2, min_value=1, max_value=4, step=1, key='polyfit_order')
             fit_args_ = {'type': 'polynomial', 'order': polyfit_order}
-            print(polyfit_order, fit_args_)
         elif fit_mode == 'spline':
             splinefit_order = col3.slider('Spline order', value=3, min_value=1, max_value=5, step=1, key='splinefit_order')
             splinefit_smooth = st.slider('Spline smooth', value=0.5, min_value=0., max_value=1., step=0.01, key='splinefit_smooth')
             fit_args_ = {'type': 'spline', 'order': splinefit_order, 'smooth': splinefit_smooth}
         elif fit_mode == 'custom':
-            if 'splinefit_smooth' not in st.session_state:
-                st.session_state.fitcustexpres_select = 'a*exp(-b*x)+c'
             fitcustexpres_select = col3.selectbox('Select a custom function',
                                                   options=['a*exp(-b*x)+c'],  # 'a*sqrt(b*x)+c',  '((x+a)/(x+b))+c'
                                                   key='plt_fitcustexpres_select')
