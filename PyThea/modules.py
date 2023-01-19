@@ -24,10 +24,11 @@ import json
 import astropy.units as u
 import numpy as np
 import pandas as pd
-from callbacks import change_fitting_sliders, change_long_lat_sliders
-from config.config_sliders import sliders_dict as sd
-from geometrical_models import ellipsoid, gcs, spheroid
-from utils import get_hek_flare, model_fittings
+
+from PyThea.callbacks import change_fitting_sliders, change_long_lat_sliders
+from PyThea.config.config_sliders import sliders_dict as sd
+from PyThea.geometrical_models import ellipsoid, gcs, spheroid
+from PyThea.utils import get_hek_flare, model_fittings
 
 
 def date_and_event_selection(st):

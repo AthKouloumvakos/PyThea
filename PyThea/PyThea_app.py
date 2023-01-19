@@ -23,18 +23,19 @@ import numpy as np
 import stqdm  # See also https://github.com/tqdm/tqdm
 import streamlit as st
 from astropy.coordinates import Distance, SkyCoord, SphericalRepresentation
-from callbacks import load_or_delete_fittings
-from config import (app_styles, config_sliders, selected_bodies,
-                    selected_imagers)
-from geometrical_models import ellipsoid, gcs, spheroid
-from modules import (date_and_event_selection, final_parameters_gmodel,
-                     fitting_and_slider_options_container, fitting_sliders,
-                     maps_clims)
 from sunpy.coordinates import frames
-from sunpy_dev.map.maputils import get_closest
-from utils import (download_fits, make_figure, maps_process, model_fittings,
-                   plot_bodies, plot_fitting_model)
-from version import version
+
+from PyThea.callbacks import load_or_delete_fittings
+from PyThea.config import (app_styles, config_sliders, selected_bodies,
+                           selected_imagers)
+from PyThea.geometrical_models import ellipsoid, gcs, spheroid
+from PyThea.modules import (date_and_event_selection, final_parameters_gmodel,
+                            fitting_and_slider_options_container,
+                            fitting_sliders, maps_clims)
+from PyThea.sunpy_dev.map.maputils import get_closest
+from PyThea.utils import (download_fits, make_figure, maps_process,
+                          model_fittings, plot_bodies, plot_fitting_model)
+from PyThea.version import version
 
 
 def delete_from_state(vars):

@@ -27,19 +27,23 @@ import astropy.units as u
 import matplotlib.colors as colors
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+import numexpr
 import numpy as np
 import seaborn as sns
 import sunpy.map
-from config.selected_bodies import bodies_dict
-from config.selected_imagers import imager_dict
 from scipy.interpolate import UnivariateSpline
+from scipy.optimize import curve_fit
 from sunpy.coordinates import get_horizons_coord
 from sunpy.map.maputils import contains_coordinate
 from sunpy.net import Fido
 from sunpy.net import attrs as a
-from sunpy_dev.map.maputils import (filter_maps, maps_sequence_processing,
-                                    prepare_maps)
-from version import version
+
+from PyThea.config.selected_bodies import bodies_dict
+from PyThea.config.selected_imagers import imager_dict
+from PyThea.sunpy_dev.map.maputils import (filter_maps,
+                                           maps_sequence_processing,
+                                           prepare_maps)
+from PyThea.version import version
 
 
 def get_hek_flare(day):
@@ -354,9 +358,6 @@ def parameter_fit(x, y, fit_args):
                                    'dlow': sv_bound_dlow},
                    }
     elif fit_args['type'] == 'custom':
-        import numexpr
-        from scipy.optimize import curve_fit
-
         expression = fit_args['expression']  # 'a * exp(-b * x) + c'
 
         def func(x, a, b, c):

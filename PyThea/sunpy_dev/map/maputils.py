@@ -8,7 +8,8 @@ import warnings
 import astropy.units as u
 import numpy as np
 import sunpy.map
-import sunpy_dev.extern.sunkit_instruments.stereo.utils
+
+import PyThea.sunpy_dev.extern.sunkit_instruments.stereo.utils  # noqa
 
 __all__ = ['maps_sequence_processing', 'get_closest', 'normalize_exposure',
            'prepare_maps', 'difference_maps', 'mask_occulter']
@@ -192,7 +193,7 @@ def prepare_maps(map_sequence, extra):
 
     if map_sequence[0].detector == 'COR1':
         if 'polar' not in extra:
-            sequence_final = sunpy_dev.extern.sunkit_instruments.stereo.utils.cor_polariz(map_sequence)
+            sequence_final = PyThea.sunpy_dev.extern.sunkit_instruments.stereo.utils.cor_polariz(map_sequence)
     else:
         sequence_final = map_sequence
     return sequence_final

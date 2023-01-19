@@ -13,7 +13,7 @@ import streamlit
 import streamlit.web.bootstrap as bootstrap
 from streamlit.runtime.credentials import check_credentials
 
-from .version import version as _vesrsion
+from PyThea.version import version as _vesrsion
 
 
 @click.group()

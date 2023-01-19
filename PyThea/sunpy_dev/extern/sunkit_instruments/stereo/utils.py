@@ -1,7 +1,7 @@
 import numpy as np
 import sunpy.map
 
-from sunpy_dev.map import maputils
+from PyThea.sunpy_dev.map import maputils
 
 __all__ = ['cor_polariz']
 

@@ -4,7 +4,7 @@
 # This is a modified script from sunpy
 try:
     try:
-        from _version import version
+        from PyThea._version import version
     except ImportError:
         from ._version import version
 except Exception:
