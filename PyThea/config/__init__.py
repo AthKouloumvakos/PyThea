@@ -1,3 +1,3 @@
-from .config_sliders import *
-from .selected_bodies import *
-from .selected_imagers import *
+from PyThea.config.config_sliders import *
+from PyThea.config.selected_bodies import *
+from PyThea.config.selected_imagers import *

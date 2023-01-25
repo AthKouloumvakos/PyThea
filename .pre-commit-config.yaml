@@ -81,6 +81,7 @@ repos:
             "--in-place",
             "--remove-all-unused-imports",
             "--remove-unused-variable",
+            "--ignore-init-module-imports"
           ]
         exclude: ".*(.fits|.fts|.fit|.txt|tca.*|extern.*|.rst|.md|PyThea/extensions)$"
   - repo: https://github.com/pre-commit/mirrors-autopep8
