@@ -129,16 +129,6 @@ def filter_maps(map_sequence, extra):
         A SunPy map.
 
     '''
-    indices = []
-    # TODO: This has been added because VSO search returns duplicates for WISPR
-    #       so we manualy filter the dublicates until this problem is solved https://github.com/sunpy/sunpy/issues/5481
-    if 'dublicates' in extra:
-        map_sequence.sort(key=attrgetter('date'))
-        for i in range(0, len(map_sequence)-1):
-            if map_sequence[i].date == map_sequence[i+1].date:
-                indices.append(i)
-        for i in sorted(indices, reverse=True):
-            map_sequence.pop(i)
 
     if 'exposure' in extra:
         map_sequence = [tmap for tmap in map_sequence if tmap.exposure_time > extra['exposure']*u.second]
