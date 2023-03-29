@@ -290,3 +290,7 @@ def mask_occulter(smap, apply_mask=True, mask_value=0):
         smap.data[mask_inner+mask_outer] = mask_value
         return sunpy.map.Map(smap.data, smap.meta)
     return mask_inner+mask_outer
+
+
+def maps_clims(images):
+    return [np.nanquantile(images[1].data, 0.20)-10, np.nanquantile(images[1].data, 0.80)+10]

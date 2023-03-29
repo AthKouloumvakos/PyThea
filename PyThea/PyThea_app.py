@@ -31,8 +31,8 @@ from PyThea.config import (app_styles, config_sliders, selected_bodies,
 from PyThea.geometrical_models import ellipsoid, gcs, spheroid
 from PyThea.modules import (date_and_event_selection, final_parameters_gmodel,
                             fitting_and_slider_options_container,
-                            fitting_sliders, maps_clims)
-from PyThea.sunpy_dev.map.maputils import get_closest
+                            fitting_sliders)
+from PyThea.sunpy_dev.map.maputils import get_closest, maps_clims
 from PyThea.utils import (download_fits, make_figure, model_fittings,
                           plot_bodies, plot_fitting_model,
                           plot_solar_reference_lines,
@@ -188,10 +188,12 @@ def run():
             st.session_state['imagers_list_'] = []
         image_mode = procoption_container.selectbox('Map Sequence Processing',
                                                     options=['Running Diff.', 'Base Diff.', 'Plain'], key='image_mode',
-                                                    on_change=delete_from_state, kwargs={'vars': ['map', 'imagers_list_']})
+                                                    on_change=delete_from_state,
+                                                    kwargs={'vars': ['map', 'imagers_list_', 'clim', 'clim_manual_low', 'clim_manual_high']})
         if image_mode in ['Running Diff.', 'Base Diff.']:
             diff_value = procoption_container.number_input('Select Step/Image for Running/Base Diff.', 1, 5, key='diff_value',
-                                                           on_change=delete_from_state, kwargs={'vars': ['map', 'imagers_list_']})
+                                                           on_change=delete_from_state,
+                                                           kwargs={'vars': ['map', 'imagers_list_', 'clim', 'clim_manual_low', 'clim_manual_high']})
         else:
             diff_value = None
 
@@ -230,6 +232,9 @@ def run():
     # This part runs only if the map_ doesn't exits or the session_state.map_ does not contain all the imagers requested
     imager_added = list(set(imagers_list) - set(st.session_state['imagers_list_']))
     imager_removed = list(set(st.session_state['imagers_list_']) - set(imagers_list))
+    if 'map_colormap_limits' not in st.session_state:
+        st.session_state['map_colormap_limits'] = {}
+
     if 'map_' not in st.session_state or imager_added != []:
         st.session_state.map_ = {} if 'map_' not in st.session_state else st.session_state.map_
         st.session_state.map = {} if 'map' not in st.session_state else st.session_state.map
@@ -249,14 +254,15 @@ def run():
                                                           diff_num=diff_value)
             if processed_images != []:
                 st.session_state.map[imager] = processed_images
+                st.session_state.map_colormap_limits[imager] = maps_clims(st.session_state.map[imager])
             else:
                 st.session_state.imagers_list_.remove(imager)
+                st.session_state.map_colormap_limits.pop(imager, None)
+
     if imager_removed != []:
         st.session_state['imagers_list_'] = imagers_list
         for imager in imager_removed:
             st.session_state.map_.pop(imager, None)
-
-    maps_clims(st, st.session_state.imagers_list_)
 
     if not st.session_state.imagers_list_:
         st.error('No images have been downloaded or processed.')  # TODO: Explain better
@@ -267,7 +273,8 @@ def run():
     st.markdown('### Multi-viewpoint imaging')
     col1, col2 = st.columns((1, 3))
     imager_select = col1.selectbox('Select an imager',
-                                   options=st.session_state.imagers_list_)
+                                   options=st.session_state.imagers_list_,
+                                   on_change=delete_from_state, kwargs={'vars': ['clim', 'clim_manual_low', 'clim_manual_high']})
 
     maps_date = [getattr(maps, 'date_average', None) or getattr(maps, 'date', None) for maps in st.session_state.map[imager_select]]
     if len(maps_date) > 1:
@@ -279,14 +286,26 @@ def run():
 
     running_map = st.session_state.map[imager_select][maps_date.index(running_map_date)]
 
-    qmin = st.session_state.map_clim[imager_select][0]  # np.nanquantile(running_map.data, 0.20)
-    qmax = st.session_state.map_clim[imager_select][1]  # np.nanquantile(running_map.data, 0.80)
-    col1, col2 = st.columns((1, 3))
-    cmmin, cpmax = config_sliders.slider_image_pmclims[image_mode]
-    clim = plotviewopt_container.slider('Images climits:',
-                                        min_value=float(cmmin), max_value=float(cpmax),
-                                        value=(float(qmin-10), float(qmax+10)),
-                                        key='clim')
+    manual_clim = plotviewopt_container.checkbox('Provide clims values')
+    if manual_clim:
+        col1, col2 = plotviewopt_container.columns(2)
+        if 'clim_manual_low' not in st.session_state:
+            st.session_state.clim_manual_low = st.session_state.map_colormap_limits[imager_select][0]
+        qmin = col1.number_input('Low clim value', label_visibility='collapsed', key='clim_manual_low')
+        if 'clim_manual_high' not in st.session_state:
+            st.session_state.clim_manual_high = st.session_state.map_colormap_limits[imager_select][1]
+        qmax = col2.number_input('High clim value', label_visibility='collapsed', key='clim_manual_high')
+        st.session_state.map_colormap_limits[imager_select] = [qmin, qmax]
+    else:
+        qmin = st.session_state.map_colormap_limits[imager_select][0]
+        qmax = st.session_state.map_colormap_limits[imager_select][1]
+        cmmin, cpmax = config_sliders.slider_image_pmclims[image_mode]
+        if 'clim' not in st.session_state:
+            st.session_state.clim = [float(qmin), float(qmax)]
+        st.session_state.map_colormap_limits[imager_select] = \
+            plotviewopt_container.slider('Images colorbar limits:',
+                                         min_value=float(cmmin), max_value=float(cpmax),
+                                         key='clim')
 
     #############################################################
     # Finalize the geometrical model
@@ -321,7 +340,7 @@ def run():
 
     #############################################################
     # Plot main and supplement figure images
-    fig, axis = make_figure(running_map, image_mode, clim=clim, clip_model=clip_model)
+    fig, axis = make_figure(running_map, image_mode, clim=st.session_state.map_colormap_limits[imager_select], clip_model=clip_model)
     if st.session_state.plot_mesh_mode == 'Skeleton':
         model.plot(axis, mode='Skeleton')
     elif st.session_state.plot_mesh_mode == 'Full':
@@ -348,11 +367,13 @@ def run():
                                         key='supl_imagers')
         col1, col2 = st.columns(2)
         fig, axis = make_figure(get_closest(st.session_state.map[supl_imagers[0]],
-                                running_map_date), image_mode)
+                                running_map_date), image_mode,
+                                clim=st.session_state.map_colormap_limits[supl_imagers[0]], clip_model=clip_model)
         model.plot(axis, mode='Skeleton')
         col1.pyplot(fig)
         fig, axis = make_figure(get_closest(st.session_state.map[supl_imagers[1]],
-                                            running_map_date), image_mode)
+                                            running_map_date), image_mode,
+                                clim=st.session_state.map_colormap_limits[supl_imagers[1]], clip_model=clip_model)
         model.plot(axis, mode='Skeleton')
         col2.pyplot(fig)
 

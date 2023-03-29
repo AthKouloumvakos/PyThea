@@ -90,7 +90,7 @@ def make_figure(map, image_mode, clim=[-20, 20], clip_model=True, **kwargs):
 
     if image_mode == 'Plain':
         # TODO: For plain images or when EUVIA-B are used, this does not work very well.
-        map.plot()
+        map.plot(norm=colors.Normalize(vmin=clim[0], vmax=clim[1]))
     else:
         map.plot(cmap='Greys_r',
                  norm=colors.Normalize(vmin=clim[0], vmax=clim[1]))

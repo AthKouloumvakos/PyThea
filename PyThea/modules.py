@@ -21,7 +21,6 @@
 import datetime
 
 import astropy.units as u
-import numpy as np
 
 from PyThea.callbacks import change_fitting_sliders, change_long_lat_sliders
 from PyThea.config.config_sliders import sliders_dict as sd
@@ -182,15 +181,3 @@ def final_parameters_gmodel(st):
             rcenter = gcs.rcenter_(height, alpha, kappa)
         tilt = st.session_state.tilt * u.degree
         return rcenter, height, alpha, kappa, tilt
-
-
-def maps_clims(st, imagers_list):
-    if 'map_clim' not in st.session_state:
-        st.session_state['map_clim'] = {}
-
-    for imager in imagers_list:
-        if imager not in st.session_state.map or st.session_state.map[imager] == []:
-            pass
-        else:
-            map_ = st.session_state.map[imager][0]
-            st.session_state.map_clim[imager] = [np.nanquantile(map_.data, 0.20), np.nanquantile(map_.data, 0.80)]
