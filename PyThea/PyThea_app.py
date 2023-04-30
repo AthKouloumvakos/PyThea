@@ -281,10 +281,10 @@ def run():
     fig, axis = make_figure(running_map, image_mode, clim=clim, clip_model=clip_model)
     if st.session_state.plot_mesh_mode == 'Skeleton':
         model.plot(axis, mode='Skeleton')
-    if st.session_state.plot_mesh_mode == 'Full':
+    elif st.session_state.plot_mesh_mode == 'Full':
         model.plot(axis, mode='Skeleton')
         model.plot(axis, mode='Full')
-    if st.session_state.plot_mesh_mode == 'Surface':
+    elif st.session_state.plot_mesh_mode == 'Surface':
         model.plot(axis, only_surface=True)
 
     if star_field:

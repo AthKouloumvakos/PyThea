@@ -82,7 +82,7 @@ def make_figure(map, image_mode, clim=[-20, 20], clip_model=True):
     else:
         map.plot(cmap='Greys_r',
                  norm=colors.Normalize(vmin=clim[0], vmax=clim[1]))
-    map.draw_limb()
+    map.draw_limb(resolution=180)
     # map.draw_grid(linewidth=2, color='red') # TODO: This takes too much computation time. Maybe for AIA or EUVI?
     yax = axis.coords[1]
     yax.set_ticklabel(rotation=90)
