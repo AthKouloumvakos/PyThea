@@ -18,5 +18,7 @@ zeep
 drms
 tqdm
 pyvista
+pythea
 pytest-astropy
 pytest-sugar
+opencv-python-headless
