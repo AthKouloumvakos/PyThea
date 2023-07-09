@@ -28,7 +28,7 @@ conda activate PyThea
 # install the required packages using pip3
 pip3 install PyThea
 
-# Run locally _PyThea_ application running PyThea streamlit (see next step)
+# Run locally the application with streamlit (see also the section "Run locally the PyThea application" )
 PyThea streamlit
 
 # When you are done you can deactivate the virtual environment
@@ -47,7 +47,7 @@ source PyThea/bin/activate
 # install the required packages using pip3
 pip3 install PyThea
 
-# Run locally _PyThea_ application running PyThea streamlit (see next step)
+# Run locally the application with streamlit (see also the section "Run locally the PyThea application" )
 PyThea streamlit
 
 # When you are done you can deactivate the virtual environment
@@ -55,6 +55,22 @@ deactivate
 ```
 
 At the directory where the terminal is open, this method will create a folder named ```/PyThea``` and install _PyThea_ and all the required packages inside.
+
+### ⬆️ Update
+
+To update the package to the latest version activate the environment first and then:
+
+```python
+# Update _PyThea_ using pip3
+pip3 install PyThea -U
+```
+
+One way to see witch version is installed in your environment is to open a python session and do:
+```python
+import PyThea
+PyThea.__version__
+```
+You can also see the verion used and the latest version on the main page of the application.
 
 ## 🐾 Run locally the _PyThea_ application
 
