@@ -1,6 +1,6 @@
 import os
-
 from pathlib import Path
+
 from setuptools import find_packages, setup
 
 # from setuptools.config import read_configuration
@@ -8,8 +8,9 @@ from setuptools import find_packages, setup
 # extras = read_configuration('pyproject.toml')
 
 # create home directory
-if not os.path.isdir(os.path.join(Path.home(), '.PyThea')):
-    os.mkdir(os.path.join(Path.home(), '.PyThea'))
+if not os.path.isdir(os.path.join(Path.home(), 'PyThea')):
+    os.mkdir(os.path.join(Path.home(), 'PyThea'))
+    os.mkdir(os.path.join(Path.home(), 'PyThea', 'data'))
 
 with open('README_pypi.md', 'r', encoding='utf8') as f:
     long_description = f.read()

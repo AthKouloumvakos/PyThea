@@ -21,7 +21,9 @@
 import datetime
 import io
 import json
+import os
 from copy import copy
+from pathlib import Path
 
 import astropy.units as u
 import matplotlib.colors as colors
@@ -44,6 +46,8 @@ from PyThea.sunpy_dev.map.maputils import (filter_maps,
                                            maps_sequence_processing,
                                            prepare_maps)
 from PyThea.version import version
+
+database_dir = os.path.join(Path.home(), 'PyThea')
 
 
 def get_hek_flare(day):
@@ -124,7 +128,7 @@ def download_fits(date_process, imager, time_range=[-1, 1]):
     result = Fido.search(timerange, *args)
     print(result)
     if result:
-        downloaded_files = Fido.fetch(result)
+        downloaded_files = Fido.fetch(result, path=f'{database_dir}'+'/data/{source}/{instrument}/'+'/{file}')
         try:
             map_ = sunpy.map.Map(downloaded_files)
         except RuntimeError as err:
