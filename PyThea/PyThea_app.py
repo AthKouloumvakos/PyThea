@@ -117,7 +117,7 @@ def run():
                                                  options=['Select a model', 'Spheroid', 'Ellipsoid', 'GCS'])
         if geometrical_model != 'Select a model':
             st.session_state.geometrical_model = geometrical_model
-            st.experimental_rerun()
+            st.rerun()
     else:
         st.sidebar.info(f'Geometrical Model: \
                         {st.session_state.geometrical_model}')

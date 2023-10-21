@@ -47,7 +47,7 @@ def date_and_event_selection(st):
         if event_selected != 'Select event' and event_selected != 'No events returned':
             st.session_state.date_process = flare_list_['event_peaktime'][selectbox_list.index(event_selected)-1]
             st.session_state.event_selected = event_selected
-            st.experimental_rerun()
+            st.rerun()
         elif event_selected == 'No events returned':
             st.sidebar.warning('Initiate manually')
     elif initialisation == 'Manual':
@@ -60,7 +60,7 @@ def date_and_event_selection(st):
                 st.session_state.date_process = datetime.datetime.combine(day, time)
                 t_ = st.session_state.date_process.strftime('%Y-%m-%dT%H:%M:%S')
                 st.session_state.event_selected = f'{ev_id}|{t_}'
-                st.experimental_rerun()
+                st.rerun()
             st.form_submit_button()
     elif initialisation == 'File':
         uploaded_file = st.sidebar.file_uploader('Provide a fitting file', accept_multiple_files=False)
@@ -91,7 +91,7 @@ def date_and_event_selection(st):
                                                              fitting['geometrical_model']['type'],
                                                              parameters,
                                                              kinematics=kinematics)
-            st.experimental_rerun()
+            st.rerun()
 
 
 def fitting_and_slider_options_container(st):
