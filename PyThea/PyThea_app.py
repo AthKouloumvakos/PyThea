@@ -21,7 +21,7 @@
 import datetime
 import glob
 import os
-from copy import copy
+from copy import deepcopy
 
 import astropy.units as u
 import numpy as np
@@ -49,6 +49,11 @@ def delete_from_state(vars):
     for var in vars:
         if var in st.session_state:
             del st.session_state[var]
+
+
+def call_extend_sources(instrument):
+    for imager in selected_imagers.providers[instrument]['imagers']:
+        st.session_state.selected_imagers_[imager]['fido'][2] = a.Provider(st.session_state[f'provider_{instrument}'])
 
 
 def highlight_row(row, row_index):
@@ -142,6 +147,8 @@ def run():
     #############################################################
     # Startup Variables
     if 'startup' not in st.session_state:
+        from PyThea.sunpy_dev.net.dataretriever.sources import lasco  # noqa
+        from PyThea.sunpy_dev.net.dataretriever.sources import stereo  # noqa
         st.session_state.startup = {'fitting': True}
 
     #############################################################
@@ -149,6 +156,29 @@ def run():
 
     if 'date_process' not in st.session_state:
         date_and_event_selection(st)
+        if 'selected_imagers_' not in st.session_state:
+            st.session_state.selected_imagers_ = deepcopy(selected_imagers.imager_dict)
+
+        st.sidebar.toggle('Change default data providers',
+                          value=False,
+                          help='Change data provider if you face issues or data are missing.',
+                          key='extend_net_sources')
+        if st.session_state.extend_net_sources:
+            container = st.sidebar.container(border=True)
+            container.text('Select provider',
+                           help='The default providers (left) use VSO to download data.')
+            for instrument in selected_imagers.providers.keys():
+                # container.text(f'{selected_imagers.imager_dict[prov]["source"]}')
+                col1, col2 = container.columns([0.3, 0.7], vertical_alignment='center')
+                col1.markdown(f'{instrument}:')
+                col2.segmented_control(f'{instrument}:',
+                                       options=selected_imagers.providers[instrument]['providers'],
+                                       selection_mode='single',
+                                       default=selected_imagers.providers[instrument]['providers'][0],
+                                       on_change=call_extend_sources,
+                                       args=[instrument],
+                                       key=f'provider_{instrument}',
+                                       label_visibility='collapsed')
     else:
         st.sidebar.markdown('## Processing Event|Date:')
         st.sidebar.info(f'{st.session_state.event_selected}')
@@ -214,7 +244,7 @@ def run():
     with st.sidebar.expander('Download Options'):
         select_imagers_form = st.form(key='select_imagers_form', border=False)
         imagers_list = select_imagers_form.multiselect('Select Imagers',
-                                                       options=selected_imagers.imager_dict.keys(),
+                                                       options=st.session_state.selected_imagers_.keys(),
                                                        default=['LC2', 'LC3', 'COR2A'],
                                                        key='imagers_list')
         select_imagers_form.form_submit_button(label='Submit', use_container_width=True)
@@ -234,7 +264,7 @@ def run():
             st.session_state['manual_dir'] = ''
 
         imager_manual = select_imager_manual_form.selectbox('Select an imager for manual import',
-                                                            options={key: value for key, value in selected_imagers.imager_dict.items() if not key.endswith('m')})
+                                                            options={key for key in st.session_state.selected_imagers_.keys() if not key.endswith('m')})
         select_imager_manual_form.text_input('Enter path containing the .fits files',
                                              key='manual_dir_text', on_change=clear_text_input)
 
@@ -242,8 +272,8 @@ def run():
             if os.path.isdir(st.session_state.manual_dir):
                 fits_files = list_fits_files(st.session_state.manual_dir)
                 if fits_files:
-                    selected_imagers.imager_dict[f'{imager_manual}m'] = selected_imagers.imager_dict[imager_manual].copy()
-                    selected_imagers.imager_dict[f'{imager_manual}m']['fido'] = {
+                    st.session_state.selected_imagers_[f'{imager_manual}m'] = deepcopy(st.session_state.selected_imagers_[imager_manual])
+                    st.session_state.selected_imagers_[f'{imager_manual}m']['fido'] = {
                         'path': st.session_state.manual_dir,
                         'fits_files': fits_files}
                     st.session_state['manual_dir'] = ''
@@ -254,7 +284,7 @@ def run():
                 select_imager_manual_form.error('Invalid directory. Please enter a valid folder path.')
             st.session_state['manual_dir'] = ''
 
-        filtered_imager_dict = [key for key in selected_imagers.imager_dict.keys() if key.endswith('m')]
+        filtered_imager_dict = [key for key in st.session_state.selected_imagers_.keys() if key.endswith('m')]
         if filtered_imager_dict:
             formatted_list = ', '.join(filtered_imager_dict)
             select_imager_manual_form.success(f'Imagers available for manual import: {formatted_list}')
@@ -357,9 +387,10 @@ def run():
 
                 if st.session_state.offline_mode is False:
                     if imager[-1] != 'm':
-                        downloaded_files = download_fits(timerange, imager)
+                        downloaded_files = download_fits(timerange, imager,
+                                                         imager_dict=st.session_state.selected_imagers_)
                     else:
-                        downloaded_files = selected_imagers.imager_dict[imager]['fido']['fits_files']
+                        downloaded_files = st.session_state.selected_imagers_[imager]['fido']['fits_files']
                 elif st.session_state.offline_mode is True:
                     progress_bar.desc = f'Load {imager} images from local database.'
                     event_id = st.session_state.event_selected.replace('-', '').replace(':', '').replace('|', 'D').replace('.', 'p') \
@@ -368,7 +399,7 @@ def run():
 
                 st.session_state.map_[imager] = load_fits(downloaded_files)
                 st.session_state.map_[imager] = single_imager_maps_process(st.session_state.map_[imager],
-                                                                           **selected_imagers.imager_dict[imager]['process'],
+                                                                           **st.session_state.selected_imagers_[imager]['process'],
                                                                            skip='sequence_processing')
             processed_images = single_imager_maps_process(st.session_state.map_[imager],
                                                           skip=['filter', 'prepare'],
@@ -488,7 +519,7 @@ def run():
             fig, axis = figure_streamlit(st, get_closest(st.session_state.map[other_elements[0]], running_map_date), image_mode, other_elements[0], model)
             st.pyplot(fig)
         else:
-            supl_imagers_list = copy(st.session_state.imagers_list_)
+            supl_imagers_list = deepcopy(st.session_state.imagers_list_)
             supl_imagers_list.remove(imager_select)
             supl_imagers = st.select_slider('Select supplement imagers',
                                             options=supl_imagers_list,
