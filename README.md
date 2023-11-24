@@ -12,6 +12,9 @@
 
 _PyThea_ is an open-source software package that can be used to reconstruct the 3D structure of Coronal Mass Ejections (CMEs) and shock waves and determine their kinematics using remote-sensing observations. The tool implements the Graduated Cylindrical Shell (GCS) model that can be used to reconstruct CMEs and two geometrical models, namely a spheroid and ellipsoid model to reconstruct shock waves. It also implements remote-sensing observations from multiple viewpoints such as the Solar and Heliospheric Observatory (SoHO) and Solar Terrestrial Relations Observatory (STEREO).
 
+> [!NOTE]
+> The lead author of PyThea (A. Kouloumvakos) has been awarded a NASA Grant (80NSSC24K0071) for further developing and improving PyThea, during fiscal year 2024. The awarded proposal is part of the NASA Headquarters Heliophysics Tools and Methods Program in response to NASA ROSES–2022 (NNH22ZDA001N). The proposed software enhancements and new features encompass a range of improvements, including but not limited to: improved code documentation, expanded and improved code testing, improved image processing and visualization, and the incorporation of new solar mission imaging data.
+
 ## 💾 Installation
 
 We recommend, creating a virtual environment for _PyThea_ and installing the package from PyPI using ```pip```.
