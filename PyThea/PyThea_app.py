@@ -160,7 +160,7 @@ def run():
     # 3D Fitting and Reconstruction
     st.sidebar.markdown('## Imaging menu')
     with st.sidebar.expander('Download Options'):
-        select_imagers_form = st.form(key='select_imagers_form')
+        select_imagers_form = st.form(key='select_imagers_form', border=False)
         imagers_list = select_imagers_form.multiselect('Select Imagers',
                                                        options=selected_imagers.imager_dict.keys(),
                                                        default=['LC2', 'LC3', 'COR2A'],
@@ -168,7 +168,7 @@ def run():
         select_imagers_form.form_submit_button(label='Submit',
                                                on_click=delete_from_state,
                                                kwargs={'vars': ['map', ]})
-        select_timerange_form = st.form(key='select_timerange_form')
+        select_timerange_form = st.form(key='select_timerange_form', border=False)
         imaging_time_range = select_timerange_form.slider('Time Range [hours]',
                                                           min_value=-3., max_value=6.,
                                                           value=[-1., 1.], step=0.5,
