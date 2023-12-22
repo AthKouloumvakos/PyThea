@@ -62,9 +62,9 @@ def test_spheroid_apex_location():
                        observer='earth',
                        obstime='2020/01/01T00:00:30')
     apex_ = SkyCoord(0*u.deg, 0*u.deg, 2*u.R_sun,
-                       frame='heliographic_stonyhurst',
-                       observer='earth',
-                       obstime='2020/01/01T00:00:30')
+                     frame='heliographic_stonyhurst',
+                     observer='earth',
+                     obstime='2020/01/01T00:00:30')
     sph = spheroid(center_, 1.*u.R_sun, 1.*u.R_sun)
     assert_quantity_allclose(sph.apex.radius, apex_.radius, atol=5e-7*u.R_sun)
 
