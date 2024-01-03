@@ -300,9 +300,15 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT'):
     elif fit_args['type'] == 'custom':
         title = 'Event: ' + model.event_selected + ' | Funct: ' + fit_args['expression']
 
-    plt.title(title)
-    axis.xaxis.set_major_formatter(mdates.DateFormatter('%Y\n%b-%d\n%H:%M'))
+    axis.set_title(title)
+    locator = mdates.AutoDateLocator(minticks=4, maxticks=8)
+    formatter = mdates.ConciseDateFormatter(locator)
+    axis.xaxis.set_major_locator(locator)
+    axis.xaxis.set_major_formatter(formatter)
     axis.minorticks_on()
+    xlim = axis.get_xlim()
+    if xlim[1] - xlim[0] <= 0.5:
+        axis.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=[0, 10, 20, 30, 40, 50]))
     fig.autofmt_xdate(bottom=0, rotation=0, ha='center')
     plt.legend(loc='lower right')
 
