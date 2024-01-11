@@ -1,4 +1,19 @@
-# v7.0.4 (09-Jul-2023)
+# v0.8.0 (11-Jan-2024)
+
+## Major Changes
+- Switches download of fits data to PyThea directory
+
+## Minor Changes
+- Adds in the README how to update PyThea and a note for the further development of PyThea
+- Adds a CHANGELOG file
+- Removes border lines from forms to improve the layout of components
+- Replaces deprecated st.experimental_rerun with st.rerun
+- Improves the datetick format of the kinematic plots
+
+## Bug Fixes
+None
+
+# v0.7.4 (09-Jul-2023)
 
 ## Minor Changes
 - Changes the intersection calculation from Vedo to PyVista to reduce redering time
@@ -8,7 +23,7 @@
 ## Bug Fixes
 - Fixes the css code that removes padding
 
-# v7.0.3 (15-Feb-2023)
+# v0.7.3 (15-Feb-2023)
 
 ## Minor Changes
 - Changes the relative imports to absolute
@@ -19,7 +34,7 @@
 - Fixes the github workflows when push
 - Fixes a deprecation in distutils (use the packaging.version instead)
 
-# v7.0.2 (28-Nov-2022)
+# v0.7.2 (28-Nov-2022)
 
 ## Minor Changes
 - Improves sliders behavior
@@ -28,7 +43,7 @@
 ## Bug Fixes
 - pip installation fails on Windows because of non-existing HOME (closed #17)
 
-# v7.0.1 (18-Oct-2022)
+# v0.7.1 (18-Oct-2022)
 
 ## Minor Changes
 - Changes the python version in GitHub workflow.
@@ -42,7 +57,7 @@
 ## Bug Fixes
 - Fixes a bug with windows install (closed #15)
 
-# v7.0.0 (01-Sep-2022)
+# v0.7.0 (01-Sep-2022)
 
 ## Minor Changes
 - Changes the default minimum limit for the images download time range.
