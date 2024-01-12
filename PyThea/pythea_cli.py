@@ -9,11 +9,12 @@ import sys
 from typing import Optional
 
 import click
+import pytest
 import streamlit
 import streamlit.web.bootstrap as bootstrap
 from streamlit.runtime.credentials import check_credentials
 
-from PyThea.version import version as _vesrsion
+from PyThea.version import version as _version
 
 
 @click.group()
@@ -79,7 +80,7 @@ def help(ctx):
 @main.command('version')
 def version():
     """Print PyThea's version number."""
-    print(f'PyThea installed version is: {_vesrsion}')
+    print(f'PyThea installed version is: {_version}')
 
 
 @main.command('docs')
@@ -96,7 +97,11 @@ def update():
     """Update PyThea."""
     print('Not implemented yet.')
 
-# TODO Include the test here.
+
+@main.command('test')
+def main_test():
+    """Test PyThea."""
+    pytest.main(['-W', 'ignore', '--pyargs', 'PyThea'])
 
 
 if __name__ == '__main__':
