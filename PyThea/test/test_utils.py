@@ -4,8 +4,13 @@ Test the utilities
 
 from datetime import datetime
 
+from astropy.coordinates import SkyCoord
+from astropy.tests.helper import assert_quantity_allclose
+from sunpy.coordinates import get_horizons_coord
+from sunpy.coordinates.frames import HeliographicStonyhurst
 from sunpy.net import hek
 
+from PyThea.config.selected_bodies import bodies_dict
 from PyThea.utils import get_hek_flare
 
 
@@ -23,3 +28,29 @@ def test_get_hek_flare():
     selectbox_list, flare_list = get_hek_flare(datetime(2117, 9, 10))
     assert flare_list == []
     assert selectbox_list == ['No events returned']
+
+
+def test_get_horizons_coord():
+    """
+    Test that get_horizons_coord returns a Skycoord instance, in HeliographicStonyhurst frame, and returns the same coordinates every time.
+    """
+    bodies_coord = []
+    for body in bodies_dict:
+        bodies_coord.append(get_horizons_coord(bodies_dict[body][0], '2022-01-01T00:00:00'))
+
+    coords = [[-106.56704928, 1.45508574, 0.3631443],
+              [-4.65750614, -1.34575135, 0.71937524],
+              [2.55987423e-06, -2.99926774, 0.98335562],
+              [135.77581107, -2.68402546, 1.53663218],
+              [-121.16524996, 6.08953762, 4.99274907],
+              [32.43818351, -5.96794509, 1.0004962],
+              [-34.99771814, 1.28725362, 0.96437702],
+              [-11.53530598, -0.39313636, 0.99738376],
+              [-138.81147107, 3.52846474, 0.74828612],
+              [144.12380481, -2.64432759, 0.67510736]
+              ]
+
+    for i, body_coord in enumerate(bodies_coord):
+        assert isinstance(body_coord, SkyCoord)
+        assert isinstance(body_coord.frame, HeliographicStonyhurst)
+        assert_quantity_allclose([body_coord.lon.value, body_coord.lat.value, body_coord.radius.value], coords[i], rtol=1e-5, atol=1e-4)
