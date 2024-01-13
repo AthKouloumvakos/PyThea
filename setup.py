@@ -45,7 +45,7 @@ setup(
         'Topic :: Scientific/Engineering :: Physics',
     ],
 
-    python_requires='>=3.8, <3.10',
+    python_requires='>=3.8, <3.11',
     install_requires=requirements,
 
     packages=find_packages(),
