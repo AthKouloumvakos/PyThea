@@ -39,14 +39,14 @@ def _main_run(file, args=None, flag_options=None):
     if flag_options is None:
         flag_options = {}
 
-    command_line = _get_command_line_as_string()
+    is_command_streamlit = _get_command_line_as_string() == 'PyThea streamlit'
 
     # Set a global flag indicating that we're "within" streamlit.
     streamlit._is_running_with_streamlit = True
 
     check_credentials()
 
-    bootstrap.run(file, command_line, args, flag_options)
+    bootstrap.run(file, is_command_streamlit, args, flag_options)
 
 
 def _get_command_line_as_string() -> Optional[str]:
