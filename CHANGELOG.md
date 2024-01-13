@@ -1,3 +1,14 @@
+# v0.8.1 (13-Jan-2024)
+
+## Features
+- Implements PyThea test to cli
+
+## Minor Changes
+- Includes Python version 3.10
+
+## Bug Fixes
+- Fixes a runtime bug with streamlit 1.30.0
+
 # v0.8.0 (11-Jan-2024)
 
 ## Major Changes
@@ -9,9 +20,6 @@
 - Removes border lines from forms to improve the layout of components
 - Replaces deprecated st.experimental_rerun with st.rerun
 - Improves the datetick format of the kinematic plots
-
-## Bug Fixes
-None
 
 # v0.7.4 (09-Jul-2023)
 
