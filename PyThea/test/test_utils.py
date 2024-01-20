@@ -4,6 +4,7 @@ Test the utilities
 
 from datetime import datetime
 
+import matplotlib.dates as mdates
 from astropy.coordinates import SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
 from sunpy.coordinates import get_horizons_coord
@@ -11,7 +12,7 @@ from sunpy.coordinates.frames import HeliographicStonyhurst
 from sunpy.net import hek
 
 from PyThea.config.selected_bodies import bodies_dict
-from PyThea.utils import get_hek_flare
+from PyThea.utils import get_hek_flare, parameter_fit
 
 
 def test_get_hek_flare():
@@ -54,3 +55,24 @@ def test_get_horizons_coord():
         assert isinstance(body_coord, SkyCoord)
         assert isinstance(body_coord.frame, HeliographicStonyhurst)
         assert_quantity_allclose([body_coord.lon.value, body_coord.lat.value, body_coord.radius.value], coords[i], rtol=1e-5, atol=1e-4)
+
+
+def test_parameter_fit_polynomial():
+    x = [datetime(2020, 1, 1, 0, 0, 0), datetime(2020, 1, 1, 0, 10, 0), datetime(2020, 1, 1, 0, 20, 0), datetime(2020, 1, 1, 0, 30, 0)]
+    xx = (mdates.date2num(x) - mdates.date2num(x[0]))
+
+    y = [0, 1, 2, 3]
+
+    fit = parameter_fit(x, y, {'type': 'polynomial', 'order': 1})
+    assert_quantity_allclose([fit['popt'][0]*xx[1], fit['popt'][1]], [1, 0], atol=1e-7)
+
+    fit = parameter_fit(x, y, {'type': 'polynomial', 'order': 2})
+    assert_quantity_allclose([fit['popt'][0], fit['popt'][1]*xx[1], fit['popt'][2]], [0, 1, 0], atol=1e-5)
+
+    y = [0, 2, 4, 6]
+
+    fit = parameter_fit(x, y, {'type': 'polynomial', 'order': 1})
+    assert_quantity_allclose([fit['popt'][0]*xx[1], fit['popt'][1]], [2, 0], atol=1e-7)
+
+    fit = parameter_fit(x, y, {'type': 'polynomial', 'order': 2})
+    assert_quantity_allclose([fit['popt'][0], fit['popt'][1]*xx[1], fit['popt'][2]], [0, 2, 0], atol=1e-5)
