@@ -23,4 +23,5 @@ dependencies:
   - pytest-sugar
   - pip
   - pip:
+      - pooch
       - stqdm

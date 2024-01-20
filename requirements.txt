@@ -6,6 +6,7 @@ astroquery
 numexpr
 sunpy==4.1.0
 parfive==1.5.1
+pooch
 matplotlib
 seaborn
 streamlit
