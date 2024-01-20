@@ -76,6 +76,9 @@ source_suffix = '.rst'
 # The master toctree document.
 master_doc = 'index'
 
+# Label the figures
+numfig = True
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
