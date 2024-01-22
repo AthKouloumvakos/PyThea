@@ -4,6 +4,7 @@ scipy
 aiapy
 astropy
 astroquery
+jplephem
 numexpr
 sunpy==5.1.2
 parfive==2.1.0
@@ -20,3 +21,4 @@ tqdm
 pyvista
 pytest-astropy
 pytest-sugar
+pytest-mpl
