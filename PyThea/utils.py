@@ -147,28 +147,44 @@ def download_fits(date_process, imager, time_range=[-1, 1]):
     return map_
 
 
-def maps_process(ninstr_map_in, imagers_list_in, image_mode):
+def maps_process(maps_dict_in, imagers_list_in, image_mode, **kwargs):
     '''
-    Process the images for the selected imagers and return the final maps.
+    Process the images for the selected imagers and return the final maps and the list of imagers loaded.
 
     Note
     ----
-    Here the ninstr_map_in is the session_state.map_ when used from the application.
+    Here the maps_dict_in is the session_state.map_ when used from the application.
     '''
-    ninstr_map_out = {}
+    maps_dict_out = {}
     imagers_list_out = []
 
     for imager in imagers_list_in:
-        extra = imager_dict[imager][1]
-        if imager in ninstr_map_in and ninstr_map_in[imager] != []:
-            ninstr_map_out[imager] = filter_maps(ninstr_map_in[imager], extra)
-            ninstr_map_out[imager] = prepare_maps(ninstr_map_out[imager], extra)
-            ninstr_map_out[imager] = maps_sequence_processing(ninstr_map_out[imager],
-                                                              seq_type=image_mode)
-            if ninstr_map_out[imager] != []:
+        if imager in maps_dict_in and maps_dict_in[imager] != []:
+            if not kwargs:
+                extras = imager_dict[imager][1]
+            else:
+                if imager in kwargs:
+                    extras = kwargs[imager]
+                else:
+                    print(f'Warning [maps_process]: No extras provided for {imager}.')
+            maps_dict_out[imager] = single_imager_maps_process(maps_dict_in[imager],
+                                                               image_mode=image_mode,
+                                                               **extras)
+            if maps_dict_out[imager] != []:
                 imagers_list_out.append(imager)
 
-    return ninstr_map_out, imagers_list_out
+    return maps_dict_out, imagers_list_out
+
+
+def single_imager_maps_process(map_list_in, image_mode='Plain', **kwargs):
+    '''
+    Process the images for a single imager and return the final maps.
+    '''
+    map_list_out = filter_maps(map_list_in, **kwargs)
+    map_list_out = prepare_maps(map_list_out, **kwargs)
+    map_list_out = maps_sequence_processing(map_list_out, seq_type=image_mode)
+
+    return map_list_out
 
 
 # TODO: Implement units here

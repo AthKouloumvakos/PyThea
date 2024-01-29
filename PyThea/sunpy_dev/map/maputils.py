@@ -108,7 +108,7 @@ def normalize_exposure(smap):
     return smap_new
 
 
-def filter_maps(map_sequence, extra):
+def filter_maps(map_sequence, **kwargs):
     '''
     Returns filtered maps.
 
@@ -121,7 +121,7 @@ def filter_maps(map_sequence, extra):
     map_sequence : `~sunpy.map.GenericMap`
         A SunPy map.
 
-    extra : A list with with the preparation arguments
+    kwargs : A list with with the preparation arguments
 
     Returns
     -------
@@ -130,14 +130,14 @@ def filter_maps(map_sequence, extra):
 
     '''
 
-    if 'exposure' in extra:
-        map_sequence = [tmap for tmap in map_sequence if tmap.exposure_time > extra['exposure']*u.second]
+    if 'exposure' in kwargs.keys():
+        map_sequence = [tmap for tmap in map_sequence if tmap.exposure_time > kwargs['exposure']*u.second]
 
-    if 'dimensions' in extra:
-        map_sequence = [tmap for tmap in map_sequence if (tmap.dimensions[0], tmap.dimensions[1]) == extra['dimensions']]
+    if 'dimensions' in kwargs.keys():
+        map_sequence = [tmap for tmap in map_sequence if (tmap.dimensions[0], tmap.dimensions[1]) == kwargs['dimensions']]
 
-    if 'polar' in extra:
-        map_sequence = [tmap for tmap in map_sequence if tmap.meta['polar'] == extra['polar']]
+    if 'polar' in kwargs.keys():
+        map_sequence = [tmap for tmap in map_sequence if tmap.meta['polar'] == kwargs['polar']]
 
     if len(map_sequence) != 0:
         sequence_final = sunpy.map.Map(map_sequence, sequence=True)
@@ -146,7 +146,7 @@ def filter_maps(map_sequence, extra):
     return sequence_final
 
 
-def prepare_maps(map_sequence, extra):
+def prepare_maps(map_sequence, **kwargs):
     '''
     Returns prepared maps.
 
@@ -159,7 +159,7 @@ def prepare_maps(map_sequence, extra):
     map_sequence : `~sunpy.map.GenericMap`
         A SunPy map.
 
-    extra : A list with with the preparation arguments
+    kwargs : A list with with the preparation arguments
 
     Returns
     -------
@@ -174,15 +174,15 @@ def prepare_maps(map_sequence, extra):
 
     map_sequence = [mask_occulter(tmap) for tmap in map_sequence]
 
-    if 'superpixel' in extra:
-        nsuper = extra['superpixel']
+    if 'superpixel' in kwargs.keys():
+        nsuper = kwargs['superpixel']
         super_dim = u.Quantity([nsuper, nsuper] * u.pixel)
         map_sequence = [tmap.superpixel(super_dim) for tmap in map_sequence]
 
     # map_sequence = [tmap.rotate(recenter=True) for tmap in map_sequence]
 
     if map_sequence[0].detector == 'COR1':
-        if 'polar' not in extra:
+        if 'polar' not in kwargs.keys():
             sequence_final = PyThea.sunpy_dev.extern.sunkit_instruments.stereo.utils.cor_polariz(map_sequence)
     else:
         sequence_final = map_sequence
