@@ -74,22 +74,26 @@ def get_hek_flare(day):
     return selectbox_list, flare_list_
 
 
-def make_figure(map, image_mode, clim=[-20, 20], clip_model=True):
+def make_figure(map, image_mode, clim=[-20, 20], clip_model=True, **kwargs):
     '''
     Makes the main imager figure and returns the figure and axis handle.
     '''
-    fig = plt.figure()
-    axis = plt.subplot(projection=map)
-    # TODO: For plain images or when EUVIA-B are used, this does not work very well.
+    fig = kwargs.get('fig', plt.figure())
+    axis = kwargs.get('axis', plt.subplot(projection=map))
+
     if image_mode == 'Plain':
+        # TODO: For plain images or when EUVIA-B are used, this does not work very well.
         map.plot()
     else:
         map.plot(cmap='Greys_r',
                  norm=colors.Normalize(vmin=clim[0], vmax=clim[1]))
+
     map.draw_limb(resolution=180)
     # map.draw_grid(linewidth=2, color='red') # TODO: This takes too much computation time. Maybe for AIA or EUVI?
+
     yax = axis.coords[1]
     yax.set_ticklabel(rotation=90)
+
     if clip_model:
         axis.set_xlim([0, map.data.shape[0]])
         axis.set_ylim([0, map.data.shape[1]])
