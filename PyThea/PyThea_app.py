@@ -66,6 +66,10 @@ def footer_text():
                    **Version**: {version} (latest release [![Version](https://img.shields.io/github/v/release/AthKouloumvakos/PyThea)](https://github.com/AthKouloumvakos/PyThea/releases))
                    """)
     left.image('https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_logo.png?raw=true')
+    st.warning('''
+           ⚠️ **NOTE: From PyThea >0.8.1 the JSON fitting files will be slightly different from the old ones.** ⚠️
+           * Due to a change in the fitting time input, the new fitting files may have slightly different times for the same images (see further information [here](https://github.com/AthKouloumvakos/PyThea/discussions/24)).
+           ''')
     st.markdown('---')
 
 
@@ -226,7 +230,7 @@ def run():
     imager_select = col1.selectbox('Select an imager',
                                    options=st.session_state.imagers_list_)
 
-    maps_date = [maps.date for maps in st.session_state.map[imager_select]]
+    maps_date = [getattr(maps, 'date_average', None) or getattr(maps, 'date', None) for maps in st.session_state.map[imager_select]]
     if len(maps_date) > 1:
         running_map_date = col2.select_slider('Slide to the image time',
                                               options=maps_date, value=maps_date[0],
@@ -261,12 +265,12 @@ def run():
         center = SkyCoord(np.sign(rcenter) * Spher_rep.to_cartesian(),
                           frame=frames.HeliographicCarrington,
                           observer='earth',
-                          obstime=running_map.date)
+                          obstime=running_map_date)
     elif st.session_state.coord_system == 'HGS':
         center = SkyCoord(np.sign(rcenter) * Spher_rep.to_cartesian(),
                           frame=frames.HeliographicStonyhurst,
                           observer='earth',
-                          obstime=running_map.date)
+                          obstime=running_map_date)
     st.session_state.center = center
 
     if st.session_state.geometrical_model == 'Spheroid':
