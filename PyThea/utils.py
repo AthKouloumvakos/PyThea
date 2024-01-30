@@ -31,6 +31,7 @@ import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import numexpr
 import numpy as np
+import pandas as pd
 import seaborn as sns
 import sunpy.map
 from scipy.interpolate import UnivariateSpline
@@ -339,9 +340,11 @@ def parameter_fit(x, y, fit_args):
     '''
     Performs a polynomial or spline fit to a set of x, y parameters.
     '''
-    xx = (mdates.date2num(x) - mdates.date2num(x[0]))
-    xxx = np.linspace(xx.min(), xx.max(), 120)
-    dd = mdates.num2date(xxx + mdates.date2num(x[0]))
+    minx = x[0].replace(second=0, microsecond=0)
+    xx = (mdates.date2num(x) - mdates.date2num(minx))  # fractional days from minx
+    step = 1/(60*24)  # one minute timestep in units of xx (fractional days)
+    xxx = np.arange(0, xx.max()+step, step)  # Makes an array with a timestep of one minute in fractional days
+    dd = pd.DatetimeIndex(mdates.num2date(xxx + mdates.date2num(minx)))
 
     if fit_args['type'] == 'polynomial':
         # scipy.optimize.curve_fit and numpy.polyfit
