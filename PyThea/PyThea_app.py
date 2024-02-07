@@ -373,29 +373,29 @@ def run():
 
         if plt_kinematics_select == 'All':
             col1, col2 = st.columns(2)
-            fig_ht = plot_fitting_model(st.session_state.model_fittings,
-                                        fit_args=fit_args_,
-                                        plt_type='HeightT')
+            fig_ht, axis_ht = plot_fitting_model(st.session_state.model_fittings,
+                                                 fit_args=fit_args_,
+                                                 plt_type='HeightT')
             col1.pyplot(fig_ht)
-            fig_vt = plot_fitting_model(st.session_state.model_fittings,
-                                        fit_args=fit_args_,
-                                        plt_type='SpeedT')
+            fig_vt, axis_vt = plot_fitting_model(st.session_state.model_fittings,
+                                                 fit_args=fit_args_,
+                                                 plt_type='SpeedT')
             col2.pyplot(fig_vt)
         elif plt_kinematics_select == 'Long-LatT':
             fit_args_['bounds'] = ([-np.inf, 0, -np.inf], [np.inf, np.inf, np.inf])
             col1, col2 = st.columns(2)
-            fig_loT = plot_fitting_model(st.session_state.model_fittings,
-                                         fit_args=fit_args_,
-                                         plt_type='LongT')
+            fig_loT, axis_loT = plot_fitting_model(st.session_state.model_fittings,
+                                                   fit_args=fit_args_,
+                                                   plt_type='LongT')
             col1.pyplot(fig_loT)
-            fig_laT = plot_fitting_model(st.session_state.model_fittings,
-                                         fit_args=fit_args_,
-                                         plt_type='LatT')
+            fig_laT, axis_laT = plot_fitting_model(st.session_state.model_fittings,
+                                                   fit_args=fit_args_,
+                                                   plt_type='LatT')
             col2.pyplot(fig_laT)
         else:
-            fig = plot_fitting_model(st.session_state.model_fittings,
-                                     fit_args=fit_args_,
-                                     plt_type=plt_kinematics_select)
+            fig, axis = plot_fitting_model(st.session_state.model_fittings,
+                                           fit_args=fit_args_,
+                                           plt_type=plt_kinematics_select)
             st.pyplot(fig)
         st.session_state.model_fittings.kinematics['fit_method'] = fit_args_
     else:

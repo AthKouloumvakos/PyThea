@@ -253,29 +253,28 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT'):
     }
     parameters = parameters[model.geometrical_model]
     # Height vs time
-    fig = plt.figure(figsize=(5.5, 5.5), tight_layout=True)
-    axis = plt.subplot()
+    fig, axis = plt.subplots(figsize=(5.5, 5.5), tight_layout=True)
     if plt_type == 'HeightT':
         for p in parameters.keys():
-            plt.plot(model.parameters.index,
-                     model.parameters[p],
-                     marker=parameters[p][0],
-                     linestyle=parameters[p][1],
-                     color=parameters[p][2],
-                     label=parameters[p][3])  # label='fit: a=%5.3f, b=%5.3f, c=%5.3f' % tuple(popt)
+            axis.plot(model.parameters.index,
+                      model.parameters[p],
+                      marker=parameters[p][0],
+                      linestyle=parameters[p][1],
+                      color=parameters[p][2],
+                      label=parameters[p][3])  # label='fit: a=%5.3f, b=%5.3f, c=%5.3f' % tuple(popt)
             if len(model.parameters[p])-1 > fit_args['order']:
                 # How to get confidence intervals from curve_fit?
                 fit = parameter_fit(model.parameters.index, model.parameters[p], fit_args)
-                plt.plot(fit['best_fit_x'], fit['best_fit_y'], '-', color=parameters[p][2])
-                plt.fill_between(fit['best_fit_x'], fit['sigma_bounds']['up'], fit['sigma_bounds']['low'],
-                                 color=parameters[p][2], alpha=0.20)
+                axis.plot(fit['best_fit_x'], fit['best_fit_y'], '-', color=parameters[p][2])
+                axis.fill_between(fit['best_fit_x'], fit['sigma_bounds']['up'], fit['sigma_bounds']['low'],
+                                  color=parameters[p][2], alpha=0.20)
                 if fit_args['type'] == 'spline':
-                    plt.fill_between(fit['best_fit_x'], fit['sigv_bounds']['up'], fit['sigv_bounds']['low'],
-                                     color=parameters[p][2], alpha=0.05)
+                    axis.fill_between(fit['best_fit_x'], fit['sigv_bounds']['up'], fit['sigv_bounds']['low'],
+                                      color=parameters[p][2], alpha=0.05)
             else:
-                plt.plot(model.parameters.index, model.parameters[p], '--', color=parameters[p][2])
-        ylabel = 'Height or Length [Rsun]'
-        plt.gca().set_ylim(bottom=0)
+                axis.plot(model.parameters.index, model.parameters[p], '--', color=parameters[p][2])
+        ylabel = 'Height of apex and length of flanks [Rsun]'
+        axis.set_ylim(bottom=0)
     elif plt_type == 'SpeedT':
         for p in parameters.keys():
             if len(model.parameters[p])-1 > fit_args['order']:
@@ -286,34 +285,34 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT'):
                 speed_best_fit = (Rs2km/sec) * np.gradient(fit['best_fit_y'], fit['best_fit_x_num'])
                 speed_bound_upper = (Rs2km/sec) * np.gradient(fit['sigma_bounds']['up'], fit['best_fit_x_num'])
                 speed_bound_lower = (Rs2km/sec) * np.gradient(fit['sigma_bounds']['low'], fit['best_fit_x_num'])
-                plt.plot(fit['best_fit_x'], speed_best_fit, '-', color=parameters[p][2], label=parameters[p][3])
-                plt.fill_between(fit['best_fit_x'], speed_bound_lower, speed_bound_upper,
-                                 color=parameters[p][2], alpha=0.20)
+                axis.plot(fit['best_fit_x'], speed_best_fit, '-', color=parameters[p][2], label=parameters[p][3])
+                axis.fill_between(fit['best_fit_x'], speed_bound_lower, speed_bound_upper,
+                                  color=parameters[p][2], alpha=0.20)
                 if fit_args['type'] == 'spline':
-                    plt.fill_between(fit['best_fit_x'], (Rs2km/sec) * fit['sigv_bounds']['dlow'], (Rs2km/sec) * fit['sigv_bounds']['dup'],
-                                     color=parameters[p][2], alpha=0.05)
+                    axis.fill_between(fit['best_fit_x'], (Rs2km/sec) * fit['sigv_bounds']['dlow'], (Rs2km/sec) * fit['sigv_bounds']['dup'],
+                                      color=parameters[p][2], alpha=0.05)
             else:
                 pass
         ylabel = 'Speed [km/s]'
-        plt.gca().set_ylim(bottom=0)
+        axis.set_ylim(bottom=0)
     if plt_type == 'LongT' or plt_type == 'LatT':
         parameters = {'LongT': ['hgln', '+', palete[3], 'Longitude'],
                       'LatT': ['hglt', '+', palete[2], 'Latitude']}
-        plt.plot(model.parameters.index,
-                 model.parameters[parameters[plt_type][0]],
-                 marker=parameters[plt_type][1],
-                 linestyle='',
-                 color=parameters[plt_type][2],
-                 label=parameters[plt_type][3])
+        axis.plot(model.parameters.index,
+                  model.parameters[parameters[plt_type][0]],
+                  marker=parameters[plt_type][1],
+                  linestyle='',
+                  color=parameters[plt_type][2],
+                  label=parameters[plt_type][3])
         if len(model.parameters[parameters[plt_type][0]])-1 > 3:
             fit = parameter_fit(model.parameters.index, model.parameters[parameters[plt_type][0]], fit_args)
-            plt.plot(fit['best_fit_x'], fit['best_fit_y'], '-', color=parameters[plt_type][2])
-            plt.fill_between(fit['best_fit_x'], fit['sigma_bounds']['up'], fit['sigma_bounds']['low'],
-                             color=parameters[plt_type][2], alpha=0.05)
+            axis.plot(fit['best_fit_x'], fit['best_fit_y'], '-', color=parameters[plt_type][2])
+            axis.fill_between(fit['best_fit_x'], fit['sigma_bounds']['up'], fit['sigma_bounds']['low'],
+                              color=parameters[plt_type][2], alpha=0.05)
         ylabel = parameters[plt_type][3] + ' [degrees]'
 
-    plt.xlabel('Time [UT]')
-    plt.ylabel(ylabel)
+    axis.set_xlabel('Time [UTC]')
+    axis.set_ylabel(ylabel)
     if fit_args['type'] == 'polynomial':
         title = 'Event: ' + model.event_selected + ' | ' + fit_args['type'] + str(fit_args['order'])
     elif fit_args['type'] == 'spline':
@@ -331,9 +330,9 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT'):
     if xlim[1] - xlim[0] <= 0.5:
         axis.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=[0, 10, 20, 30, 40, 50]))
     fig.autofmt_xdate(bottom=0, rotation=0, ha='center')
-    plt.legend(loc='lower right')
+    axis.legend(loc='lower right')
 
-    return fig
+    return fig, axis
 
 
 def parameter_fit(x, y, fit_args):
