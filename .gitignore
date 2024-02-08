@@ -8,6 +8,7 @@ env/
 # Distribution / packaging and Python egg metadata, generated from source files by setuptools.
 build/
 dist/
+baseline/
 *.egg-info/
 *.egg
 .eggs/
