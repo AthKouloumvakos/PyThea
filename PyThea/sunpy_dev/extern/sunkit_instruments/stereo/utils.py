@@ -1,9 +1,11 @@
+import copy
 import numpy as np
 import sunpy.map
+import scipy
 
 from PyThea.sunpy_dev.map import maputils
 
-__all__ = ['cor_polariz']
+__all__ = ['cor_polariz', 'euvi_prep']
 
 
 def cor_polariz(map_sequence):
@@ -76,5 +78,60 @@ def cor_polariz(map_sequence):
 
         map_ = sunpy.map.Map(I, new_map_meta)
         smap.append(map_)
+
+    return sunpy.map.Map(smap, sequence=True)
+
+
+def euvi_prep(map_sequence):
+    smap = []
+    for map_ in map_sequence:
+
+        image = map_.data
+        new_map_meta = copy.deepcopy(map_.meta)
+
+        # Bias Subtraction
+        if map_.meta['offsetcr'] == 0:
+            bias = map_.meta['BIASMEAN']
+            if map_.meta['ipsum'] > 1:
+                bias *= ( (2.0**(map_.meta['ipsum'] - 1))**2.0 )
+            if map_.meta['IP_PROG3'] == 95:  # Added manually
+                bias *= 1.995  # Added manually
+            image = image - bias
+
+        # Normalize to Open filter position
+        if map_.meta['FILTER'] == 'OPEN':
+            filter_factor = 1  # no filter
+        elif map_.meta['FILTER'] == 'S1':
+            filter_factor = 0.49  # 1500A filter
+        elif map_.meta['FILTER'] == 'S2':
+            filter_factor = 0.49  # 1500A filter
+        elif map_.meta['FILTER'] == 'DBL':
+            filter_factor = 0.41  # 3000A filter
+        image = image / filter_factor
+
+        # Image Dejitter
+        offset = [0., 0.]
+        nsum = 2**(map_.meta['summed']-1)
+
+        scale = map_.dimensions[0].value/2048
+
+        offset[0] = scale * round(map_.meta['fpsoffz'] / 38.) / nsum
+        offset[1] = scale * round(map_.meta['fpsoffy'] / 38.) / nsum
+
+        if map_.meta['obsrvtry'] == 'STEREO_B': offset = [-offset[0], -offset[1]]
+        # if hdr.date_obs lt '2015-05-19' then offset = -offset
+
+        new_map_meta['crpix1'] += offset[0]
+        new_map_meta['crpix2'] += offset[1]
+        new_map_meta['crpix1a'] += offset[0]
+        new_map_meta['crpix2a'] += offset[1]
+        new_map_meta['xcen'] -= map_.meta['cdelt1'] * offset[0]
+        new_map_meta['ycen'] -= map_.meta['cdelt2'] * offset[1]
+
+        image = scipy.ndimage.interpolation.affine_transform(
+            np.nan_to_num(image).T, [[1, 0], [0, 1]], offset=[-offset[0], -offset[1]], order=3,
+            mode='constant', cval=0.0).T
+
+        smap.append(sunpy.map.Map(image, new_map_meta))
 
     return sunpy.map.Map(smap, sequence=True)

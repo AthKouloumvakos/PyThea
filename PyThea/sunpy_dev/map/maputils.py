@@ -8,7 +8,9 @@ import warnings
 import astropy.units as u
 import numpy as np
 import sunpy.map
+from aiapy.calibrate import fix_observer_location, update_pointing
 
+import PyThea.sunpy_dev.extern.sunkit_instruments.lasco.utils  # noqa
 import PyThea.sunpy_dev.extern.sunkit_instruments.stereo.utils  # noqa
 
 __all__ = ['maps_sequence_processing', 'get_closest', 'normalize_exposure',
@@ -167,8 +169,23 @@ def prepare_maps(map_sequence, **kwargs):
         A SunPy map.
 
     '''
+    detector = map_sequence[0].detector
+    print(f'Preparing image sequence for {detector}.')
+
     if len(map_sequence) == 0:
         return []
+
+    # Prepare the maps before anything else
+    if detector == 'AIA':
+        map_sequence = [update_pointing(tmap) for tmap in map_sequence]
+        map_sequence = [fix_observer_location(tmap) for tmap in map_sequence]
+    elif detector == 'COR1':
+        if 'polar' not in kwargs.keys():
+            map_sequence = PyThea.sunpy_dev.extern.sunkit_instruments.stereo.utils.cor_polariz(map_sequence)
+    elif detector == 'EUVI':
+        map_sequence = PyThea.sunpy_dev.extern.sunkit_instruments.stereo.utils.euvi_prep(map_sequence)
+    elif detector in ['C2', 'C3']:
+        map_sequence = PyThea.sunpy_dev.extern.sunkit_instruments.lasco.utils.prep_lasco(map_sequence)
 
     map_sequence = [normalize_exposure(tmap) for tmap in map_sequence]
 
@@ -181,12 +198,7 @@ def prepare_maps(map_sequence, **kwargs):
 
     # map_sequence = [tmap.rotate(recenter=True) for tmap in map_sequence]
 
-    if map_sequence[0].detector == 'COR1':
-        if 'polar' not in kwargs.keys():
-            sequence_final = PyThea.sunpy_dev.extern.sunkit_instruments.stereo.utils.cor_polariz(map_sequence)
-    else:
-        sequence_final = map_sequence
-    return sequence_final
+    return map_sequence
 
 
 def difference_maps(smapi, smapm):

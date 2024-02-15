@@ -1,6 +1,7 @@
 numpy
 pandas
 scipy
+aiapy
 astropy
 astroquery
 numexpr

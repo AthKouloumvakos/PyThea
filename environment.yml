@@ -10,6 +10,7 @@ dependencies:
   - pandas
   - scipy
   - matplotlib
+  - aiapy
   - astropy
   - astroquery
   - numexpr
