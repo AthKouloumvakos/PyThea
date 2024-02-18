@@ -33,8 +33,9 @@ from PyThea.modules import (date_and_event_selection, final_parameters_gmodel,
                             fitting_and_slider_options_container,
                             fitting_sliders, maps_clims)
 from PyThea.sunpy_dev.map.maputils import get_closest
-from PyThea.utils import (download_fits, make_figure, maps_process,
-                          model_fittings, plot_bodies, plot_fitting_model)
+from PyThea.utils import (download_fits, make_figure, model_fittings,
+                          plot_bodies, plot_fitting_model,
+                          single_imager_maps_process)
 from PyThea.version import version
 
 
@@ -169,9 +170,7 @@ def run():
                                                        options=selected_imagers.imager_dict.keys(),
                                                        default=['LC2', 'LC3', 'COR2A'],
                                                        key='imagers_list')
-        select_imagers_form.form_submit_button(label='Submit',
-                                               on_click=delete_from_state,
-                                               kwargs={'vars': ['map', ]})
+        select_imagers_form.form_submit_button(label='Submit')
         select_timerange_form = st.form(key='select_timerange_form', border=False)
         imaging_time_range = select_timerange_form.slider('Time Range [hours]',
                                                           min_value=-3., max_value=6.,
@@ -179,7 +178,7 @@ def run():
                                                           key='imaging_time_range')
         select_timerange_form.form_submit_button(label='Submit',
                                                  on_click=delete_from_state,
-                                                 kwargs={'vars': ['map', 'map_']})
+                                                 kwargs={'vars': ['map', 'map_', 'imagers_list_']})
 
     with st.sidebar.expander('Processing Options'):
         procoption_container = st.container()
@@ -188,7 +187,7 @@ def run():
             st.session_state['imagers_list_'] = []
         image_mode = procoption_container.selectbox('Map sequence processing',
                                                     options=['Running Diff.', 'Base Diff.', 'Plain'], key='image_mode',
-                                                    on_change=delete_from_state, kwargs={'vars': ['map', ]})
+                                                    on_change=delete_from_state, kwargs={'vars': ['map', 'imagers_list_']})
 
     with st.sidebar.expander('Plot/View Options'):
         plotviewopt_container = st.container()
@@ -202,22 +201,31 @@ def run():
     #############################################################
     # Download and Process the Images
     # This part runs only if the map_ doesn't exits or the session_state.map_ does not contain all the imagers requested
-    if 'map_' not in st.session_state or [False for lst in imagers_list if lst not in st.session_state.map_]:
+    imager_added = list(set(imagers_list) - set(st.session_state['imagers_list_']))
+    imager_removed = list(set(st.session_state['imagers_list_']) - set(imagers_list))
+    if 'map_' not in st.session_state or imager_added != []:
         st.session_state.map_ = {} if 'map_' not in st.session_state else st.session_state.map_
-        progress_bar = stqdm.stqdm(imagers_list, desc='Preparing to Download data')
+        st.session_state.map = {} if 'map' not in st.session_state else st.session_state.map
+        st.session_state['imagers_list_'] = imagers_list
+        progress_bar = stqdm.stqdm(imager_added, desc='Preparing to Download data')
         for imager in progress_bar:
-            if imager in st.session_state.map_:
-                pass
-            else:
-                progress_bar.desc = f'Downloaded {imager} images from VSO'
+            progress_bar.desc = f'Downloaded {imager} images from VSO'
+            if imager not in st.session_state.map_:
                 st.session_state.map_[imager] = download_fits(st.session_state.date_process,
                                                               imager, time_range=imaging_time_range)
+            processed_images = single_imager_maps_process(st.session_state.map_[imager],
+                                                          image_mode=image_mode,
+                                                          **selected_imagers.imager_dict[imager][1])
+            if processed_images != []:
+                st.session_state.map[imager] = processed_images
+            else:
+                st.session_state.imagers_list_.remove(imager)
+    if imager_removed != []:
+        st.session_state['imagers_list_'] = imagers_list
+        for imager in imager_removed:
+            st.session_state.map_.pop(imager, None)
 
-    if 'map' not in st.session_state:
-        st.session_state.map, st.session_state.imagers_list_ = maps_process(st.session_state.map_,
-                                                                            imagers_list,
-                                                                            image_mode)
-        maps_clims(st, imagers_list)
+    maps_clims(st, st.session_state.imagers_list_)
 
     if not st.session_state.imagers_list_:
         st.error('No images have been downloaded or processed.')  # TODO: Explain better
