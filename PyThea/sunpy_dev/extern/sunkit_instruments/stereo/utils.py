@@ -60,11 +60,15 @@ def cor_polariz(map_sequence):
 
         t = [map_0.date, map_120.date, map_240.date]
         obs_time = min(t) + (max(t)-min(t))/2
+        t = [map_0.date_average, map_120.date_average, map_240.date_average]
+        time_avg = min(t) + (max(t)-min(t))/2
+
         crota = np.mean([map_0.meta['crota'], map_120.meta['crota'], map_240.meta['crota']])
 
         new_map_meta = map_120.meta
         # TODO: Check if any other keys need to change
         new_map_meta['date-obs'] = obs_time.strftime('%Y-%m-%dT%H:%M:%S.%f')
+        new_map_meta['date-avg'] = time_avg.strftime('%Y-%m-%dT%H:%M:%S.%f')
         new_map_meta['polar'] = '1001'
         new_map_meta['crval1'] = np.mean([map_0.meta['crval1'], map_120.meta['crval1'], map_240.meta['crval1']])
         new_map_meta['crval2'] = np.mean([map_0.meta['crval2'], map_120.meta['crval2'], map_240.meta['crval2']])
@@ -93,7 +97,7 @@ def euvi_prep(map_sequence):
         if map_.meta['offsetcr'] == 0:
             bias = map_.meta['BIASMEAN']
             if map_.meta['ipsum'] > 1:
-                bias *= ( (2.0**(map_.meta['ipsum'] - 1))**2.0 )
+                bias *= ((2.0**(map_.meta['ipsum'] - 1))**2.0)
             if map_.meta['IP_PROG3'] == 95:  # Added manually
                 bias *= 1.995  # Added manually
             image = image - bias
@@ -118,8 +122,10 @@ def euvi_prep(map_sequence):
         offset[0] = scale * round(map_.meta['fpsoffz'] / 38.) / nsum
         offset[1] = scale * round(map_.meta['fpsoffy'] / 38.) / nsum
 
-        if map_.meta['obsrvtry'] == 'STEREO_B': offset = [-offset[0], -offset[1]]
-        # if hdr.date_obs lt '2015-05-19' then offset = -offset
+        if map_.meta['obsrvtry'] == 'STEREO_B':
+            offset = [-offset[0], -offset[1]]
+
+        # TODO: if hdr.date_obs lt '2015-05-19' then offset = -offset
 
         new_map_meta['crpix1'] += offset[0]
         new_map_meta['crpix2'] += offset[1]

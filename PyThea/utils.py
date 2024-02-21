@@ -22,6 +22,7 @@ import datetime
 import io
 import json
 import os
+import re
 from copy import copy
 from pathlib import Path
 
@@ -40,6 +41,7 @@ from sunpy.coordinates import get_horizons_coord
 from sunpy.map.maputils import contains_coordinate
 from sunpy.net import Fido
 from sunpy.net import attrs as a
+from sunpy.time import parse_time
 
 from PyThea.config.selected_bodies import bodies_dict
 from PyThea.config.selected_imagers import imager_dict
@@ -89,7 +91,7 @@ def make_figure(map, image_mode, clim=[-20, 20], clip_model=True, **kwargs):
         map.plot(cmap='Greys_r',
                  norm=colors.Normalize(vmin=clim[0], vmax=clim[1]))
 
-    map.draw_limb(resolution=180)
+    map.draw_limb(resolution=90)
     # map.draw_grid(linewidth=2, color='red') # TODO: This takes too much computation time. Maybe for AIA or EUVI?
 
     yax = axis.coords[1]
@@ -107,6 +109,10 @@ def make_figure(map, image_mode, clim=[-20, 20], clip_model=True, **kwargs):
     if cref.Ty > 0:
         axis.invert_yaxis()
 
+    axis.set_title(re.sub(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}',
+                          ' $T_{AGV}:$' + parse_time(map.date_average).strftime('%Y-%m-%d %H:%M:%S'),
+                          map.latex_name), fontsize=10, pad=8)
+
     return fig, axis
 
 
@@ -115,7 +121,7 @@ def plot_bodies(axis, bodies_list, smap):
     Plots in the images the possition of the pre-configured bodies (Earth, STA, Venus etc.)
     '''
     for body in bodies_list:
-        body_coo = get_horizons_coord(bodies_dict[body][0], smap.date)
+        body_coo = get_horizons_coord(bodies_dict[body][0], smap.date_average)
         if contains_coordinate(smap, body_coo):
             axis.plot_coord(body_coo, 'o', color=bodies_dict[body][1],
                             fillstyle='none', markersize=6, label=body)

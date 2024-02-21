@@ -78,7 +78,7 @@ def get_closest(smap, date):
     `~sunpy.map.GenericMap`
         A SunPy map.
     """
-    delta_time = [abs(map_.date-date) for map_ in smap]
+    delta_time = [abs(map_.date_average-date) for map_ in smap]
     map_closest = smap[delta_time.index(min(delta_time))]
     return map_closest
 
