@@ -36,13 +36,16 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import sunpy.map
+from astropy.coordinates import SkyCoord
+from astropy.visualization.wcsaxes.wcsapi import wcsapi_to_celestial_frame
 from scipy.interpolate import UnivariateSpline
 from scipy.optimize import curve_fit
-from sunpy.coordinates import get_horizons_coord
+from sunpy.coordinates import frames, get_horizons_coord
 from sunpy.map.maputils import contains_coordinate
 from sunpy.net import Fido
 from sunpy.net import attrs as a
 from sunpy.time import parse_time
+from sunpy.visualization import drawing
 
 from PyThea.config.selected_bodies import bodies_dict
 from PyThea.config.selected_imagers import imager_dict
@@ -93,7 +96,6 @@ def make_figure(map, image_mode, clim=[-20, 20], clip_model=True, **kwargs):
                  norm=colors.Normalize(vmin=clim[0], vmax=clim[1]))
 
     map.draw_limb(resolution=90)
-    # map.draw_grid(linewidth=2, color='red') # TODO: This takes too much computation time. Maybe for AIA or EUVI?
 
     yax = axis.coords[1]
     yax.set_ticklabel(rotation=90)
@@ -126,6 +128,42 @@ def plot_bodies(axis, bodies_list, smap):
         if contains_coordinate(smap, body_coo):
             axis.plot_coord(body_coo, 'o', color=bodies_dict[body][1],
                             fillstyle='none', markersize=6, label=body)
+
+
+def plot_solar_reference_lines(axis, bodies_list, smap, mode='Limb from Obs.'):
+    '''
+    Plots solar reference lines (e.g. solar limb, central meridians, equator) in wcs axis.
+    '''
+    def draw_central_meridian(axis, body_coo, date, color):
+        body_coo = body_coo.transform_to(frames.HeliographicStonyhurst)
+        constant_lon = SkyCoord(body_coo.lon, np.linspace(-90, 90, 90) * u.deg,
+                                frame=frames.HeliographicStonyhurst(obstime=date))
+        v, _ = drawing._plot_vertices(constant_lon, axis, wcsapi_to_celestial_frame(axis.wcs), None,
+                                      color=color, close_path=False, linewidth=1)
+
+    for body in bodies_list:
+        try:
+            body_coo = get_horizons_coord(bodies_dict[body][0], smap.date_average)
+        except ValueError as ve:
+            print(f'Error processing {body}: {ve}')
+            continue
+
+        if mode in ['Limb from Obs.', 'limb']:
+            drawing.limb(axis, body_coo, color=bodies_dict[body][1],
+                         linewidth=1, resolution=90, label=f'Limb seen from {body}')
+        if mode in ['Central Meridian from Obs.', 'meridian']:
+            draw_central_meridian(axis, body_coo, smap.date_average, bodies_dict[body][1])
+
+    if mode in ['Carr. Prime Meridian+Solar Equator', ['carr-me']]:
+        drawing.equator(axis, linewidth=1, resolution=90)
+        drawing.prime_meridian(axis, linewidth=1, resolution=90)
+    elif mode in ['Stonyhurst Grid', ['stony-grid']]:
+        earth = get_horizons_coord(3, smap.date_average)
+        draw_central_meridian(axis, earth, smap.date_average, 'white')
+        smap.draw_grid(linewidth=1, color='red', system='stonyhurst', alpha=0.8)
+    elif mode in ['Carrington Grid', ['carr-grid']]:
+        drawing.prime_meridian(axis, linewidth=1, resolution=90)
+        smap.draw_grid(linewidth=1, color='red', system='carrington', alpha=0.8)
 
 
 def download_fits(date_process, imager, time_range=[-1, 1]):

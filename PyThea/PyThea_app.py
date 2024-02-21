@@ -35,6 +35,7 @@ from PyThea.modules import (date_and_event_selection, final_parameters_gmodel,
 from PyThea.sunpy_dev.map.maputils import get_closest
 from PyThea.utils import (download_fits, make_figure, model_fittings,
                           plot_bodies, plot_fitting_model,
+                          plot_solar_reference_lines,
                           single_imager_maps_process)
 from PyThea.version import version
 
@@ -202,6 +203,27 @@ def run():
         if star_field:
             bodies_list = plotviewopt_container.multiselect('Select Bodies', options=selected_bodies.bodies_dict.keys(),
                                                             default=['Mercury', 'Venus', 'Jupiter'])
+        plot_solar_reference_lines_ = plotviewopt_container.checkbox('View Limb and Meridians')
+        if plot_solar_reference_lines_:
+            markdown = '''
+                **Limb**: plots the solar limb as observed  # noqa
+                for the selected observers.  # noqa
+                **Central Meridian**: plots the central meridian  # noqa
+                observed for the selected observers.  # noqa
+                **CR Meridan+Equator**: plots the primary meridian  # noqa
+                and equator of Carrington coordinate system.  # noqa
+                '''.strip()
+            plot_solar_reference_lines_mode = \
+                plotviewopt_container.selectbox('Select plot option',
+                                                options=['Limb from Obs.', 'Central Meridian from Obs.', 'Carr. Prime Meridian+Solar Equator',
+                                                         'Stonyhurst Grid', 'Carrington Grid'],
+                                                help=markdown)
+            disabled = False if plot_solar_reference_lines_mode in ['Limb from Obs.', 'Central Meridian from Obs.'] else True
+            plot_solar_reference_lines_bodies_list = \
+                plotviewopt_container.multiselect('Select Bodies',
+                                                  label_visibility='collapsed',
+                                                  options=selected_bodies.bodies_dict.keys(),
+                                                  default=['Earth'], disabled=disabled)
 
     #############################################################
     # Download and Process the Images
@@ -311,6 +333,11 @@ def run():
     if star_field:
         plot_bodies(axis, bodies_list, running_map)
         axis.legend()
+
+    if plot_solar_reference_lines_:
+        plot_solar_reference_lines(axis, plot_solar_reference_lines_bodies_list,
+                                   running_map, mode=plot_solar_reference_lines_mode)
+
     st.pyplot(fig)
 
     if plt_supp_imagers and len(st.session_state.imagers_list_) > 2:
