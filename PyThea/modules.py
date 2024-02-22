@@ -19,11 +19,9 @@
 
 
 import datetime
-import json
 
 import astropy.units as u
 import numpy as np
-import pandas as pd
 
 from PyThea.callbacks import change_fitting_sliders, change_long_lat_sliders
 from PyThea.config.config_sliders import sliders_dict as sd
@@ -68,29 +66,14 @@ def date_and_event_selection(st):
             if uploaded_file.type != 'application/json':
                 st.sidebar.error('Unsupported file type')
                 st.stop()
-            fitting = json.loads(uploaded_file.read())
-            st.session_state.event_selected = fitting['event_selected']
-            st.session_state.date_process  = datetime.datetime.strptime(fitting['date_process'], '%Y-%m-%dT%H:%M:%S.%f')
-            st.session_state.geometrical_model = fitting['geometrical_model']['type']
-            table_indx = [datetime.datetime.strptime(t, '%Y-%m-%dT%H:%M:%S.%f') for t in fitting['geometrical_model']['parameters']['time']]
-            parameters = pd.DataFrame(fitting['geometrical_model']['parameters'], index=table_indx)
-            parameters = parameters.drop(['time'], axis=1)
 
-            if 'kinematics' in fitting:
-                kinematics = fitting['kinematics']
-            else:
-                # TODO: Remove this in version 1.0.0
-                st.warning('**Warning:** The .json fitting file does not contain the "kinematics" information. \
-                            This means that the file was prodused using Pythea with <V0.6.0. \
-                            **To resolve this:** Just do a save of the loaded fitting now and replace \
-                            the old file with the new one. This will not alter your fittings.')
-                kinematics = {'fit_method': {'type': 'polynomial', 'order': 1}}
+            st.session_state.model_fittings = model_fittings.load_from_json(uploaded_file)
 
-            st.session_state.model_fittings = model_fittings(fitting['event_selected'],
-                                                             fitting['date_process'],
-                                                             fitting['geometrical_model']['type'],
-                                                             parameters,
-                                                             kinematics=kinematics)
+            st.session_state.event_selected = st.session_state.model_fittings.event_selected
+            st.session_state.date_process  = \
+                datetime.datetime.strptime(st.session_state.model_fittings.date_process, '%Y-%m-%dT%H:%M:%S.%f')
+            st.session_state.geometrical_model = st.session_state.model_fittings.geometrical_model
+
             st.rerun()
 
 

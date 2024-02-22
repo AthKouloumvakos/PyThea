@@ -23,6 +23,7 @@ import io
 import json
 import os
 import re
+import warnings
 from copy import copy
 from pathlib import Path
 
@@ -206,6 +207,36 @@ class model_fittings:
         self.geometrical_model = geometrical_model
         self.parameters = model_parameters
         self.kinematics = kinematics
+
+    @staticmethod
+    def load_from_json(json_file):
+        if isinstance(json_file, str):
+            with open(json_file, 'r') as file:
+                json_content = file.read()
+                fitting = json.loads(json_content)
+        else:
+            fitting = json.loads(json_file.read())
+
+        table_indx = [datetime.datetime.strptime(t, '%Y-%m-%dT%H:%M:%S.%f') for t in fitting['geometrical_model']['parameters']['time']]
+        parameters = pd.DataFrame(fitting['geometrical_model']['parameters'], index=table_indx)
+        parameters = parameters.drop(['time'], axis=1)
+        if 'kinematics' in fitting:
+            kinematics = fitting['kinematics']
+        else:
+            # TODO: Remove this in version 1.0.0
+            warnings.warn('The .json fitting file does not contain the "kinematics" information. \n \
+                            This means that the file was prodused using Pythea with <V0.6.0. \n \
+                            To resolve this: Just do a save of the loaded fitting now and replace \n \
+                            the old file with the new one. This will not alter your fittings.')
+            kinematics = {'fit_method': {'type': 'polynomial', 'order': 1}}
+
+        model_fittings_class = model_fittings(fitting['event_selected'],
+                                              fitting['date_process'],
+                                              fitting['geometrical_model']['type'],
+                                              parameters,
+                                              kinematics=kinematics)
+
+        return model_fittings_class
 
     def model_id(self):
         str_id = self.event_selected.replace('-', '').replace(':', '').replace('|', 'D').replace('.', 'p') + 'M' + self.geometrical_model
