@@ -35,6 +35,9 @@ def maps_sequence_processing(map_sequence, seq_type='Plain'):
         A SunPy map.
     """
 
+    if len(map_sequence) == 0:
+        return []
+
     normalized = True if True in [tmap.exposure_time == 1.0*u.second for tmap in map_sequence] else False
     if not normalized:
         warnings.warn('Warning [maps_sequence_processing]: The exposure time of the maps is not normalized.')
@@ -132,6 +135,9 @@ def filter_maps(map_sequence, **kwargs):
 
     '''
 
+    if len(map_sequence) == 0:
+        return []
+
     if 'exposure' in kwargs.keys():
         map_sequence = [tmap for tmap in map_sequence if tmap.exposure_time > kwargs['exposure']*u.second]
 
@@ -169,11 +175,12 @@ def prepare_maps(map_sequence, **kwargs):
         A SunPy map.
 
     '''
-    detector = map_sequence[0].detector
-    print(f'Preparing image sequence for {detector}.')
 
     if len(map_sequence) == 0:
         return []
+
+    detector = map_sequence[0].detector
+    print(f'Preparing image sequence for {detector}.')
 
     # Prepare the maps before anything else
     if detector == 'AIA':
