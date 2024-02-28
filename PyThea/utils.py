@@ -135,24 +135,26 @@ def download_fits(date_process, imager, time_range=[-1, 1]):
     timerange = a.Time(date_process + datetime.timedelta(hours=time_range[0]),
                        date_process + datetime.timedelta(hours=time_range[1]))
 
-    map_ = {}
+    maps_ = []
     args = imager_dict[imager][0]
     result = Fido.search(timerange, *args)
     print(result)
     if result:
         downloaded_files = Fido.fetch(result, path=f'{database_dir}'+'/data/{source}/{instrument}/'+'/{file}')
-        try:
-            map_ = sunpy.map.Map(downloaded_files)
-        except RuntimeError as err:
-            print('Handling RuntimeError error:', err)
-            map_ = []
-        except OSError as err:
-            print('Handling OSError error:', err)
-            map_ = []
-    else:
-        map_ = []
+        for file_path in downloaded_files:
+            try:
+                map_ = sunpy.map.Map(file_path)
+                maps_.append(map_)
+            except RuntimeError as err:
+                print('Handling RuntimeError error:', err)
+            except OSError as err:
+                print('Handling OSError error:', err)
+                os.remove(file_path)
+                print(f"File '{file_path}' has been removed.")
+        if maps_:
+            maps_ = sunpy.map.Map(maps_, sequence=True)
 
-    return map_
+    return maps_
 
 
 def maps_process(maps_dict_in, imagers_list_in, image_mode, **kwargs):
