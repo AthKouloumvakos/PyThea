@@ -185,9 +185,14 @@ def run():
         if 'imagers_list_' not in st.session_state:
             # imagers_list_ is used later when we download or filter the images
             st.session_state['imagers_list_'] = []
-        image_mode = procoption_container.selectbox('Map sequence processing',
+        image_mode = procoption_container.selectbox('Map Sequence Processing',
                                                     options=['Running Diff.', 'Base Diff.', 'Plain'], key='image_mode',
                                                     on_change=delete_from_state, kwargs={'vars': ['map', 'imagers_list_']})
+        if image_mode in ['Running Diff.', 'Base Diff.']:
+            diff_value = procoption_container.number_input('Select Step/Image for Running/Base Diff.', 1, 5, key='diff_value',
+                                                           on_change=delete_from_state, kwargs={'vars': ['map', 'imagers_list_']})
+        else:
+            diff_value = None
 
     with st.sidebar.expander('Plot/View Options'):
         plotviewopt_container = st.container()
@@ -218,7 +223,8 @@ def run():
                                                                            skip='sequence_processing')
             processed_images = single_imager_maps_process(st.session_state.map_[imager],
                                                           skip=['filter', 'prepare'],
-                                                          image_mode=image_mode)
+                                                          image_mode=image_mode,
+                                                          diff_num=diff_value)
             if processed_images != []:
                 st.session_state.map[imager] = processed_images
             else:
