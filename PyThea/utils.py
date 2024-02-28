@@ -186,15 +186,21 @@ def maps_process(maps_dict_in, imagers_list_in, image_mode, **kwargs):
     return maps_dict_out, imagers_list_out
 
 
-def single_imager_maps_process(map_list_in, image_mode='Plain', **kwargs):
+def single_imager_maps_process(map_list, skip=None, **kwargs):
     '''
     Process the images for a single imager and return the final maps.
     '''
-    map_list_out = filter_maps(map_list_in, **kwargs)
-    map_list_out = prepare_maps(map_list_out, **kwargs)
-    map_list_out = maps_sequence_processing(map_list_out, seq_type=image_mode)
 
-    return map_list_out
+    if 'filter' not in str(skip or ''):
+        map_list = filter_maps(map_list, **kwargs)
+
+    if 'prepare' not in str(skip or ''):
+        map_list = prepare_maps(map_list, **kwargs)
+
+    if 'sequence_processing' not in str(skip or ''):
+        map_list = maps_sequence_processing(map_list, **kwargs)
+
+    return map_list
 
 
 # TODO: Implement units here

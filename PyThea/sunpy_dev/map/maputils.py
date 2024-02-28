@@ -17,17 +17,17 @@ __all__ = ['maps_sequence_processing', 'get_closest', 'normalize_exposure',
            'prepare_maps', 'difference_maps', 'mask_occulter']
 
 
-def maps_sequence_processing(map_sequence, seq_type='Plain'):
+def maps_sequence_processing(map_sequence, **kwargs):
     """
-    Returns a sequence of maps which is processed as running difference or base difference or plain images.
+    Returns a sequence of maps which is processed as plain images, running or base difference images.
 
     Parameters
     ----------
     map_sequence : `~sunpy.map.GenericMap`
         A list SunPy maps.
 
-    seq_type : '~str'
-        The type of sequence processing
+    image_mode : '~str'
+        The type of sequence processing: 'Running Diff.', 'Base Diff.', 'Plain'
 
     Returns
     -------
@@ -38,18 +38,21 @@ def maps_sequence_processing(map_sequence, seq_type='Plain'):
     if len(map_sequence) == 0:
         return []
 
+    seq_type = kwargs.get('image_mode', 'Plain')
+    diff_num = kwargs.get('diff_num', 1 if seq_type == 'Running Diff.' else 0 if seq_type == 'Base Diff.' else None)
+
     normalized = True if True in [tmap.exposure_time == 1.0*u.second for tmap in map_sequence] else False
     if not normalized:
         warnings.warn('Warning [maps_sequence_processing]: The exposure time of the maps is not normalized.')
 
     smap = []
     if seq_type == 'Running Diff.':
-        for i in range(1, len(map_sequence)):
-            smap_diff = difference_maps(map_sequence[i], map_sequence[i-1])
+        for i in range(1+diff_num, len(map_sequence)):
+            smap_diff = difference_maps(map_sequence[i], map_sequence[i-diff_num])
             smap.append(smap_diff)
     if seq_type == 'Base Diff.':
         for i in range(1, len(map_sequence)):
-            smap_diff = difference_maps(map_sequence[i], map_sequence[0])
+            smap_diff = difference_maps(map_sequence[i], map_sequence[diff_num])
             smap.append(smap_diff)
     if seq_type == 'Plain':
         for i in range(0, len(map_sequence)):
@@ -151,6 +154,7 @@ def filter_maps(map_sequence, **kwargs):
         sequence_final = sunpy.map.Map(map_sequence, sequence=True)
     else:
         sequence_final = []
+
     return sequence_final
 
 

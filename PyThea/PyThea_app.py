@@ -213,9 +213,12 @@ def run():
             if imager not in st.session_state.map_:
                 st.session_state.map_[imager] = download_fits(st.session_state.date_process,
                                                               imager, time_range=imaging_time_range)
+                st.session_state.map_[imager] = single_imager_maps_process(st.session_state.map_[imager],
+                                                                           **selected_imagers.imager_dict[imager][1],
+                                                                           skip='sequence_processing')
             processed_images = single_imager_maps_process(st.session_state.map_[imager],
-                                                          image_mode=image_mode,
-                                                          **selected_imagers.imager_dict[imager][1])
+                                                          skip=['filter', 'prepare'],
+                                                          image_mode=image_mode)
             if processed_images != []:
                 st.session_state.map[imager] = processed_images
             else:
