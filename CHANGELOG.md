@@ -1,3 +1,15 @@
+# v0.9.1 (5-March-2024)
+
+## Features
+ - A utility added to load the json fitting files
+
+## Minor Changes
+- Simplifies the code structure for loading the fitting files in the app
+
+## Bug Fixes
+- Fixes a bug when passing no maps in maputils
+- Fixes a bug when corrupted fits files loaded and imager load skipped
+
 # v0.9.0 (8-Feb-2024)
 
 ## Features
