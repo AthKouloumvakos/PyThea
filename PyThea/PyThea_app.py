@@ -196,6 +196,8 @@ def run():
         else:
             diff_value = None
 
+        procoption_container.number_input('Median Filter', 1, 6, 1, 1, key='images_median_filter')
+
     with st.sidebar.expander('Plot/View Options'):
         plotviewopt_container = st.container()
         plotviewopt_container.checkbox('Clip plot on image limits', value=True, key='clip_model')

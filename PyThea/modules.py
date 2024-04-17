@@ -188,7 +188,8 @@ def figure_streamlit(st, running_map, image_mode, imager, model):
 
     fig, axis = make_figure(running_map, image_mode,
                             clim=st.session_state.map_colormap_limits[imager],
-                            clip_model=st.session_state.clip_model)
+                            clip_model=st.session_state.clip_model,
+                            median_filter=st.session_state.images_median_filter)
 
     if st.session_state.plot_mesh_mode == 'Skeleton':
         model.plot(axis, mode='Skeleton')
