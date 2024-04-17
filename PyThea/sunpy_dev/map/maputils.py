@@ -8,8 +8,8 @@ import warnings
 import astropy.units as u
 import numpy as np
 import sunpy.map
-from aiapy.calibrate import fix_observer_location, update_pointing
 
+import PyThea.sunpy_dev.extern.sunkit_instruments.aia.utils  # noqa
 import PyThea.sunpy_dev.extern.sunkit_instruments.lasco.utils  # noqa
 import PyThea.sunpy_dev.extern.sunkit_instruments.stereo.utils  # noqa
 
@@ -184,12 +184,11 @@ def prepare_maps(map_sequence, **kwargs):
         return []
 
     detector = map_sequence[0].detector
-    print(f'Preparing image sequence for {detector}.')
+    print(f'Preparing image sequence for {detector}. This could take a while...')
 
     # Prepare the maps before anything else
     if detector == 'AIA':
-        map_sequence = [update_pointing(tmap) for tmap in map_sequence]
-        map_sequence = [fix_observer_location(tmap) for tmap in map_sequence]
+        map_sequence = PyThea.sunpy_dev.extern.sunkit_instruments.aia.utils.prep_aia(map_sequence)
     elif detector == 'COR1':
         if 'polar' not in kwargs.keys():
             map_sequence = PyThea.sunpy_dev.extern.sunkit_instruments.stereo.utils.cor_polariz(map_sequence)
