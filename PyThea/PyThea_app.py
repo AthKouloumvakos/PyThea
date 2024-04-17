@@ -250,6 +250,21 @@ def run():
                                               key='plot_solar_reference_lines_bodies_list')
 
     #############################################################
+    # Magnetic Connectivity
+    st.sidebar.markdown('## Overlays')
+    with st.sidebar.expander('Magnetic Connectivity'):
+        connectivity_container = st.container()
+        connectivity_container.checkbox('Plot Parker spirals', key='plot_parker_spirals')
+        if st.session_state.plot_parker_spirals:
+            connectivity_container.multiselect('Select bodies/spacecraft', options=selected_bodies.bodies_dict.keys(),
+                                               default=['Earth'], key='mag_bodies_list')
+            st.session_state.sw_speed_select = {}
+            for body in st.session_state.mag_bodies_list:
+                connectivity_container.number_input(f'{body} solar wind speed', min_value=200, max_value=800, value=350, step=50,
+                                                    key=f'sw_speed_select_{body}')
+                st.session_state.sw_speed_select[body] = st.session_state[f'sw_speed_select_{body}'] * (u.km/u.second)
+
+    #############################################################
     # Download and Process the Images
     # This part runs only if the map_ doesn't exits or the session_state.map_ does not contain all the imagers requested
     imager_added = list(set(imagers_list) - set(st.session_state['imagers_list_']))

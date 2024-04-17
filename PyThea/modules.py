@@ -25,6 +25,7 @@ from sunpy.net import attrs as a
 
 from PyThea.callbacks import change_fitting_sliders, change_long_lat_sliders
 from PyThea.config.config_sliders import sliders_dict as sd
+from PyThea.extensions.Parker_spirals.utils import plot_parker_spiral
 from PyThea.geometrical_models import ellipsoid, gcs, spheroid
 from PyThea.utils import (get_hek_flare, make_figure, model_fittings,
                           plot_bodies, plot_solar_reference_lines)
@@ -219,5 +220,10 @@ def figure_streamlit(st, running_map, image_mode, imager, model):
     if st.session_state.plot_solar_reference_lines_:
         plot_solar_reference_lines(axis, st.session_state.plot_solar_reference_lines_bodies_list,
                                    running_map, mode=st.session_state.plot_solar_reference_lines_mode)
+
+    if st.session_state.plot_parker_spirals:
+        plot_parker_spiral(axis, running_map,
+                           st.session_state.mag_bodies_list,
+                           sw_speed=st.session_state.sw_speed_select)
 
     return fig, axis
