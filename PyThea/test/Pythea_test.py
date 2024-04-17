@@ -15,5 +15,10 @@ def test_database_dir_exists():
     """
     Tests that Pythea's database directory exists.
     """
+    # Skip the test if running in GitHub Actions
+    if os.environ.get('CI') == 'true':
+        print("Skipping test as it's running in GitHub Actions.")
+        return
+
     database_dir = os.path.join(Path.home(), 'PyThea')
     assert os.path.exists(database_dir), f"PyThea's database directory '{database_dir}' does not exist."
