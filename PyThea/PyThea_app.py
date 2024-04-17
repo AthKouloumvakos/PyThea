@@ -18,6 +18,8 @@
 """
 
 
+from copy import copy
+
 import astropy.units as u
 import numpy as np
 import stqdm  # See also https://github.com/tqdm/tqdm
@@ -351,10 +353,11 @@ def run():
             fig, axis = figure_streamlit(st, get_closest(st.session_state.map[other_element], running_map_date), image_mode, other_element, model)
             st.pyplot(fig)
         else:
-            supl_imagers_list = st.session_state.imagers_list_.remove(imager)
+            supl_imagers_list = copy(st.session_state.imagers_list_)
+            supl_imagers_list.remove(imager_select)
             supl_imagers = st.select_slider('Select supplement imagers',
                                             options=supl_imagers_list,
-                                            value=(supl_imagers_list[1],
+                                            value=(supl_imagers_list[0],
                                                    supl_imagers_list[-1]),
                                             key='supl_imagers')
             col1, col2 = st.columns(2)
