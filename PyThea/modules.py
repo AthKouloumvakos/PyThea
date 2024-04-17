@@ -25,7 +25,8 @@ import astropy.units as u
 from PyThea.callbacks import change_fitting_sliders, change_long_lat_sliders
 from PyThea.config.config_sliders import sliders_dict as sd
 from PyThea.geometrical_models import ellipsoid, gcs, spheroid
-from PyThea.utils import get_hek_flare, model_fittings
+from PyThea.utils import (get_hek_flare, make_figure, model_fittings,
+                          plot_bodies, plot_solar_reference_lines)
 
 
 def date_and_event_selection(st):
@@ -181,3 +182,28 @@ def final_parameters_gmodel(st):
             rcenter = gcs.rcenter_(height, alpha, kappa)
         tilt = st.session_state.tilt * u.degree
         return rcenter, height, alpha, kappa, tilt
+
+
+def figure_streamlit(st, running_map, image_mode, imager, model):
+
+    fig, axis = make_figure(running_map, image_mode,
+                            clim=st.session_state.map_colormap_limits[imager],
+                            clip_model=st.session_state.clip_model)
+
+    if st.session_state.plot_mesh_mode == 'Skeleton':
+        model.plot(axis, mode='Skeleton')
+    elif st.session_state.plot_mesh_mode == 'Full':
+        model.plot(axis, mode='Skeleton')
+        model.plot(axis, mode='Full')
+    elif st.session_state.plot_mesh_mode == 'Surface':
+        model.plot(axis, only_surface=True)
+
+    if st.session_state.star_field:
+        plot_bodies(axis, st.session_state.bodies_list, running_map)
+        axis.legend()
+
+    if st.session_state.plot_solar_reference_lines_:
+        plot_solar_reference_lines(axis, st.session_state.plot_solar_reference_lines_bodies_list,
+                                   running_map, mode=st.session_state.plot_solar_reference_lines_mode)
+
+    return fig, axis

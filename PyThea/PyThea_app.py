@@ -29,13 +29,12 @@ from PyThea.callbacks import load_or_delete_fittings
 from PyThea.config import (app_styles, config_sliders, selected_bodies,
                            selected_imagers)
 from PyThea.geometrical_models import ellipsoid, gcs, spheroid
-from PyThea.modules import (date_and_event_selection, final_parameters_gmodel,
+from PyThea.modules import (date_and_event_selection, figure_streamlit,
+                            final_parameters_gmodel,
                             fitting_and_slider_options_container,
                             fitting_sliders)
 from PyThea.sunpy_dev.map.maputils import get_closest, maps_clims
-from PyThea.utils import (download_fits, make_figure, model_fittings,
-                          plot_bodies, plot_fitting_model,
-                          plot_solar_reference_lines,
+from PyThea.utils import (download_fits, model_fittings, plot_fitting_model,
                           single_imager_maps_process)
 from PyThea.version import version
 
@@ -199,14 +198,15 @@ def run():
 
     with st.sidebar.expander('Plot/View Options'):
         plotviewopt_container = st.container()
-        clip_model = plotviewopt_container.checkbox('Clip plot on image limits', value=True)
+        plotviewopt_container.checkbox('Clip plot on image limits', value=True, key='clip_model')
         plt_supp_imagers = plotviewopt_container.checkbox('Supplementary Imaging', value=False)
-        star_field = plotviewopt_container.checkbox('View Bodies or s/c')
-        if star_field:
-            bodies_list = plotviewopt_container.multiselect('Select Bodies', options=selected_bodies.bodies_dict.keys(),
-                                                            default=['Mercury', 'Venus', 'Jupiter'])
-        plot_solar_reference_lines_ = plotviewopt_container.checkbox('View Limb and Meridians')
-        if plot_solar_reference_lines_:
+        plotviewopt_container.checkbox('View Bodies or s/c', key='star_field')
+        if st.session_state.star_field:
+            plotviewopt_container.multiselect('Select Bodies', options=selected_bodies.bodies_dict.keys(),
+                                              default=['Mercury', 'Venus', 'Jupiter'],
+                                              key='bodies_list')
+        plotviewopt_container.checkbox('View Limb and Meridians', key='plot_solar_reference_lines_')
+        if st.session_state.plot_solar_reference_lines_:
             markdown = '''
                 **Limb**: plots the solar limb as observed  # noqa
                 for the selected observers.  # noqa
@@ -215,17 +215,17 @@ def run():
                 **CR Meridan+Equator**: plots the primary meridian  # noqa
                 and equator of Carrington coordinate system.  # noqa
                 '''.strip()
-            plot_solar_reference_lines_mode = \
-                plotviewopt_container.selectbox('Select plot option',
-                                                options=['Limb from Obs.', 'Central Meridian from Obs.', 'Carr. Prime Meridian+Solar Equator',
-                                                         'Stonyhurst Grid', 'Carrington Grid'],
-                                                help=markdown)
-            disabled = False if plot_solar_reference_lines_mode in ['Limb from Obs.', 'Central Meridian from Obs.'] else True
-            plot_solar_reference_lines_bodies_list = \
-                plotviewopt_container.multiselect('Select Bodies',
-                                                  label_visibility='collapsed',
-                                                  options=selected_bodies.bodies_dict.keys(),
-                                                  default=['Earth'], disabled=disabled)
+            plotviewopt_container.selectbox('Select plot option',
+                                            options=['Limb from Obs.', 'Central Meridian from Obs.', 'Carr. Prime Meridian+Solar Equator',
+                                                     'Stonyhurst Grid', 'Carrington Grid'],
+                                            help=markdown,
+                                            key='plot_solar_reference_lines_mode')
+            disabled = False if st.session_state.plot_solar_reference_lines_mode in ['Limb from Obs.', 'Central Meridian from Obs.'] else True
+            plotviewopt_container.multiselect('Select Bodies',
+                                              label_visibility='collapsed',
+                                              options=selected_bodies.bodies_dict.keys(),
+                                              default=['Earth'], disabled=disabled,
+                                              key='plot_solar_reference_lines_bodies_list')
 
     #############################################################
     # Download and Process the Images
@@ -286,7 +286,7 @@ def run():
 
     running_map = st.session_state.map[imager_select][maps_date.index(running_map_date)]
 
-    manual_clim = plotviewopt_container.checkbox('Provide clims values')
+    manual_clim = plotviewopt_container.checkbox('Provide clims values', on_change=delete_from_state, kwargs={'vars': ['clim']})
     if manual_clim:
         col1, col2 = plotviewopt_container.columns(2)
         if 'clim_manual_low' not in st.session_state:
@@ -340,42 +340,27 @@ def run():
 
     #############################################################
     # Plot main and supplement figure images
-    fig, axis = make_figure(running_map, image_mode, clim=st.session_state.map_colormap_limits[imager_select], clip_model=clip_model)
-    if st.session_state.plot_mesh_mode == 'Skeleton':
-        model.plot(axis, mode='Skeleton')
-    elif st.session_state.plot_mesh_mode == 'Full':
-        model.plot(axis, mode='Skeleton')
-        model.plot(axis, mode='Full')
-    elif st.session_state.plot_mesh_mode == 'Surface':
-        model.plot(axis, only_surface=True)
-
-    if star_field:
-        plot_bodies(axis, bodies_list, running_map)
-        axis.legend()
-
-    if plot_solar_reference_lines_:
-        plot_solar_reference_lines(axis, plot_solar_reference_lines_bodies_list,
-                                   running_map, mode=plot_solar_reference_lines_mode)
-
+    fig, axis = figure_streamlit(st, running_map, image_mode, imager_select, model)
     st.pyplot(fig)
 
-    if plt_supp_imagers and len(st.session_state.imagers_list_) > 2:
-        supl_imagers = st.select_slider('Select supplement imagers',
-                                        options=st.session_state.imagers_list_,
-                                        value=(st.session_state.imagers_list_[1],
-                                               st.session_state.imagers_list_[-1]),
-                                        key='supl_imagers')
-        col1, col2 = st.columns(2)
-        fig, axis = make_figure(get_closest(st.session_state.map[supl_imagers[0]],
-                                running_map_date), image_mode,
-                                clim=st.session_state.map_colormap_limits[supl_imagers[0]], clip_model=clip_model)
-        model.plot(axis, mode='Skeleton')
-        col1.pyplot(fig)
-        fig, axis = make_figure(get_closest(st.session_state.map[supl_imagers[1]],
-                                            running_map_date), image_mode,
-                                clim=st.session_state.map_colormap_limits[supl_imagers[1]], clip_model=clip_model)
-        model.plot(axis, mode='Skeleton')
-        col2.pyplot(fig)
+    if plt_supp_imagers:
+        if len(st.session_state.imagers_list_) < 3:
+            other_element = [element for element in st.session_state.imagers_list_ if element != imager_select][0]
+            fig, axis = figure_streamlit(st, get_closest(st.session_state.map[other_element], running_map_date), image_mode, other_element, model)
+            st.pyplot(fig)
+        else:
+            supl_imagers_list = st.session_state.imagers_list_.remove(imager)
+            supl_imagers = st.select_slider('Select supplement imagers',
+                                            options=supl_imagers_list,
+                                            value=(supl_imagers_list[1],
+                                                   supl_imagers_list[-1]),
+                                            key='supl_imagers')
+            col1, col2 = st.columns(2)
+            fig, axis = figure_streamlit(st, get_closest(st.session_state.map[supl_imagers[0]], running_map_date), image_mode, supl_imagers[0], model)
+            col1.pyplot(fig)
+            fig, axis = figure_streamlit(st, get_closest(st.session_state.map[supl_imagers[1]], running_map_date), image_mode, supl_imagers[1], model)
+            model.plot(axis, mode='Skeleton')
+            col2.pyplot(fig)
 
     #############################################################
     # Store the fitting
