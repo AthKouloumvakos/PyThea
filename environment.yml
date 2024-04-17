@@ -14,8 +14,8 @@ dependencies:
   - astropy
   - astroquery
   - numexpr
-  - sunpy=4.1.0
-  - parfive==1.5.1 # With parfive>=2.0.0 there is an issue with streamlit and asyncio (see #13)
+  - sunpy=5.1.2
+  - parfive==2.1.0  # The issue with streamlit and asyncio is resolved (see #13). Keep this for a while to make sure everything works smoothly.
   - streamlit
   - seaborn
   - pyvista

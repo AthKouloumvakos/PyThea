@@ -283,7 +283,8 @@ class spheroid:
         """
         Returns the spheroid parameters as `~pandas.DataFrame`.
         """
-        center_ = self.center.transform_to(frames.HeliographicCarrington)
+        center_ = self.center.transform_to(frames.HeliographicCarrington(observer='Earth',
+                                                                         obstime=self.center.obstime))
         data_dict = {
             'hgln': self.center.lon.to_value(u.degree),
             'hglt': self.center.lat.to_value(u.degree),
@@ -303,7 +304,8 @@ class spheroid:
         '''
         Returns the Spheroid object and parameters in a printable sting array.
         '''
-        center_ = self.center.transform_to(frames.HeliographicCarrington)
+        center_ = self.center.transform_to(frames.HeliographicCarrington(observer='Earth',
+                                                                         obstime=self.center.obstime))
         output = '<Spheroid object \n'
         output += 'HGLN = %3.2f degrees \n'%self.center.lon.to_value(u.degree)
         output += 'HGLT = %3.2f degrees \n'%self.center.lat.to_value(u.degree)
@@ -402,7 +404,8 @@ class ellipsoid(spheroid):
         """
         Returns the ellipsoid parameters as `~pandas.DataFrame`.
         """
-        center_ = self.center.transform_to(frames.HeliographicCarrington)
+        center_ = self.center.transform_to(frames.HeliographicCarrington(observer='Earth',
+                                                                         obstime=self.center.obstime))
         data_dict = {
             'hgln': self.center.lon.to_value(u.degree),
             'hglt': self.center.lat.to_value(u.degree),
@@ -469,7 +472,8 @@ class ellipsoid(spheroid):
         '''
         Returns the Ellipsoid object and parameters in a printable sting array.
         '''
-        center_ = self.center.transform_to(frames.HeliographicCarrington)
+        center_ = self.center.transform_to(frames.HeliographicCarrington(observer='Earth',
+                                                                         obstime=self.center.obstime))
         output = '<Ellipsoid object \n'
         output += 'HGLN = %3.2f degrees \n'%self.center.lon.to_value(u.degree)
         output += 'HGLT = %3.2f degrees \n'%self.center.lat.to_value(u.degree)
@@ -669,7 +673,8 @@ class gcs():
         """
         Returns the GCS parameters as `~pandas.DataFrame`.
         """
-        center_ = self.center.transform_to(frames.HeliographicCarrington)
+        center_ = self.center.transform_to(frames.HeliographicCarrington(observer='Earth',
+                                                                         obstime=self.center.obstime))
         data_dict = {
             'hgln': self.center.lon.to_value(u.degree),
             'hglt': self.center.lat.to_value(u.degree),
@@ -689,7 +694,8 @@ class gcs():
         '''
         Returns the GCS object and parameters in a printable sting array.
         '''
-        center_ = self.center.transform_to(frames.HeliographicCarrington)
+        center_ = self.center.transform_to(frames.HeliographicCarrington(observer='Earth',
+                                                                         obstime=self.center.obstime))
         output = '<GCS object \n'
         output += 'HGLN = %3.2f degrees \n'%self.center.lon.to_value(u.degree)
         output += 'HGLT = %3.2f degrees \n'%self.center.lat.to_value(u.degree)

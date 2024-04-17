@@ -39,7 +39,8 @@ def change_long_lat_sliders(st):
     if st.session_state.coord_system == 'HGS':
         center_ = st.session_state.center.transform_to(frames.HeliographicStonyhurst)
     elif st.session_state.coord_system == 'HGC':
-        center_ = st.session_state.center.transform_to(frames.HeliographicCarrington)
+        center_ = st.session_state.center.transform_to(frames.HeliographicCarrington(observer='Earth',
+                                                                                     obstime=st.session_state.center.obstime))
     st.session_state.longit = float(center_.lon.to_value(u.degree))
     st.session_state.latitu = float(center_.lat.to_value(u.degree))
 

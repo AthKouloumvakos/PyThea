@@ -5,8 +5,8 @@ aiapy
 astropy
 astroquery
 numexpr
-sunpy==4.1.0
-parfive==1.5.1
+sunpy==5.1.2
+parfive==2.1.0
 pooch
 matplotlib
 seaborn
