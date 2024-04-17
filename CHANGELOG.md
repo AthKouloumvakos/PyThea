@@ -1,3 +1,26 @@
+# v0.10.0 (17-April-2024)
+
+## Features
+ - Option added to choose the step for Running Difference or the background image for the Base Difference image processing.
+ - Fetures added in the app to plot limb or meridians from different observers and grid.
+ - Feture added in the app for manual change of the images colorbar limits.
+ - Feture added in the app to use median filter images processing.
+ - Tests added: A test to verify the existence of Pythea's database directory
+
+## Major Changes
+- Updates sunpy dependencies to sunpy 5.1.2
+
+## Minor Changes
+- Improvements on the pipeline of image download and processing in the app.
+- Improvements and simplifications on the figures production in the app.
+- Values of the colormap limits in the app are stored and are reused when changing the imager.
+
+## Bug Fixes
+- Fixes a bug with test_database_dir_exists.
+- Fixes a bug when corrupted fits files loaded and imager load skipped.
+- Fixes a bug with AIA visuallization from missing date_average.
+- Fixes a bug with supplementary imaging selection.
+
 # v0.9.1 (5-March-2024)
 
 ## Features
