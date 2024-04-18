@@ -2,6 +2,7 @@
 Test the utilities
 """
 
+import json
 from datetime import datetime
 
 import matplotlib.dates as mdates
@@ -12,7 +13,8 @@ from sunpy.coordinates.frames import HeliographicStonyhurst
 from sunpy.net import hek
 
 from PyThea.config.selected_bodies import bodies_dict
-from PyThea.utils import get_hek_flare, parameter_fit
+from PyThea.data.sample_data import json_fitting_file_sample_data
+from PyThea.utils import get_hek_flare, model_fittings, parameter_fit
 
 
 def test_get_hek_flare():
@@ -20,15 +22,57 @@ def test_get_hek_flare():
     Test that the get_hek_flare returns a hek.hek.HEKTable and the results are formated correct.
     """
     # This test requests the flare info for a date that returns a list of flares and compares against previous results
-    selectbox_list, flare_list = get_hek_flare(datetime(2017, 9, 10))
+    selectbox_list, flare_list = get_hek_flare(datetime(2017, 9, 10, 0, 0, 0))
     assert type(flare_list) == hek.hek.HEKTable
     assert selectbox_list == ['FLM1.1|2017-09-09T23:53:00', 'FLC9.0|2017-09-10T03:09:00', 'FLC2.9|2017-09-10T09:20:00',
                               'FLC1.6|2017-09-10T14:23:00', 'FLC1.0|2017-09-10T15:26:00', 'FLX8.2|2017-09-10T16:06:00']
 
     # This test requests the flare info for a date that returns an empty list
-    selectbox_list, flare_list = get_hek_flare(datetime(2117, 9, 10))
+    selectbox_list, flare_list = get_hek_flare(datetime(2030, 9, 10, 0, 0, 0))
     assert flare_list == []
     assert selectbox_list == ['No events returned']
+
+
+def test_load_fitting_json_file():
+    """
+    Tests that the load_fitting_json_file returns the model_fittings class and storing it to the model_fittings
+    will return the same result as the model_fittings.to_json().
+    """
+    def compare_json_objects(obj1, obj2, path='', exclude=['date_created', 'version']):
+        if exclude:
+            for key in exclude:
+                obj1.pop(key, None)
+                obj2.pop(key, None)
+
+        for key in set(obj1.keys()) | set(obj2.keys()):
+            new_path = f'{path}.{key}' if path else key
+
+            if key not in obj1 or key not in obj2:
+                print(f"Key '{new_path}' is not present in one of the objects.")
+                return False
+            elif obj1[key] != obj2[key]:
+                if isinstance(obj1[key], dict) and isinstance(obj2[key], dict):
+                    check = compare_json_objects(obj1[key], obj2[key], path=new_path)
+                    if not check:
+                        return False
+                else:
+                    print(f"Value mismatch at key '{new_path}': {obj1[key]} != {obj2[key]}")
+                    return False
+
+        return True
+
+    json_fitting_file = json_fitting_file_sample_data.fetch('FLX1p0D20211028T153500MEllipsoid.json')
+    with open(json_fitting_file, 'r') as file:
+        json_content = file.read()
+        fitting_from_json = json.loads(json_content)
+
+    model_fittings_class = model_fittings.load_from_json(json_fitting_file)
+    model_fittings_class_dict = json.loads(model_fittings_class.to_json())
+    assert isinstance(model_fittings_class, model_fittings)
+    assert model_fittings_class.event_selected == 'FLX1.0|2021-10-28T15:35:00'
+    assert model_fittings_class.date_process == '2021-10-28T15:35:00.000000'
+    assert model_fittings_class.geometrical_model == 'Ellipsoid'
+    assert compare_json_objects(model_fittings_class_dict, fitting_from_json)
 
 
 def test_get_horizons_coord():
