@@ -63,3 +63,11 @@ imager_dict['HI2A'] = {'fido': (a.Source('STEREO_A'), a.Detector.hi2),
 imager_dict['HI2B'] = {'fido': (a.Source('STEREO_B'), a.Detector.hi2),
                        'process': {'dimensions': (1024*u.pixel, 1024*u.pixel), 'superpixel': 2},
                        'source': 'STEREO_B', 'instrument': 'SECCHI', 'detector': 'HI2'}
+
+imager_dict['WISPR1'] = {'fido': (a.Instrument.wispr, a.Detector.inner),
+                         'process': {'dimensions': (960*u.pixel, 1024*u.pixel), 'processing_level': 3, 'superpixel': 2},
+                         'source': 'PSP', 'instrument': 'WISPR', 'detector': 'Inner'}
+
+imager_dict['WISPR2'] = {'fido': (a.Instrument.wispr, a.Detector.outer),
+                         'process': {'dimensions': (960*u.pixel, 1024*u.pixel), 'processing_level': 3, 'superpixel': 2},
+                         'source': 'PSP', 'instrument': 'WISPR', 'detector': 'Outer'}

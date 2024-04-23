@@ -142,6 +142,9 @@ def filter_maps(map_sequence, **kwargs):
     if len(map_sequence) == 0:
         return []
 
+    if 'processing_level' in kwargs:
+        map_sequence = [tmap for tmap in map_sequence if tmap.processing_level == kwargs['processing_level']]
+
     if 'exposure' in kwargs.keys():
         map_sequence = [tmap for tmap in map_sequence if tmap.exposure_time > kwargs['exposure']*u.second]
 
@@ -297,4 +300,9 @@ def mask_occulter(smap, apply_mask=True, mask_value=0):
 
 
 def maps_clims(images):
+    if images[1].instrument == 'WISPR':
+        if images[1].detector == 'Outer':
+            return [14., 14.]
+        elif images[1].detector == 'Inner':
+            return [13., 13.]
     return [np.nanquantile(images[1].data, 0.20)-10, np.nanquantile(images[1].data, 0.80)+10]

@@ -128,6 +128,9 @@ def make_figure(map, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):
     if median_filter_value != 1:
         map = sunpy.map.Map(median_filter(map.data, size=int(median_filter_value)), map.meta)
 
+    if map.instrument == 'WISPR':
+        clim = [-10**-clim[0], 10**-clim[1]]
+
     if cmap == 'default':
         # TODO: For plain images or when EUVIA-B are used, this does not work very well.
         map.plot(norm=colors.Normalize(vmin=clim[0], vmax=clim[1]))
@@ -144,7 +147,7 @@ def make_figure(map, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):
         axis.set_ylim([0, map.data.shape[1]])
 
     cref = map.pixel_to_world(0*u.pix, 0*u.pix)
-    if cref.Tx > 0:
+    if cref.Tx > 0 and (map.instrument != 'WISPR'):
         axis.invert_xaxis()
     if cref.Ty > 0:
         axis.invert_yaxis()
