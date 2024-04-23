@@ -25,6 +25,7 @@ from sunpy.net import attrs as a
 
 from PyThea.callbacks import change_fitting_sliders, change_long_lat_sliders
 from PyThea.config.config_sliders import sliders_dict as sd
+from PyThea.extensions.hek.utils import plot_hek
 from PyThea.extensions.Parker_spirals.utils import plot_parker_spiral
 from PyThea.geometrical_models import ellipsoid, gcs, spheroid
 from PyThea.utils import (get_hek_flare, make_figure, model_fittings,
@@ -225,5 +226,13 @@ def figure_streamlit(st, running_map, image_mode, imager, model):
         plot_parker_spiral(axis, running_map,
                            st.session_state.mag_bodies_list,
                            sw_speed=st.session_state.sw_speed_select)
+
+    if st.session_state.plot_hek:
+        if 'hek_responses' not in st.session_state:
+            st.session_state.hek_responses = {'Active Regions': [], 'Coronal Holes': [], 'Flares': []}
+        for mode in st.session_state.hek_list:
+            st.session_state.hek_responses[mode] = plot_hek(axis, running_map, mode,
+                                                            st.session_state.imaging_time_range,
+                                                            hek_responses=st.session_state.hek_responses)
 
     return fig, axis

@@ -7,7 +7,7 @@ from PyThea.extensions import Parker_spirals
 
 def plot_parker_spiral(axis, map, bodies, sw_speed=350*(u.km/u.second)):
     for body in bodies:
-        pos = get_horizons_coord(bodies_dict[body][0], map.date, 'id')
+        pos = get_horizons_coord(bodies_dict[body][0], map.date_average, 'id')
         pos = pos.transform_to(frames.HeliographicCarrington(observer='Earth',
                                                              obstime=map.date_average))
 

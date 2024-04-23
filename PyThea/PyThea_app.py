@@ -197,7 +197,7 @@ def run():
                                                           key='imaging_time_range')
         select_timerange_form.form_submit_button(label='Submit',
                                                  on_click=delete_from_state,
-                                                 kwargs={'vars': ['map', 'map_', 'imagers_list_']})
+                                                 kwargs={'vars': ['map', 'map_', 'imagers_list_', 'hek_responses']})
 
     with st.sidebar.expander('Processing Options'):
         procoption_container = st.container()
@@ -222,47 +222,59 @@ def run():
         plotviewopt_container = st.container()
         plotviewopt_container.checkbox('Clip plot on image limits', value=True, key='clip_model')
         plt_supp_imagers = plotviewopt_container.checkbox('Supplementary Imaging', value=False)
-        plotviewopt_container.checkbox('View Bodies or s/c', key='star_field')
-        if st.session_state.star_field:
-            plotviewopt_container.multiselect('Select Bodies', options=selected_bodies.bodies_dict.keys(),
-                                              default=['Mercury', 'Venus', 'Jupiter'],
-                                              key='bodies_list')
-        plotviewopt_container.checkbox('View Limb and Meridians', key='plot_solar_reference_lines_')
-        if st.session_state.plot_solar_reference_lines_:
-            markdown = '''
-                **Limb**: plots the solar limb as observed  # noqa
-                for the selected observers.  # noqa
-                **Central Meridian**: plots the central meridian  # noqa
-                observed for the selected observers.  # noqa
-                **CR Meridan+Equator**: plots the primary meridian  # noqa
-                and equator of Carrington coordinate system.  # noqa
-                '''.strip()
-            plotviewopt_container.selectbox('Select plot option',
-                                            options=['Limb from Obs.', 'Central Meridian from Obs.', 'Carr. Prime Meridian+Solar Equator',
-                                                     'Stonyhurst Grid', 'Carrington Grid'],
-                                            help=markdown,
-                                            key='plot_solar_reference_lines_mode')
-            disabled = False if st.session_state.plot_solar_reference_lines_mode in ['Limb from Obs.', 'Central Meridian from Obs.'] else True
-            plotviewopt_container.multiselect('Select Bodies',
-                                              label_visibility='collapsed',
-                                              options=selected_bodies.bodies_dict.keys(),
-                                              default=['Earth'], disabled=disabled,
-                                              key='plot_solar_reference_lines_bodies_list')
 
     #############################################################
     # Magnetic Connectivity
     st.sidebar.markdown('## Overlays')
+    with st.sidebar.expander('Bodies or s/c Location'):
+        bodies_container = st.container()
+        bodies_container.checkbox('View Bodies or s/c', key='star_field')
+        bodies_container.multiselect('Select Bodies', options=selected_bodies.bodies_dict.keys(),
+                                     default=['Mercury', 'Venus', 'Jupiter'],
+                                     key='bodies_list',
+                                     disabled=not st.session_state.star_field)
+    with st.sidebar.expander('Limb and Meridians'):
+        limb_meridians_container = st.container()
+        limb_meridians_container.checkbox('View Limb and Meridians', key='plot_solar_reference_lines_')
+        markdown = '''
+            **Limb**: plots the solar limb as observed
+            for the selected observers.
+            **Central Meridian**: plots the central meridian
+            observed for the selected observers.
+            **CR Meridan+Equator**: plots the primary meridian
+            and equator of Carrington coordinate system.
+            '''.strip()
+        limb_meridians_container.selectbox('Select plot option',
+                                           options=['Limb from Obs.', 'Central Meridian from Obs.', 'Carr. Prime Meridian+Solar Equator',
+                                                    'Stonyhurst Grid', 'Carrington Grid'],
+                                           help=markdown,
+                                           key='plot_solar_reference_lines_mode',
+                                           disabled=not st.session_state.plot_solar_reference_lines_)
+        disabled = False if (st.session_state.plot_solar_reference_lines_) and \
+            (st.session_state.plot_solar_reference_lines_mode in ['Limb from Obs.', 'Central Meridian from Obs.']) else True
+        limb_meridians_container.multiselect('Select Bodies',
+                                             label_visibility='collapsed',
+                                             options=selected_bodies.bodies_dict.keys(),
+                                             default=['Earth'], disabled=disabled,
+                                             key='plot_solar_reference_lines_bodies_list')
     with st.sidebar.expander('Magnetic Connectivity'):
         connectivity_container = st.container()
         connectivity_container.checkbox('Plot Parker spirals', key='plot_parker_spirals')
-        if st.session_state.plot_parker_spirals:
-            connectivity_container.multiselect('Select bodies/spacecraft', options=selected_bodies.bodies_dict.keys(),
-                                               default=['Earth'], key='mag_bodies_list')
-            st.session_state.sw_speed_select = {}
-            for body in st.session_state.mag_bodies_list:
-                connectivity_container.number_input(f'{body} solar wind speed', min_value=200, max_value=800, value=350, step=50,
-                                                    key=f'sw_speed_select_{body}')
-                st.session_state.sw_speed_select[body] = st.session_state[f'sw_speed_select_{body}'] * (u.km/u.second)
+        connectivity_container.multiselect('Select bodies/spacecraft', options=selected_bodies.bodies_dict.keys(),
+                                           default=['Earth'], key='mag_bodies_list',
+                                           disabled=not st.session_state.plot_parker_spirals)
+        st.session_state.sw_speed_select = {}
+        for body in st.session_state.mag_bodies_list:
+            connectivity_container.number_input(f'{body} solar wind speed', min_value=200, max_value=800, value=350, step=50,
+                                                key=f'sw_speed_select_{body}',
+                                                disabled=not st.session_state.plot_parker_spirals)
+            st.session_state.sw_speed_select[body] = st.session_state[f'sw_speed_select_{body}'] * (u.km/u.second)
+    with st.sidebar.expander('HEK feature/events'):
+        hek_container = st.container()
+        hek_container.checkbox('Plot HEK feature/events', key='plot_hek', on_change=delete_from_state,
+                               kwargs={'vars': ['hek_responses', ]})
+        hek_container.multiselect('Select HEK feature/events', options=['Active Regions', 'Coronal Holes', 'Flares'],
+                                  default=['Flares'], key='hek_list', disabled=not st.session_state.plot_hek)
 
     #############################################################
     # Download and Process the Images
@@ -314,13 +326,14 @@ def run():
     col1, col2 = st.columns((1, 3))
     imager_select = col1.selectbox('Select an imager',
                                    options=st.session_state.imagers_list_,
-                                   on_change=delete_from_state, kwargs={'vars': ['clim', 'clim_manual_low', 'clim_manual_high']})
+                                   on_change=delete_from_state, kwargs={'vars': ['clim', 'clim_manual_low', 'clim_manual_high', 'hek_responses']})
 
     maps_date = [getattr(maps, 'date_average', None) or getattr(maps, 'date', None) for maps in st.session_state.map[imager_select]]
     if len(maps_date) > 1:
         running_map_date = col2.select_slider('Slide to the image time',
                                               options=maps_date, value=maps_date[0],
-                                              key='running_map_date')
+                                              key='running_map_date',
+                                              on_change=delete_from_state, kwargs={'vars': ['hek_responses']})
     else:
         running_map_date = maps_date[0]
 
@@ -382,6 +395,15 @@ def run():
     # Plot main and supplement figure images
     fig, axis = figure_streamlit(st, running_map, image_mode, imager_select, model)
     st.pyplot(fig)
+
+    if st.session_state.plot_hek and st.session_state.hek_responses['Flares']:
+        st.markdown('**HEK Flare List:**')
+        st.write(st.session_state.hek_responses['Flares'].to_pandas())
+        st.markdown('*Flares with no location have been removed from the table.')
+    if st.session_state.plot_hek and st.session_state.hek_responses['Active Regions']:
+        st.markdown('**HEK Active Regions List:**')
+        st.write(st.session_state.hek_responses['Active Regions'].to_pandas())
+        st.markdown('*Active Regions without NOAA number have been removed from the table.')
 
     if plt_supp_imagers:
         if len(st.session_state.imagers_list_) < 3:
