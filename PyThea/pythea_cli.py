@@ -99,9 +99,28 @@ def update():
 
 
 @main.command('test')
-def main_test():
+@click.option('--mpl', is_flag=True, default=False, help='Run the test including figure tests.')
+@click.option('--remote-data', is_flag=True, default=False, help='Run the test including figure tests.')
+@click.option('--all', is_flag=True, default=False, help='Run the test including figure tests.')
+def main_test(mpl, remote_data, all):
     """Test PyThea."""
-    pytest.main(['-W', 'ignore', '--pyargs', 'PyThea'])
+
+    test_directory = os.path.dirname(__file__)
+
+    print(f'Running a test of PyThea package located in: {test_directory}')
+
+    if mpl:
+        # Run a test of the package including figure tests
+        pytest.main(['-W', 'ignore', '--mpl', '--mpl-hash-library=figure_hashes.json', '--pyargs', f'{test_directory}'])
+    elif remote_data:
+        # Run a test of the package including remote-data tests
+        pytest.main(['-W', 'ignore', '--remote-data', '--pyargs', f'{test_directory}'])
+    elif all:
+        # Run a test of the package including remote-data tests
+        pytest.main(['-W', 'ignore', '--mpl', '--mpl-hash-library=figure_hashes.json', '--remote-data', '--pyargs', f'{test_directory}'])
+    else:
+        # Run a minimum test of the package (figure tests are always true and remote-data tests are skipped)
+        pytest.main(['-W', 'ignore', '--pyargs', f'{test_directory}'])
 
 
 if __name__ == '__main__':

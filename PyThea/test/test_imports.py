@@ -1,3 +1,4 @@
+import os
 import pkgutil
 
 
@@ -23,6 +24,8 @@ def test_imports_all():
         except Warning:
             pass
 
-    for imper, nm, ispkg in pkgutil.walk_packages(['PyThea'], 'PyThea.',
+    test_directory = os.path.dirname(__file__)
+
+    for imper, nm, ispkg in pkgutil.walk_packages([f'{test_directory}'], 'PyThea.',
                                                   onerror=on_error):
         imper.find_spec(nm)
