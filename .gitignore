@@ -18,6 +18,7 @@ PyThea/_version.py
 
 # PyThea doc files
 docs/source/_build
+docs/source/_examples
 
 .DS_Store
 
