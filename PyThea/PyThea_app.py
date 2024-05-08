@@ -18,6 +18,7 @@
 """
 
 
+import datetime
 from copy import copy
 
 import astropy.units as u
@@ -26,6 +27,7 @@ import stqdm  # See also https://github.com/tqdm/tqdm
 import streamlit as st
 from astropy.coordinates import Distance, SkyCoord, SphericalRepresentation
 from sunpy.coordinates import frames
+from sunpy.net import attrs as a
 
 from PyThea.callbacks import load_or_delete_fittings
 from PyThea.config import (app_styles, config_sliders, selected_bodies,
@@ -247,8 +249,9 @@ def run():
         for imager in progress_bar:
             progress_bar.desc = f'Downloaded {imager} images from VSO'
             if imager not in st.session_state.map_:
-                st.session_state.map_[imager] = download_fits(st.session_state.date_process,
-                                                              imager, time_range=imaging_time_range)
+                timerange = a.Time(st.session_state.date_process + datetime.timedelta(hours=imaging_time_range[0]),
+                                   st.session_state.date_process + datetime.timedelta(hours=imaging_time_range[1]))
+                st.session_state.map_[imager] = download_fits(timerange, imager)
                 st.session_state.map_[imager] = single_imager_maps_process(st.session_state.map_[imager],
                                                                            **selected_imagers.imager_dict[imager][1],
                                                                            skip='sequence_processing')

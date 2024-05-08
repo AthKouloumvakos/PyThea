@@ -170,13 +170,10 @@ def plot_solar_reference_lines(axis, bodies_list, smap, mode='Limb from Obs.'):
         smap.draw_grid(linewidth=1, color='red', system='carrington', alpha=0.8)
 
 
-def download_fits(date_process, imager, time_range=[-1, 1]):
+def download_fits(timerange, imager):
     '''
     Downloads the imaging data (fits files) from VSO
     '''
-    timerange = a.Time(date_process + datetime.timedelta(hours=time_range[0]),
-                       date_process + datetime.timedelta(hours=time_range[1]))
-
     maps_ = []
     args = imager_dict[imager][0]
     result = Fido.search(timerange, *args)
