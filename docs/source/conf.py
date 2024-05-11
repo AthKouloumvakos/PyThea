@@ -14,13 +14,14 @@ import sys
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import sphinx_rtd_theme
+from sphinx_gallery.sorting import ExplicitOrder
 
 sys.path.insert(0, os.path.abspath('../../'))
 
 # -- Project information -----------------------------------------------------
 
 project = 'PyThea'
-copyright = '2022, Athanasios Kouloumvakos'
+copyright = '2024, Athanasios Kouloumvakos'
 author = 'Athanasios Kouloumvakos'
 version = ''
 release = ''
@@ -42,8 +43,8 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.doctest',
     'sphinx.ext.inheritance_diagram',
-    'jupyter_sphinx'
-    # 'sphinx_gallery.gen_gallery',
+    'jupyter_sphinx',
+    'sphinx_gallery.gen_gallery',
 ]
 
 extensions += [
@@ -79,6 +80,17 @@ master_doc = 'index'
 # Label the figures
 numfig = True
 
+# Sphinx Gallery Config
+sphinx_gallery_conf = {
+    'examples_dirs': 'examples',   # path to your example scripts
+    'gallery_dirs': '_examples',  # path to where to save gallery generated output
+    'filename_pattern': '/',
+    'subsection_order': ExplicitOrder(['./examples/Utilites',
+                                       './examples/Basic_Plots',
+                                       './examples/Tests']),
+    'nested_sections': False
+}
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -91,6 +103,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+html_css_files = ['css/custom.css']
 
 html_logo = '../logo/pythea_logo_wb.png'
 html_theme_options = {
