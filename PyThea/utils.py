@@ -335,7 +335,7 @@ class model_fittings:
             return json.dumps(model_dict, indent=' ')
 
 
-def plot_fitting_model(model, fit_args, plt_type='HeightT'):
+def plot_fitting_model(model, fit_args, plt_type='HeightT', fig=None, axis=None):
     '''
     Plot the height(speed)--time evolution of the fitting parameters.
     '''
@@ -356,8 +356,12 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT'):
              },
     }
     parameters = parameters[model.geometrical_model]
-    # Height vs time
-    fig, axis = plt.subplots(figsize=(5.5, 5.5), tight_layout=True)
+
+    if fig is None and axis is None:
+        fig, axis = plt.subplots(figsize=(5.5, 5.5), tight_layout=True)
+    else:
+        fig, axis = fig, axis
+
     if plt_type == 'HeightT':
         for p in parameters.keys():
             axis.plot(model.parameters.index,
@@ -431,8 +435,15 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT'):
     axis.xaxis.set_major_formatter(formatter)
     axis.minorticks_on()
     xlim = axis.get_xlim()
-    if xlim[1] - xlim[0] <= 0.5:
-        axis.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=[0, 10, 20, 30, 40, 50]))
+    hour_threshold = 24 * (xlim[1] - xlim[0])
+
+    if hour_threshold <= 2:
+        axis.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=range(60), interval=1))
+    elif hour_threshold <= 6:
+        axis.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=range(60), interval=5))
+    else:
+        axis.xaxis.set_minor_locator(mdates.HourLocator(byhour=range(24), interval=1))
+
     fig.autofmt_xdate(bottom=0, rotation=0, ha='center')
     axis.legend(loc='lower right')
 

@@ -5,9 +5,12 @@ import sunpy.map
 from astropy.coordinates import SkyCoord, solar_system_ephemeris
 from sunpy.coordinates import get_body_heliographic_stonyhurst
 
-from PyThea.data.sample_data import aia_sample_data, stereo_sample_data
+from PyThea.data.sample_data import (aia_sample_data,
+                                     json_fitting_file_sample_data,
+                                     stereo_sample_data)
 from PyThea.geometrical_models import ellipsoid
 from PyThea.sunpy_dev.map.maputils import prepare_maps
+from PyThea.utils import model_fittings, plot_fitting_model
 
 solar_system_ephemeris.set('de432s')
 
@@ -167,3 +170,26 @@ def test_ellipsoid_on_STEREO_COR2_three_planets():
     fig.subplots_adjust(hspace=0.5, wspace=0.35)
 
     return fig
+
+
+@pytest.mark.mpl_image_compare()
+def test_kinematics_figure():
+    json_fitting_file = json_fitting_file_sample_data.fetch('FLX1p0D20211028T153500MEllipsoid.json')
+    model_fittings_class = model_fittings.load_from_json(json_fitting_file)
+
+    fit_method = {'type': 'polynomial', 'order': 2}
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 5), tight_layout=True)
+
+    fig, ax1 = plot_fitting_model(model_fittings_class,
+                                  fit_args=fit_method,
+                                  plt_type='HeightT',
+                                  fig=fig, axis=ax1)
+    fig, ax2 = plot_fitting_model(model_fittings_class,
+                                  fit_args=fit_method,
+                                  plt_type='SpeedT',
+                                  fig=fig, axis=ax2)
+    return fig
+    # fig, axis = plot_fitting_model(model_fittings_class,
+    #                            fit_args=fit_method,
+    #                            plt_type='SpeedT')
+    # plt.show()
