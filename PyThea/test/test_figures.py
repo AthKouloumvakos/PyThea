@@ -178,7 +178,8 @@ def test_kinematics_figure():
     model_fittings_class = model_fittings.load_from_json(json_fitting_file)
 
     fit_method = {'type': 'polynomial', 'order': 2}
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 5), tight_layout=True)
+
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18, 5), tight_layout=True)
 
     fig, ax1 = plot_fitting_model(model_fittings_class,
                                   fit_args=fit_method,
@@ -188,8 +189,8 @@ def test_kinematics_figure():
                                   fit_args=fit_method,
                                   plt_type='SpeedT',
                                   fig=fig, axis=ax2)
+    fig, ax3 = plot_fitting_model(model_fittings_class,
+                                  fit_args=fit_method,
+                                  plt_type='AccelerationT',
+                                  fig=fig, axis=ax3)
     return fig
-    # fig, axis = plot_fitting_model(model_fittings_class,
-    #                            fit_args=fit_method,
-    #                            plt_type='SpeedT')
-    # plt.show()

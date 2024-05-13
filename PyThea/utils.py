@@ -340,6 +340,10 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT', fig=None, axis=None)
     Plot the height(speed)--time evolution of the fitting parameters.
     '''
     palete = sns.color_palette('deep')
+
+    Rs2km = (1 * u.R_sun).to_value(u.km)
+    sec = 24*60*60
+
     parameters = {
         'Spheroid':
             {'height': ['+', '', palete[3], 'h-apex'],
@@ -355,6 +359,7 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT', fig=None, axis=None)
              'rapex': ['x', '', palete[0], 'r-apex'],
              },
     }
+
     parameters = parameters[model.geometrical_model]
 
     if fig is None and axis is None:
@@ -369,7 +374,7 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT', fig=None, axis=None)
                       marker=parameters[p][0],
                       linestyle=parameters[p][1],
                       color=parameters[p][2],
-                      label=parameters[p][3])  # label='fit: a=%5.3f, b=%5.3f, c=%5.3f' % tuple(popt)
+                      label=parameters[p][3])
             if len(model.parameters[p])-1 > fit_args['order']:
                 # How to get confidence intervals from curve_fit?
                 fit = parameter_fit(model.parameters.index, model.parameters[p], fit_args)
@@ -383,26 +388,42 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT', fig=None, axis=None)
                 axis.plot(model.parameters.index, model.parameters[p], '--', color=parameters[p][2])
         ylabel = 'Height of apex and length of flanks [Rsun]'
         axis.set_ylim(bottom=0)
-    elif plt_type == 'SpeedT':
+    elif plt_type in ('SpeedT', 'AccelerationT'):
+        gradient_power = {'SpeedT': 1, 'AccelerationT': 2}
+        const = {'SpeedT': Rs2km/sec, 'AccelerationT': Rs2km/sec**2}
         for p in parameters.keys():
-            if len(model.parameters[p])-1 > fit_args['order']:
+            if len(model.parameters[p])-gradient_power[plt_type] > fit_args['order']:
                 # How to get confidence intervals from curve_fit?
                 fit = parameter_fit(model.parameters.index, model.parameters[p], fit_args)
-                Rs2km = (1 * u.R_sun).to_value(u.km)
-                sec = 24*60*60
-                speed_best_fit = (Rs2km/sec) * np.gradient(fit['best_fit_y'], fit['best_fit_x_num'])
-                speed_bound_upper = (Rs2km/sec) * np.gradient(fit['sigma_bounds']['up'], fit['best_fit_x_num'])
-                speed_bound_lower = (Rs2km/sec) * np.gradient(fit['sigma_bounds']['low'], fit['best_fit_x_num'])
-                axis.plot(fit['best_fit_x'], speed_best_fit, '-', color=parameters[p][2], label=parameters[p][3])
-                axis.fill_between(fit['best_fit_x'], speed_bound_lower, speed_bound_upper,
+                if plt_type == 'SpeedT':
+                    best_fit = const[plt_type] * np.gradient(fit['best_fit_y'], fit['best_fit_x_num'])
+                    upper_bound = const[plt_type] * np.gradient(fit['sigma_bounds']['up'], fit['best_fit_x_num'])
+                    lower_bound = const[plt_type] * np.gradient(fit['sigma_bounds']['low'], fit['best_fit_x_num'])
+                    ylabel = 'Speed [km/s]'
+                elif plt_type == 'AccelerationT':
+                    best_fit = const[plt_type] * np.gradient(np.gradient(fit['best_fit_y'], fit['best_fit_x_num'], edge_order=2), fit['best_fit_x_num'], edge_order=2)
+                    upper_bound = const[plt_type] * np.gradient(np.gradient(fit['sigma_bounds']['up'], fit['best_fit_x_num'], edge_order=2), fit['best_fit_x_num'], edge_order=2)
+                    lower_bound = const[plt_type] * np.gradient(np.gradient(fit['sigma_bounds']['low'], fit['best_fit_x_num'], edge_order=2), fit['best_fit_x_num'], edge_order=2)
+                    ylabel = 'Acceleration [km/s$^2$]'
+
+                axis.plot(fit['best_fit_x'], best_fit, '-', color=parameters[p][2], label=parameters[p][3])
+                axis.fill_between(fit['best_fit_x'], lower_bound, upper_bound,
                                   color=parameters[p][2], alpha=0.20)
+
                 if fit_args['type'] == 'spline':
-                    axis.fill_between(fit['best_fit_x'], (Rs2km/sec) * fit['sigv_bounds']['dlow'], (Rs2km/sec) * fit['sigv_bounds']['dup'],
+                    axis.fill_between(fit['best_fit_x'], const[plt_type] * fit['sigv_bounds']['dlow'], const[plt_type] * fit['sigv_bounds']['dup'],
                                       color=parameters[p][2], alpha=0.05)
             else:
-                pass
-        ylabel = 'Speed [km/s]'
+                ylabel = ' '
+                axis.text(0.5, 0.5, f'Not enough points for \n fitting with order {fit_args["order"]}.',
+                          transform=axis.transAxes,
+                          fontsize=20, color='gray', alpha=0.5,
+                          ha='center', va='center', rotation=30)
+                break
+
+    if plt_type != 'AccelerationT':
         axis.set_ylim(bottom=0)
+
     if plt_type == 'LongT' or plt_type == 'LatT':
         parameters = {'LongT': ['hgln', '+', palete[3], 'Longitude'],
                       'LatT': ['hglt', '+', palete[2], 'Latitude']}
@@ -435,6 +456,7 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT', fig=None, axis=None)
     axis.xaxis.set_major_formatter(formatter)
     axis.minorticks_on()
     xlim = axis.get_xlim()
+
     hour_threshold = 24 * (xlim[1] - xlim[0])
 
     if hour_threshold <= 2:
