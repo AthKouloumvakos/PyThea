@@ -1,3 +1,13 @@
+# v0.11.0 (17-April-2024)
+
+## Features
+ - Adds tests for ellipsoid location on AIA and STEREO COR images.
+ - Adds test_load_fitting_json_file to check the fitting file load and save.
+ - Improve PyThea tests on cli.
+
+## Major Changes
+- Change the inputs for download_fits from string dates to timerange.
+
 # v0.10.0 (17-April-2024)
 
 ## Features
