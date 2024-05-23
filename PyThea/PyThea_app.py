@@ -253,7 +253,7 @@ def run():
                                    st.session_state.date_process + datetime.timedelta(hours=imaging_time_range[1]))
                 st.session_state.map_[imager] = download_fits(timerange, imager)
                 st.session_state.map_[imager] = single_imager_maps_process(st.session_state.map_[imager],
-                                                                           **selected_imagers.imager_dict[imager][1],
+                                                                           **selected_imagers.imager_dict[imager]['process'],
                                                                            skip='sequence_processing')
             processed_images = single_imager_maps_process(st.session_state.map_[imager],
                                                           skip=['filter', 'prepare'],

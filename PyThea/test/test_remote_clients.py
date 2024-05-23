@@ -79,7 +79,7 @@ def test_vso_search(imager):
     for query in [a.Time('2011/01/01 00:00:00', '2011/01/01 01:00:00'),
                   a.Time('2012/01/01 00:00:00', '2012/01/01 01:00:00'),
                   a.Time('2013/01/01 00:00:00', '2013/01/01 01:00:00'), ]:
-        args = imager_dict[imager][0]
+        args = imager_dict[imager]['fido']
         result = Fido.search(query, *args)
 
         assert len(result) == 1

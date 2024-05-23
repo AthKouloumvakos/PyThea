@@ -175,11 +175,16 @@ def download_fits(timerange, imager):
     Downloads the imaging data (fits files) from VSO
     '''
     maps_ = []
-    args = imager_dict[imager][0]
-    result = Fido.search(timerange, *args)
+    imager_prop = imager_dict[imager]
+    result = Fido.search(timerange, *imager_prop['fido'])
     print(result)
     if result:
-        downloaded_files = Fido.fetch(result, path=f'{database_dir}'+'/data/{source}/{instrument}/'+'/{file}')
+        if 'detector' in imager_prop:
+            sub_path = imager_prop['detector']
+        elif 'wavelength' in imager_prop:
+            sub_path = imager_prop['wavelength']
+        path_str = f'{database_dir}/data/{imager_prop["source"]}/{imager_prop["instrument"]}/{sub_path}'+'/{file}'
+        downloaded_files = Fido.fetch(result, path=path_str)
         for file_path in downloaded_files:
             try:
                 map_ = sunpy.map.Map(file_path)
@@ -210,7 +215,7 @@ def maps_process(maps_dict_in, imagers_list_in, image_mode, **kwargs):
     for imager in imagers_list_in:
         if imager in maps_dict_in and maps_dict_in[imager] != []:
             if not kwargs:
-                extras = imager_dict[imager][1]
+                extras = imager_dict[imager]['process']
             else:
                 if imager in kwargs:
                     extras = kwargs[imager]

@@ -6,29 +6,56 @@
 import astropy.units as u
 from sunpy.net import attrs as a
 
-imager_dict = dict.fromkeys(['LC2'], [(a.Instrument.lasco, a.Detector.c2),
-                                      {'dimensions': (1024*u.pixel, 1024*u.pixel), 'polar': 'Clear', 'superpixel': 2}, 'LASCO-C2'])
-imager_dict.update(dict.fromkeys(['LC3'], [(a.Instrument.lasco, a.Detector.c3),
-                                           {'dimensions': (1024*u.pixel, 1024*u.pixel), 'polar': 'Clear', 'superpixel': 2}, 'LASCO-C3']))
-imager_dict.update(dict.fromkeys(['AIA'], [(a.Instrument.aia, a.Wavelength(19.3 * u.nm), a.Sample(1*u.minute)),
-                                           {'dimensions': (4096*u.pixel, 4096*u.pixel), 'superpixel': 8, 'exposure': 1.90}, 'SDO-AIA']))
-imager_dict.update(dict.fromkeys(['COR2A'], [(a.Source('STEREO_A'), a.Detector.cor2),
-                                             {'dimensions': (2048*u.pixel, 2048*u.pixel), 'polar': 1001, 'superpixel': 4}, 'STA-COR2']))
-imager_dict.update(dict.fromkeys(['COR2B'], [(a.Source('STEREO_B'), a.Detector.cor2),
-                                             {'dimensions': (2048*u.pixel, 2048*u.pixel), 'polar': 1001, 'superpixel': 4}, 'STB-COR2']))
-imager_dict.update(dict.fromkeys(['EUVIA'], [(a.Source('STEREO_A'), a.Detector.euvi, a.Wavelength(19.5 * u.nm)),
-                                             {'dimensions': (2048*u.pixel, 2048*u.pixel), 'superpixel': 4}, 'STA-EUVI']))
-imager_dict.update(dict.fromkeys(['EUVIB'], [(a.Source('STEREO_B'), a.Detector.euvi, a.Wavelength(19.5 * u.nm)),
-                                             {'dimensions': (2048*u.pixel, 2048*u.pixel), 'superpixel': 4}, 'STB-EUVI']))
-imager_dict.update(dict.fromkeys(['COR1A'], [(a.Source('STEREO_A'), a.Detector.cor1),
-                                             {'dimensions': (512*u.pixel, 512*u.pixel)}, 'STA-COR1']))  # 'polar':0
-imager_dict.update(dict.fromkeys(['COR1B'], [(a.Source('STEREO_B'), a.Detector.cor1),
-                                             {'dimensions': (512*u.pixel, 512*u.pixel)}, 'STB-COR1']))  # 'polar':0
-imager_dict.update(dict.fromkeys(['HI1A'], [(a.Source('STEREO_A'), a.Detector.hi1),
-                                            {'dimensions': (1024*u.pixel, 1024*u.pixel), 'superpixel': 2}, 'STA-HI1']))
-imager_dict.update(dict.fromkeys(['HI1B'], [(a.Source('STEREO_B'), a.Detector.hi1),
-                                            {'dimensions': (1024*u.pixel, 1024*u.pixel), 'superpixel': 2}, 'STB-HI1']))
-imager_dict.update(dict.fromkeys(['HI2A'], [(a.Source('STEREO_A'), a.Detector.hi2),
-                                            {'dimensions': (1024*u.pixel, 1024*u.pixel), 'superpixel': 2}, 'STA-HI2']))
-imager_dict.update(dict.fromkeys(['HI2B'], [(a.Source('STEREO_B'), a.Detector.hi2),
-                                            {'dimensions': (1024*u.pixel, 1024*u.pixel)}, 'STB-HI2']))
+imager_dict = {}
+
+imager_dict['LC2'] = {'fido': (a.Instrument.lasco, a.Detector.c2),
+                      'process': {'dimensions': (1024*u.pixel, 1024*u.pixel), 'polar': 'Clear', 'superpixel': 2},
+                      'source': 'SOHO', 'instrument': 'LASCO', 'detector': 'C2'}
+
+imager_dict['LC3'] = {'fido': (a.Instrument.lasco, a.Detector.c3),
+                      'process': {'dimensions': (1024*u.pixel, 1024*u.pixel), 'polar': 'Clear', 'superpixel': 2},
+                      'source': 'SOHO', 'instrument': 'LASCO', 'detector': 'C3'}
+
+imager_dict['AIA'] = {'fido': (a.Instrument.aia, a.Wavelength(19.3 * u.nm), a.Sample(1*u.minute)),
+                      'process': {'dimensions': (4096*u.pixel, 4096*u.pixel), 'superpixel': 8, 'exposure': 1.90},
+                      'source': 'SDO', 'instrument': 'AIA', 'wavelength': '193'}
+
+imager_dict['COR2A'] = {'fido': (a.Source('STEREO_A'), a.Detector.cor2),
+                        'process': {'dimensions': (2048*u.pixel, 2048*u.pixel), 'polar': 1001, 'superpixel': 4},
+                        'source': 'STEREO_A', 'instrument': 'SECCHI', 'detector': 'COR2'}
+
+imager_dict['COR2B'] = {'fido': (a.Source('STEREO_B'), a.Detector.cor2),
+                        'process': {'dimensions': (2048*u.pixel, 2048*u.pixel), 'polar': 1001, 'superpixel': 4},
+                        'source': 'STEREO_B', 'instrument': 'SECCHI', 'detector': 'COR2'}
+
+imager_dict['EUVIA'] = {'fido': (a.Source('STEREO_A'), a.Detector.euvi, a.Wavelength(19.5 * u.nm)),
+                        'process': {'dimensions': (2048*u.pixel, 2048*u.pixel), 'superpixel': 4},
+                        'source': 'STEREO_A', 'instrument': 'SECCHI', 'detector': 'EUVI'}
+
+imager_dict['EUVIB'] = {'fido': (a.Source('STEREO_B'), a.Detector.euvi, a.Wavelength(19.5 * u.nm)),
+                        'process': {'dimensions': (2048*u.pixel, 2048*u.pixel), 'superpixel': 4},
+                        'source': 'STEREO_B', 'instrument': 'SECCHI', 'detector': 'EUVI'}
+
+imager_dict['COR1A'] = {'fido': (a.Source('STEREO_A'), a.Detector.cor1),
+                        'process': {'dimensions': (512*u.pixel, 512*u.pixel)},
+                        'source': 'STEREO_A', 'instrument': 'SECCHI', 'detector': 'COR1'}
+
+imager_dict['COR1B'] = {'fido': (a.Source('STEREO_B'), a.Detector.cor1),
+                        'process': {'dimensions': (512*u.pixel, 512*u.pixel)},
+                        'source': 'STEREO_B', 'instrument': 'SECCHI', 'detector': 'COR1'}
+
+imager_dict['HI1A'] = {'fido': (a.Source('STEREO_A'), a.Detector.hi1),
+                       'process': {'dimensions': (1024*u.pixel, 1024*u.pixel), 'superpixel': 2},
+                       'source': 'STEREO_A', 'instrument': 'SECCHI', 'detector': 'HI1'}
+
+imager_dict['HI1B'] = {'fido': (a.Source('STEREO_B'), a.Detector.hi1),
+                       'process': {'dimensions': (1024*u.pixel, 1024*u.pixel), 'superpixel': 2},
+                       'source': 'STEREO_B', 'instrument': 'SECCHI', 'detector': 'HI1'}
+
+imager_dict['HI2A'] = {'fido': (a.Source('STEREO_A'), a.Detector.hi2),
+                       'process': {'dimensions': (1024*u.pixel, 1024*u.pixel), 'superpixel': 2},
+                       'source': 'STEREO_A', 'instrument': 'SECCHI', 'detector': 'HI2'}
+
+imager_dict['HI2B'] = {'fido': (a.Source('STEREO_B'), a.Detector.hi2),
+                       'process': {'dimensions': (1024*u.pixel, 1024*u.pixel), 'superpixel': 2},
+                       'source': 'STEREO_B', 'instrument': 'SECCHI', 'detector': 'HI2'}
