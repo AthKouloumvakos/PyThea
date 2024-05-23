@@ -32,7 +32,7 @@ maps = download_fits(timerange, imager)
 # Process the downloaded fits files using the ``single_imager_maps_process`` utility. We select to process the maps into running differences images.
 
 processed_images = single_imager_maps_process(maps,
-                                              **selected_imagers.imager_dict[imager][1],
+                                              **selected_imagers.imager_dict[imager]['process'],
                                               image_mode='Running Diff.',
                                               diff_num=1)
 

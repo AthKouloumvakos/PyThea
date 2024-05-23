@@ -16,13 +16,10 @@ from PyThea.utils import download_fits, single_imager_maps_process
 # %%
 # Retrieve the list of available imagers and their corresponding keys using the following,
 for key in selected_imagers.imager_dict.keys():
-    instrument = selected_imagers.imager_dict[key][0][0].value
-    if selected_imagers.imager_dict[key][0][1].type_name == 'wave':
-        wave = selected_imagers.imager_dict[key][0][1].min
-        print(f'{instrument}/{round(wave.value)}A:  {key}')
-    else:
-        detector = selected_imagers.imager_dict[key][0][1].value
-        print(f'{instrument}/{detector}:  {key}')
+    imager = selected_imagers.imager_dict[key]
+    detector_or_wavelenght = imager['detector'] if 'detector' in imager else imager['wavelength']
+    print(f'{imager["source"]}/{imager["instrument"]}-{detector_or_wavelenght}:  {key}')
+
 
 # %%
 # First, select the imager and specify the time range of the query. For this example we will download data from SOHO LASCO coronagraph.
@@ -43,7 +40,7 @@ maps = download_fits(timerange, imager)
 #
 # The default options for the maps processing, for each imager, can be found in,
 
-print(selected_imagers.imager_dict[imager][1])
+print(selected_imagers.imager_dict[imager]['process'])
 
 # For LASCO-C2 select only the images with dimensions 1024x1024 and only total brightness images. Then the filtered images are prepared. Depending on the instrument, this includes pointing corrections, calibrations, observer location corrections, exposure time normalization, and others.
 
@@ -51,7 +48,7 @@ print(selected_imagers.imager_dict[imager][1])
 # At the last step the images are resampled using SynPy's ``superpixel`` method and the final maps are processed  into running/base difference or plain image sequence maps.
 
 processed_images = single_imager_maps_process(maps,
-                                              **selected_imagers.imager_dict[imager][1],
+                                              **selected_imagers.imager_dict[imager]['process'],
                                               image_mode='Running Diff.',
                                               diff_num=1)
 
