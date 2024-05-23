@@ -65,12 +65,15 @@ def footer_text():
     right.markdown("""
                    **Github**: Find the latest version here
                                [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AthKouloumvakos/PyThea) \n
-                   **Citation**: Cite PyThea as [![https://doi.org/10.5281/zenodo.5713659](https://zenodo.org/badge/DOI/10.5281/zenodo.5713659.svg)](https://doi.org/10.5281/zenodo.5713659) \n
+                   **Documentation Page**: https://www.pythea.org/
                    """ +
                    f"""
                    **Version**: {version} (latest release [![Version](https://img.shields.io/github/v/release/AthKouloumvakos/PyThea)](https://github.com/AthKouloumvakos/PyThea/releases))
                    """)
     left.image('https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_logo.png?raw=true')
+    st.markdown("""
+                **Citation**: Please cite the following paper [![https://www.frontiersin.org/articles/10.3389/fspas.2022.974137/](https://img.shields.io/static/v1?label=Paper&message=Frontiers&color=red)](https://www.frontiersin.org/articles/10.3389/fspas.2022.974137/) and [![https://doi.org/10.5281/zenodo.5713659](https://zenodo.org/badge/DOI/10.5281/zenodo.5713659.svg)](https://doi.org/10.5281/zenodo.5713659)
+                """)
     st.info('''
             More imaging data have been added:
             - SDO/AIA images from 211A channel have been added.
@@ -110,7 +113,6 @@ def run():
 
     if 'date_process' not in st.session_state:
         date_and_event_selection(st)
-        st.markdown(""" #### ⏻ Select a day & solar event. """)
     else:
         st.sidebar.markdown('## Processing Event|Date:')
         st.sidebar.info(f'{st.session_state.event_selected}')
