@@ -68,7 +68,7 @@ def test_vso_search(imager):
     """
     Tests that the Fido.search returns always the same number of files from VSO.
     """
-    file_num = {'AIA': [60, 61],
+    file_num = {'AIA-193': [60, 61], 'AIA-211': [60, 61],
                 'LC2': [5], 'LC3': [5],
                 'COR2A': [7], 'COR2B': [7],
                 'EUVIA': [11], 'EUVIB': [11],

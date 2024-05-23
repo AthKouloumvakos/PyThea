@@ -71,6 +71,10 @@ def footer_text():
                    **Version**: {version} (latest release [![Version](https://img.shields.io/github/v/release/AthKouloumvakos/PyThea)](https://github.com/AthKouloumvakos/PyThea/releases))
                    """)
     left.image('https://github.com/AthKouloumvakos/PyThea/blob/master/docs/logo/pythea_logo.png?raw=true')
+    st.info('''
+            More imaging data have been added:
+            - SDO/AIA images from 211A channel have been added.
+            ''', icon='ℹ️')
     st.warning('''
            ⚠️ **NOTE: From PyThea >0.8.1 the JSON fitting files will be slightly different from the old ones.** ⚠️
            * Due to a change in the fitting time input, the new fitting files may have slightly different times for the same images (see further information [here](https://github.com/AthKouloumvakos/PyThea/discussions/24)).

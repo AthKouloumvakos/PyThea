@@ -282,6 +282,11 @@ class model_fittings:
                             the old file with the new one. This will not alter your fittings.')
             kinematics = {'fit_method': {'type': 'polynomial', 'order': 1}}
 
+        if fitting['version'] <= '0.11.0':
+            # In version >0.11.0 more AIA channels added so this will update the fitting files
+            # prodused at earlier versions by replasing the imager values from "AIA" to "AIA-193".
+            parameters['imager'] = parameters['imager'].replace('AIA', 'AIA-193')
+
         model_fittings_class = model_fittings(fitting['event_selected'],
                                               fitting['date_process'],
                                               fitting['geometrical_model']['type'],
