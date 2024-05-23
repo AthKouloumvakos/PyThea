@@ -76,9 +76,9 @@ def footer_text():
             - SDO/AIA images from 211A channel have been added.
             ''', icon='ℹ️')
     st.warning('''
-           ⚠️ **NOTE: From PyThea >0.8.1 the JSON fitting files will be slightly different from the old ones.** ⚠️
-           * Due to a change in the fitting time input, the new fitting files may have slightly different times for the same images (see further information [here](https://github.com/AthKouloumvakos/PyThea/discussions/24)).
-           ''')
+           **NOTE: From PyThea >0.8.1 the JSON fitting files will be slightly different from the old ones.**
+           Due to a change in the fitting time input, the new fitting files may have slightly different times for the same images (see further information [here](https://github.com/AthKouloumvakos/PyThea/discussions/24)).
+           ''', icon='⚠️')
     st.markdown('---')
 
 
