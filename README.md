@@ -22,8 +22,8 @@ We recommend, creating a virtual environment for _PyThea_ and installing the pac
 If you use Anaconda or Miniconda (which we also recommend) you can create a virtual environment using ```conda``` and then install _PyThea_ using from PyPI using ```pip```. In the terminal do the following:
 
 ```python
-# Create a virtual environment. Use python=3.8 or 3.9
-conda create --name PyThea python=3.9
+# Create a virtual environment. Use python>3.9
+conda create --name PyThea python=3.10
 
 # Activate the environment
 conda activate PyThea
@@ -97,7 +97,7 @@ If there is an error when running ```PyThea streamlit``` then you can manually r
 
 ## 📙 Usage
 
-Complete documentation of the _PyThea_ can be found in (under construction)
+Complete documentation of the _PyThea_ can be found in [https://www.pythea.org/](https://www.pythea.org/).
 
 ## 📦 Useful Python packages
 
