@@ -4,4 +4,6 @@
   "PyThea.test.test_figures.test_ellipsoid_on_STEREO_COR1_venus": "18a3af72e9da5b60e435f83ee3ef3f8cd0eb437eaef463329552ff56968f12ff",
   "PyThea.test.test_figures.test_ellipsoid_on_STEREO_COR2_three_planets": "231d5635f57c4d66556674a83f6cbcef7dc94b51846e977c4c2dc3dc244096ac",
   "PyThea.test.test_figures.test_kinematics_figure": "83e060de53b57e9d34fe50111ba60a44f7c7c7b20faae9a4381654ef1c9ea72d"
+  "PyThea.test.test_figures.test_ellipsoid_on_WISPR_Inner_Venus": "8d831b43b0c789cacfcff8386c00af0707bb68d64fca16c6188deca93d3cba87",
+  "PyThea.test.test_figures.test_ellipsoid_on_WISPR_Outer_Mercury": "f94c444f2c6f00cd5dd5deff394d0e233c9e720413fd5570b306b262915c9732"
 }

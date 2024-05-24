@@ -26,6 +26,15 @@ stereo_sample_data = pooch.create(
     },
 )
 
+wispr_sample_data = pooch.create(
+    path=os.path.join(database_dir, 'sample_data'),  # The cache folder
+    base_url=f'{github_main_url}/raw/main/data/',  # The remote data url on Github
+    registry={
+        'psp_l3_wispr_20210808t103707_v1_1211.fits': 'sha256:85035693c4677e8fa8a3e61b8051d6f0a46e96806b5b0cbdb3efa77652308bda',
+        'psp_l3_wispr_20210808t104010_v1_2222.fits': 'sha256:5e55e17f1aed7dc96f88b79f092947c58e6ee0def1b72822dbf1a696d8df7e6f'
+    },
+)
+
 json_fitting_file_sample_data = pooch.create(
     path=os.path.join(database_dir, 'sample_data'),  # The cache folder
     base_url=f'{github_main_url}/raw/main/data/',  # The remote data url on Github

@@ -7,7 +7,7 @@ from sunpy.coordinates import get_body_heliographic_stonyhurst
 
 from PyThea.data.sample_data import (aia_sample_data,
                                      json_fitting_file_sample_data,
-                                     stereo_sample_data)
+                                     stereo_sample_data, wispr_sample_data)
 from PyThea.geometrical_models import ellipsoid
 from PyThea.sunpy_dev.map.maputils import prepare_maps
 from PyThea.utils import model_fittings, plot_fitting_model
@@ -193,4 +193,74 @@ def test_kinematics_figure():
                                   fit_args=fit_method,
                                   plt_type='AccelerationT',
                                   fig=fig, axis=ax3)
+    return fig
+
+
+@pytest.mark.mpl_image_compare()
+def test_ellipsoid_on_WISPR_Inner_Venus():
+    """
+    Tests that the position of Venus is ploted correct at WISPR-Inner telescope images.
+    """
+    fits_file = wispr_sample_data.fetch('psp_l3_wispr_20210808t103707_v1_1211.fits')
+
+    map_ = sunpy.map.Map(fits_file, sequence=True)
+    map_ = prepare_maps(map_)[0]
+
+    model_shock = model_from_body('venus', map_.date_average, map_.observer_coordinate)
+
+    fig = plt.figure(dpi=200)
+    ax = fig.add_subplot(projection=map_)
+    map_.plot(axes=ax)
+    map_.draw_limb(axes=ax)
+    ax.grid(False)
+
+    model_shock = model_from_body('venus', map_.date_average, map_.observer_coordinate)
+    ax.plot_coord(model_shock.center, 'o', color=bodies_color_dict['venus'], fillstyle='none', markersize=6, markeredgewidth=2)
+    x = map_.world_to_pixel(model_shock.center)[0].value
+    y = map_.world_to_pixel(model_shock.center)[1].value+20
+    ax.annotate('Venus', (x, y), xytext=(x, y),
+                backgroundcolor='none', color='white', fontsize=8,
+                horizontalalignment='center', verticalalignment='bottom')
+    lon, lat = ax.coords
+    lon .set_major_formatter('d.dd')
+    lat.set_major_formatter('d.dd')
+
+    ax.set_xlim([0, map_.data.shape[0]-80])
+    ax.set_ylim([0, map_.data.shape[1]])
+
+    return fig
+
+
+@pytest.mark.mpl_image_compare()
+def test_ellipsoid_on_WISPR_Outer_Mercury():
+    """
+    Tests that the position of Mercury is ploted correct at WISPR-Outer telescope images.
+    """
+    fits_file = wispr_sample_data.fetch('psp_l3_wispr_20210808t104010_v1_2222.fits')
+
+    map_ = sunpy.map.Map(fits_file, sequence=True)
+    map_ = prepare_maps(map_)[0]
+
+    model_shock = model_from_body('mercury', map_.date_average, map_.observer_coordinate)
+
+    fig = plt.figure(dpi=200)
+    ax = fig.add_subplot(projection=map_)
+    map_.plot(axes=ax)
+    map_.draw_limb(axes=ax)
+    ax.grid(False)
+
+    model_shock = model_from_body('mercury', map_.date_average, map_.observer_coordinate)
+    ax.plot_coord(model_shock.center, 'o', color=bodies_color_dict['mercury'], fillstyle='none', markersize=6, markeredgewidth=2)
+    x = map_.world_to_pixel(model_shock.center)[0].value
+    y = map_.world_to_pixel(model_shock.center)[1].value+20
+    ax.annotate('Mercury', (x, y), xytext=(x, y),
+                backgroundcolor='none', color='white', fontsize=8,
+                horizontalalignment='center', verticalalignment='bottom')
+    lon, lat = ax.coords
+    lon .set_major_formatter('d.dd')
+    lat.set_major_formatter('d.dd')
+
+    ax.set_xlim([0, map_.data.shape[0]-80])
+    ax.set_ylim([0, map_.data.shape[1]])
+
     return fig
