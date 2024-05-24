@@ -8,6 +8,7 @@ import warnings
 import astropy.units as u
 import numpy as np
 import sunpy.map
+from sunpy.map.mapsequence import MapSequence
 
 import PyThea.sunpy_dev.extern.sunkit_instruments.aia.utils  # noqa
 import PyThea.sunpy_dev.extern.sunkit_instruments.lasco.utils  # noqa
@@ -151,7 +152,11 @@ def filter_maps(map_sequence, **kwargs):
         map_sequence = [tmap for tmap in map_sequence if tmap.meta['polar'] == kwargs['polar']]
 
     if len(map_sequence) != 0:
-        sequence_final = sunpy.map.Map(map_sequence, sequence=True)
+        if isinstance(map_sequence, MapSequence):
+            return map_sequence
+        else:
+            sequence_final = sunpy.map.Map(map_sequence, sequence=True)
+
     else:
         sequence_final = []
 
