@@ -26,7 +26,7 @@ Main Geometrical Fitting Page
 When the main geometrical fitting page appears you can start the fitting process. In this page you can adjust the parameters of the geometrical model, change the images and the selected imager, and select among various visualization options. An example of the main geometrical fitting page is shown in :numref:`main-app-page` (right panel).
 
 .. figure:: ./images/app_slider_details.png
-   :name: app_slider_details
+   :name: app-slider-details
    :width: 800px
    :align: center
 
@@ -35,7 +35,7 @@ When the main geometrical fitting page appears you can start the fitting process
 Widgets Panel
 ~~~~~~~~~~~~~
 
-You can easily customize your visualization using various input widgets found on the left panel of this page. From sliders to radio buttons and drop-down menus, these widgets offer a range of options for visualizing your data, adjusting fitted parameters, selecting specific images, and performing image processing tasks. An example of the different options is shown in :numref:`app_slider_details`.
+You can easily customize your visualization using various input widgets found on the left panel of this page. From sliders to radio buttons and drop-down menus, these widgets offer a range of options for visualizing your data, adjusting fitted parameters, selecting specific images, and performing image processing tasks. An example of the different options is shown in :numref:`app-slider-details`.
 
 In the first container (panel a), you'll find options related to the coordinate system and axis representation for fitting parameters, and visualization options for the model, as well as, visualization of the fitting table and kinematics. Switching between coordinate systems allows you to specify model coordinates in Carrington or Stonyhurst systems, offering flexibility in your analysis. Changing the coordinate system of the geometrical model you can provide the longitude and latitude of the model in Carrington or Stonyhurst coordinates. Similarly, the axis representation provides alternative ways to input geometrical parameters for the model. You can also select whether to display the full mesh or just the skeleton of the geometrical model within the images. Additionally, the 'View Fitting Table' and 'View Kinematics Plots' options enable you to visualize the fitting table containing the geometrical parameters and kinematic plots resulting from the fittings, respectively. These features provide comprehensive insights into your fittings and the kinematics of the model during the analysis.
 
@@ -48,5 +48,21 @@ Imaging and Results Panel
 
 The right panel of the main geometrical fitting page is the imaging panel. Here appear the images for the selected imager with the geometrical model overlaid onto the images. You can select the imager to visualize the available data from a drop drop-down menu and also use a slider to select the different times of the images. Additionally, if the 'Supplementary Imaging' has been selected two nearly co-temporal images from other instruments will appear. You can use the slider on the bottom of the two images to select among the different loaded imagers. In this panel, the fitting table and the kinematic plots can appear on the bottom of the images, if these options have been selected. We give more details in the following Section.
 
-Fitting Table and Kinematics Plot
----------------------------------
+Fitting Table and Kinematics Plots
+----------------------------------
+
+When enabling the ‘View Fitting Table’ a section with the fitting parameters appears in the imaging panel bellow the imaging section. An example of this section is shown in :numref:`app-fitting-table-details`. These section shows two fitting parameters table: at the top is the ‘Running Fiting Table‘ and at the bottom the ‘Stored Fitting Table'. The ‘Running Fiting Table‘ provides the fitted parameters of the geometrical model to the selected image. These parametes will be stored when the user presses the ‘Store Fit‘ button.The ‘Stored Fitting Table' provides all the fitted parameters of the geometrical model to the valrious images. The information of this table updates when a new single fitting is stored. The parameters stored in this table can be dowloaded in a json file when the overal fitting of an event is ready from the ‘Finalize and save results‘ section by pressing the ‘Download Fitting as .json file‘.  Additionally, the user can load the fitting parameters from any of the single fittings (i.e. rows) or delete any record from the ‘Store Fit‘ selecting first the fitting record from the ‘Select a fitting‘ drop-down menu and then using the ‘Action‘ drop-down menu.
+
+.. figure:: ./images/fitting_app_table.png
+   :name: app-fitting-table-details
+   :width: 800px
+   :align: center
+
+   A view of the ftting table in the application
+
+.. figure:: ./images/kinematic_app_plots.png
+   :name: app-kinematics-plots-details
+   :width: 800px
+   :align: center
+
+   A view of the kinematic plots in the application
