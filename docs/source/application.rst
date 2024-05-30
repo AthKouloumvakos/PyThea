@@ -8,7 +8,7 @@ Performing a 3D reconstruction is mainly an interactive process. To reconstruct 
 
 The PyThea web application comprises two main pages as shown in :numref:`main-app-page`. The starting page (left panel) appears when running the application for the first time. On this page, the user can initiate the fitting process by selecting the date of the event and the fitting model to be used. Then the application initiates and a second page is loaded with the fitting sliders and the imaging views. Each main page comprises two primary vertical panels as shown in :numref:`main-app-page`, namely Panel 1 and 2. The left panel serves as a hub for your input widgets, allowing the user to interactively change the parameters and control the reconstruction process. On the other hand, the right panel is dedicated to displaying data elements, providing a visual feedback on the reconstruction results. This separation of input and output elements enhances the usability and clarity of the application interface, enabling you to navigate through the reconstruction process with ease. In essence, PyThea revolutionizes the 3D reconstruction workflow by combining advanced algorithms with intuitive interface design, making complex analyses accessible to a broader audience.
 
-.. figure:: ./images/main_page.png
+.. figure:: ./images/main_page.jpg
    :name: main-app-page
    :width: 800px
    :align: center
