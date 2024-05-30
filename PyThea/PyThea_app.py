@@ -38,8 +38,8 @@ from PyThea.modules import (date_and_event_selection, figure_streamlit,
                             fitting_and_slider_options_container,
                             fitting_sliders)
 from PyThea.sunpy_dev.map.maputils import get_closest, maps_clims
-from PyThea.utils import (download_fits, model_fittings, plot_fitting_model,
-                          single_imager_maps_process)
+from PyThea.utils import (download_fits, load_fits, model_fittings,
+                          plot_fitting_model, single_imager_maps_process)
 from PyThea.version import version
 
 
@@ -257,7 +257,8 @@ def run():
             if imager not in st.session_state.map_:
                 timerange = a.Time(st.session_state.date_process + datetime.timedelta(hours=imaging_time_range[0]),
                                    st.session_state.date_process + datetime.timedelta(hours=imaging_time_range[1]))
-                st.session_state.map_[imager] = download_fits(timerange, imager)
+                downloaded_files = download_fits(timerange, imager)
+                st.session_state.map_[imager] = load_fits(downloaded_files)
                 st.session_state.map_[imager] = single_imager_maps_process(st.session_state.map_[imager],
                                                                            **selected_imagers.imager_dict[imager]['process'],
                                                                            skip='sequence_processing')

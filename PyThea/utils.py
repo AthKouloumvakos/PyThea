@@ -174,7 +174,6 @@ def download_fits(timerange, imager):
     '''
     Downloads the imaging data (fits files) from VSO
     '''
-    maps_ = []
     imager_prop = imager_dict[imager]
     result = Fido.search(timerange, *imager_prop['fido'])
     print(result)
@@ -185,7 +184,19 @@ def download_fits(timerange, imager):
             sub_path = imager_prop['wavelength']
         path_str = f'{database_dir}/data/{imager_prop["source"]}/{imager_prop["instrument"]}/{sub_path}'+'/{file}'
         downloaded_files = Fido.fetch(result, path=path_str)
-        for file_path in downloaded_files:
+    else:
+        downloaded_files = []
+
+    return downloaded_files
+
+
+def load_fits(files):
+    '''
+    Loads the imaging data (fits files) from a list of files.
+    '''
+    maps_ = []
+    if files:
+        for file_path in files:
             try:
                 map_ = sunpy.map.Map(file_path)
                 maps_.append(map_)
@@ -197,7 +208,6 @@ def download_fits(timerange, imager):
                 print(f"File '{file_path}' has been removed.")
         if maps_:
             maps_ = sunpy.map.Map(maps_, sequence=True)
-
     return maps_
 
 
