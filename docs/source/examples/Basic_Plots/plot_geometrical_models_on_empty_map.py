@@ -4,9 +4,10 @@ Plot geometrical models on empty Map
 
 This example shows how to plot an ellipsoid on a blank map.
 """
-import astropy.units as u
+
 # %%
 # Import Required Modules
+import astropy.units as u
 import matplotlib.pyplot as plt
 import numpy as np
 import sunpy.map

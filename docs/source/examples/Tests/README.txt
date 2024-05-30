@@ -1,4 +1,4 @@
 Tests
 =====
 
-Basic examples of how to use PyThea's utilities.
+A few examples of PyThea's tests.

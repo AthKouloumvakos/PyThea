@@ -1,11 +1,12 @@
 r"""
-Overplot ellipsoid on image
----------------------------
+Ellipsoid location on AIA images
+--------------------------------
 
 This is an example of how the accuracy of the ellipsoid possition is tested in PyThea.
 
 We use an EUV image when Venus transited in front of the Sun and was observed by SDO/AIA and we oveplot the ellipsoid.
 """
+
 # %%
 import astropy.units as u
 import matplotlib.pyplot as plt

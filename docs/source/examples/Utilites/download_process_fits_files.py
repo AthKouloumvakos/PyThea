@@ -4,6 +4,7 @@ Download and process fits files
 
 In this example, using the utility `download_fits` we download data for a selected imager and then process the fits files.
 """
+
 # %%
 # Import Required Modules
 from datetime import datetime, timedelta

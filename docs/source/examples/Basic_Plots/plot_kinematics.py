@@ -1,14 +1,15 @@
 r"""
-Plot Model Kinematics
+Plot model kinematics
 ---------------------
 
 In this example, we use PyThea's utilities to plot the kinematics of the geometrical model from a fitting file.
 """
+
+# %%
+# Import Required Modules
 from datetime import datetime
 
 import matplotlib.dates as mdates
-# %%
-# Import Required Modules
 import matplotlib.pyplot as plt
 from IPython.display import display
 

@@ -4,6 +4,7 @@ Load a fiting file
 
 This script demonstrates how to use functionalities from the PyThea library to work with fitting data stored in JSON format.
 """
+
 # %%
 # Import Required Modules
 from IPython.display import display

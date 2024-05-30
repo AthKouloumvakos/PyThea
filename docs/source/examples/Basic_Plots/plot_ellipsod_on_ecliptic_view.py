@@ -1,14 +1,15 @@
 r"""
-Plot Model Kinematics
----------------------
+Plot geometrical model in the ecliptic plane
+--------------------------------------------
 
-In this example, we use PyThea's utilities to plot the kinematics of the geometrical model from a fitting file.
+In this example, we use PyThea's utilities to plot the geometrical model to a view of the ecliptic plane.
 """
+
+# %%
+# Import Required Modules
 from datetime import datetime
 
 import astropy.units as u
-# %%
-# Import Required Modules
 import matplotlib.pyplot as plt
 import numpy as np
 from astropy.coordinates import Longitude, SkyCoord
