@@ -399,20 +399,23 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT', fig=None, axis=None)
                     best_fit = const[plt_type] * np.gradient(fit['best_fit_y'], fit['best_fit_x_num'])
                     upper_bound = const[plt_type] * np.gradient(fit['sigma_bounds']['up'], fit['best_fit_x_num'])
                     lower_bound = const[plt_type] * np.gradient(fit['sigma_bounds']['low'], fit['best_fit_x_num'])
+                    if fit_args['type'] == 'spline':
+                        axis.fill_between(fit['best_fit_x'], const[plt_type] * fit['sigv_bounds']['dlow'], const[plt_type] * fit['sigv_bounds']['dup'],
+                                          color=parameters[p][2], alpha=0.05)
                     ylabel = 'Speed [km/s]'
                 elif plt_type == 'AccelerationT':
                     best_fit = const[plt_type] * np.gradient(np.gradient(fit['best_fit_y'], fit['best_fit_x_num'], edge_order=2), fit['best_fit_x_num'], edge_order=2)
                     upper_bound = const[plt_type] * np.gradient(np.gradient(fit['sigma_bounds']['up'], fit['best_fit_x_num'], edge_order=2), fit['best_fit_x_num'], edge_order=2)
                     lower_bound = const[plt_type] * np.gradient(np.gradient(fit['sigma_bounds']['low'], fit['best_fit_x_num'], edge_order=2), fit['best_fit_x_num'], edge_order=2)
+                    if fit_args['type'] == 'spline':
+                        axis.fill_between(fit['best_fit_x'], const[plt_type] * fit['sigv_bounds']['ddlow'], const[plt_type] * fit['sigv_bounds']['ddup'],
+                                          color=parameters[p][2], alpha=0.05)
                     ylabel = 'Acceleration [km/s$^2$]'
 
                 axis.plot(fit['best_fit_x'], best_fit, '-', color=parameters[p][2], label=parameters[p][3])
                 axis.fill_between(fit['best_fit_x'], lower_bound, upper_bound,
                                   color=parameters[p][2], alpha=0.20)
 
-                if fit_args['type'] == 'spline':
-                    axis.fill_between(fit['best_fit_x'], const[plt_type] * fit['sigv_bounds']['dlow'], const[plt_type] * fit['sigv_bounds']['dup'],
-                                      color=parameters[p][2], alpha=0.05)
             else:
                 ylabel = ' '
                 axis.text(0.5, 0.5, f'Not enough points for \n fitting with order {fit_args["order"]}.',
@@ -460,11 +463,11 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT', fig=None, axis=None)
     hour_threshold = 24 * (xlim[1] - xlim[0])
 
     if hour_threshold <= 2:
-        axis.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=range(60), interval=1))
+        axis.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=np.arange(0, 61, 1)))
     elif hour_threshold <= 6:
-        axis.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=range(60), interval=5))
+        axis.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=np.arange(0, 61, 5)))
     else:
-        axis.xaxis.set_minor_locator(mdates.HourLocator(byhour=range(24), interval=1))
+        axis.xaxis.set_minor_locator(mdates.HourLocator(byhour=np.arange(0, 25, 1)))
 
     fig.autofmt_xdate(bottom=0, rotation=0, ha='center')
     axis.legend(loc='lower right')
@@ -506,13 +509,17 @@ def parameter_fit(x, y, fit_args):
         sigma_bound_up = best_fit + sigma
         sigma_bound_low = best_fit - sigma
 
-        sv_bound_up, sv_bound_low, sv_bound_dup, sv_bound_dlow = best_fit, best_fit, np.gradient(best_fit, xxx), np.gradient(best_fit, xxx)
+        sv_bound_up, sv_bound_low, sv_bound_dup, sv_bound_dlow, sv_bound_ddup, sv_bound_ddlow = \
+            best_fit, best_fit, np.gradient(best_fit, xxx), np.gradient(best_fit, xxx), \
+            np.gradient(np.gradient(best_fit, xxx)), np.gradient(np.gradient(best_fit, xxx))
         for i in range(2, 100):
             spl = UnivariateSpline(xx, y, s=i/100, k=fit_args['order'])
             sv_bound_up = np.maximum(sv_bound_up, spl(xxx))
             sv_bound_low = np.minimum(sv_bound_low, spl(xxx))
             sv_bound_dup = np.maximum(sv_bound_dup, np.gradient(spl(xxx), xxx))
             sv_bound_dlow = np.minimum(sv_bound_dlow, np.gradient(spl(xxx), xxx))
+            sv_bound_ddup = np.maximum(sv_bound_ddup, np.gradient(np.gradient(spl(xxx), xxx)))
+            sv_bound_ddlow = np.minimum(sv_bound_ddlow, np.gradient(np.gradient(spl(xxx), xxx)))
 
         fitting = {'spl': spl,
                    'sigma': sigma,
@@ -524,7 +531,9 @@ def parameter_fit(x, y, fit_args):
                    'sigv_bounds': {'up': sv_bound_up,
                                    'low': sv_bound_low,
                                    'dup': sv_bound_dup,
-                                   'dlow': sv_bound_dlow},
+                                   'dlow': sv_bound_dlow,
+                                   'ddup': sv_bound_ddup,
+                                   'ddlow': sv_bound_ddlow},
                    }
     elif fit_args['type'] == 'custom':
         expression = fit_args['expression']  # 'a * exp(-b * x) + c'

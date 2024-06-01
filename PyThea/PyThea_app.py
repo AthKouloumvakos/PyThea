@@ -420,7 +420,7 @@ def run():
         st.markdown('### Plots of kinematics ')
         col1, col2, col3 = st.columns(3)
         plt_kinematics_select = col1.selectbox('Select Plots',
-                                               options=['All', 'HeightT', 'SpeedT', 'Long-LatT'])
+                                               options=['All', 'HeightT', 'SpeedT', 'AccelerationT', 'Long-LatT'])
 
         fit_mode = col2.selectbox('Select Fitting Mode',
                                   options=['polynomial', 'spline', 'custom'],
