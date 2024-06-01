@@ -35,8 +35,8 @@ display(model_fittings_class.parameters)
 # Use the stored curve fitting parameters
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
-# This part uses the curve fitting parameters that are stored in the json fitting file. The curve fitting parameters are selected by the user during the fitting process in the application.
-# View the curve fitting parameters. These consist of the 'type' of the curve fitting ('polynomial' in this example) and the 'order' (2nd order in this example).
+# This part uses the curve fitting method parameters that are stored in the json fitting file. The curve fitting parameters are selected by the user during the fitting process in the application.
+# View the curve fitting method parameters. These consist of the method (``type``) of the curve fitting ('polynomial' in this example) and the ``order`` (2nd order in this example).
 
 print(f'Fitting Parameters: {model_fittings_class.kinematics["fit_method"]}')
 
