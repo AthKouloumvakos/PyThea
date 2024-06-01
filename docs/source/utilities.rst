@@ -101,9 +101,9 @@ The code below gives a small example of how the ``maps_sequence_processing`` fun
     >>> from PyThea.utils import single_imager_maps_process
 
     >>> processed_images = single_imager_maps_process(maps,
-                                                      **selected_imagers.imager_dict[imager]['process'],
-                                                      image_mode='Running Diff.',
-                                                      diff_num=1)
+    ...                                               **selected_imagers.imager_dict[imager]['process'],
+    ...                                               image_mode='Running Diff.',
+    ...                                               diff_num=1)
 
 Plot Imaging Data
 -----------------
@@ -134,8 +134,8 @@ To over-plot a geometrical model to an image, the user can either construct the 
 
     >>> obstime = '2021-10-28 16:00:17.986000'
     >>> center = SkyCoord(3.62*u.degree, -23.56*u.degree, 3.106424*u.R_sun,
-                          obstime=obstime,
-                          observer='earth', frame=frames.HeliographicStonyhurst)
+    ...                   obstime=obstime,
+    ...                   observer='earth', frame=frames.HeliographicStonyhurst)
     >>> model_shock = ellipsoid(center, 3.273576*u.R_sun, 3.4432*u.R_sun, 4.414359*u.R_sun, 0 * u.degree)
     >>> fig, ax = make_figure(processed_images[0], cmap='Greys_r', clim=[-20, 20], clip_model=True)
     >>> model_shock.plot(ax, mode='Full')
@@ -190,16 +190,76 @@ Then the user can construct the geometrical model for a single fit using the ``m
     >>> obstime = model_parameters.name
 
     >>> center = SkyCoord(model_parameters['hgln']*u.degree,
-                          model_parameters['hglt']*u.degree,
-                          model_parameters['rcenter']*u.R_sun,
-                          obstime=obstime, observer='earth',
-                          frame=frames.HeliographicStonyhurst)
+    ...                   model_parameters['hglt']*u.degree,
+    ...                   model_parameters['rcenter']*u.R_sun,
+    ...                   obstime=obstime, observer='earth',
+    ...                   frame=frames.HeliographicStonyhurst)
 
     >>> model_shock = ellipsoid(center,
-                                model_parameters['radaxis']*u.R_sun,
-                                model_parameters['orthoaxis1']*u.R_sun,
-                                model_parameters['orthoaxis2']*u.R_sun,
-                                model_parameters['tilt']*u.degree)
+    ...                         model_parameters['radaxis']*u.R_sun,
+    ...                         model_parameters['orthoaxis1']*u.R_sun,
+    ...                         model_parameters['orthoaxis2']*u.R_sun,
+    ...                         model_parameters['tilt']*u.degree)
 
 
 From the ``model_fittings_class.parameters`` table, a single fit (second) is selected and stored in the ``model_parameters`` variable. The fitting time (i.e. the time that the fitted shock is observed) can be found from the ``model_parameters.name`` value. Before constructing the ellipsoid geometrical model the center of the model has to be defined. This can be done using SunPy's ``SkyCoord``. The coordinates of the ellipsoid center are the ``hgln``, ``hglt``, and ``rcenter`` variables in the ``model_parameters``. These coordinates are in the Heliographic Stonyhurst coordinate system. The ellipsoid can be constructed from the center and the three geometrical parameters ``radaxis``, ``orthoaxis1``, ``orthoaxis2``, and ``tilt`` are also variables in the ``model_parameters``. Parameters with angular values are in degrees and length values are stored in solar radii.
+
+Process Kinematics
+------------------
+
+An important aspect of the 3D reconstruction process is to determine and visualize the kinematics of the geometrical model fitted on the images. Using the results from the JSON fitting file and also using the ``plot_fitting_model`` function which is part of the utilities, the users can visualize the kinematics of the model.
+
+The JSON files provide the curve fitting method parameters that have been selected by the users during the fitting in the application. However, the kinematic plots can be processed with any selected curve fitting method parameters that can also be manualy passed in the function. The example code below shows how to plot the kinematics with the user defined parameters stored in the JSON file.
+
+.. code-block:: python
+
+    >>> from datetime import datetime
+    >>> import matplotlib.dates as mdates
+    >>> import matplotlib.pyplot as plt
+    >>> from IPython.display import display
+    >>> from PyThea.data.sample_data import json_fitting_file_sample_data
+    >>> from PyThea.utils import model_fittings, plot_fitting_model
+
+    >>> json_fitting_file = json_fitting_file_sample_data.fetch('FLX1p0D20211028T153500MEllipsoid.json')
+    >>> model_fittings_class = model_fittings.load_from_json(json_fitting_file)
+
+    >>> fig, axis = plot_fitting_model(model_fittings_class,
+    ...                                fit_args=model_fittings_class.kinematics['fit_method'],
+    ...                                plt_type='HeightT')
+    >>> axis.set_xlim([datetime(2021, 10, 28, 15, 40, 0), datetime(2021, 10, 28, 16, 40, 0)])
+    >>> axis.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=range(60), interval=1))
+    >>> plt.show()
+
+The code loads first the sample JSON file and imports the fitting parameters into the ``model_fittings_class`` as shown previously. Then using the ``plot_fitting_model`` function makes a figure of the kinematics. The ``plot_fitting_model`` function requires three main arguments, first the fitting parameters loaded from the JSON file, the curve fitting method parameters, and the plot type. The curve fitting method parameters is a dictionary that defines the method (``type``) of the fitting, i.e. ``polynomial``, ``spline``, or ``custom``, and the ``order`` (e.g. linear fit for order of one). The curve fitting method parameters that are stored in the JSON file are loaded in the ``model_fittings_class.kinematics["fit_method"]`` and the dictionary is the following,
+
+.. code-block:: python
+
+    >>> print(f'Fitting Parameters: {model_fittings_class.kinematics["fit_method"]}')
+
+ Fitting Parameters: {'type': 'polynomial', 'order': 2}
+
+In the example code above, a second-order polynomial is fitted to the height/length-time parameters.
+
+The plot type (``plt_type``) can be selected among three different options: ``HeightT`` which plots the height/length time profile, ``SpeedT`` which plots the speed time profile, and ``AccelerationT`` which plots the acceleration time profile. The speed and time profiles are calculated from the derivative of the fitted curve to the height/length time profile. An example of these plots can be found in the 'Gallery of Examples'.
+
+The manual fitting process
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Instead of using the curve fitting method parameters from the JSON file, the user can also define a new set of parameters. This can be done by making a new dictionary with the curve-fitting method parameters. For example, the dictionary below defines a fitting with the spline method, of order two, and a smoothing parameter of 0.5.
+
+.. code-block:: python
+
+    >>> fit_method = {'type': 'spline', 'order': 2, 'smooth': 0.5}
+
+The fitting method (e.g. 'type') can be polynomial, spline, or custom (e.g. a custom-defined function).
+
+Then the user can plot the results using the ``plot_fitting_model`` function as shown above, for example:
+
+.. code-block:: python
+
+    >>> fig, axis = plot_fitting_model(model_fittings_class,
+    ...                             fit_args=fit_method,
+    ...                             plt_type='HeightT')
+    >>> axis.set_xlim([datetime(2021, 10, 28, 15, 40, 0), datetime(2021, 10, 28, 16, 40, 0)])
+    >>> axis.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=range(60), interval=1))
+    >>> plt.show()
