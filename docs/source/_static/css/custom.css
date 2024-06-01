@@ -1,0 +1,11 @@
+@import url("theme.css");
+
+code.literal {
+  font-size: 90%;
+  border: none;
+  padding: .1rem .25rem;
+  background-color: inherit;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
+}
