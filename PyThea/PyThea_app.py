@@ -209,7 +209,8 @@ def run():
                                                     on_change=delete_from_state,
                                                     kwargs={'vars': ['map', 'imagers_list_', 'clim', 'clim_manual_low', 'clim_manual_high']})
         if image_mode in ['Running Diff.', 'Base Diff.']:
-            diff_value = procoption_container.number_input('Select Step/Image for Running/Base Diff.', 1, 5, key='diff_value',
+            min_diff = 1 if image_mode == 'Running Diff.' else 0
+            diff_value = procoption_container.number_input('Select Step/Image for Running/Base Diff.', min_diff, 5, key='diff_value',
                                                            on_change=delete_from_state,
                                                            kwargs={'vars': ['map', 'imagers_list_', 'clim', 'clim_manual_low', 'clim_manual_high']})
         else:

@@ -48,7 +48,7 @@ def maps_sequence_processing(map_sequence, **kwargs):
 
     smap = []
     if seq_type == 'Running Diff.':
-        for i in range(1+diff_num, len(map_sequence)):
+        for i in range(diff_num, len(map_sequence)):
             smap_diff = difference_maps(map_sequence[i], map_sequence[i-diff_num])
             smap.append(smap_diff)
     if seq_type == 'Base Diff.':
