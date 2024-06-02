@@ -92,7 +92,10 @@ def run():
     #############################################################
     # set page config
     st.set_page_config(page_title='PyThea', page_icon=':rocket:',
-                       initial_sidebar_state='expanded')
+                       initial_sidebar_state='expanded',
+                       menu_items={
+                           'Get Help': 'https://www.pythea.org/',
+                           'Report a Bug': 'https://github.com/AthKouloumvakos/PyThea'})
 
     #############################################################
     # HTML Styles
@@ -100,7 +103,7 @@ def run():
 
     #############################################################
     # Main page information text
-    st.title('PyThea: Reconstruct CMEs & Shocks')
+    st.header('PyThea: Reconstruct CMEs & Shocks')
 
     #############################################################
     # Startup Variables

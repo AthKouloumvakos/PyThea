@@ -1,9 +1,4 @@
 def apply(st):
-    # Hide the menu button
-    st.markdown(""" <style>
-                #MainMenu {visibility: hidden;}
-                footer {visibility: hidden;}
-                </style> """, unsafe_allow_html=True)
     # Do some css styling tricks here (e.g. remove the padding)
     # https://discuss.streamlit.io/t/reduce-white-space-top-of-the-page/21737/3
     st.markdown("""
