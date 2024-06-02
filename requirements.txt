@@ -13,7 +13,6 @@ matplotlib
 seaborn
 streamlit
 Pillow
-stqdm
 lxml
 zeep
 drms

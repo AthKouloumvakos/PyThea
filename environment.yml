@@ -26,5 +26,4 @@ dependencies:
   - pip
   - pip:
       - pooch
-      - stqdm
       - jplephem

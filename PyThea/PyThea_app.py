@@ -23,7 +23,6 @@ from copy import copy
 
 import astropy.units as u
 import numpy as np
-import stqdm  # See also https://github.com/tqdm/tqdm
 import streamlit as st
 from astropy.coordinates import Distance, SkyCoord, SphericalRepresentation
 from sunpy.coordinates import frames
@@ -251,9 +250,9 @@ def run():
         st.session_state.map_ = {} if 'map_' not in st.session_state else st.session_state.map_
         st.session_state.map = {} if 'map' not in st.session_state else st.session_state.map
         st.session_state['imagers_list_'] = imagers_list
-        progress_bar = stqdm.stqdm(imager_added, desc='Preparing to Download data')
-        for imager in progress_bar:
-            progress_bar.desc = f'Downloaded {imager} images from VSO'
+        progress_bar = st.progress(0, text='Preparing to Download data')
+        for i, imager in enumerate(imager_added):
+            progress_bar.progress(i/len(imager_added), text=f'Download {imager} images from VSO')
             if imager not in st.session_state.map_:
                 timerange = a.Time(st.session_state.date_process + datetime.timedelta(hours=imaging_time_range[0]),
                                    st.session_state.date_process + datetime.timedelta(hours=imaging_time_range[1]))
@@ -272,6 +271,7 @@ def run():
             else:
                 st.session_state.imagers_list_.remove(imager)
                 st.session_state.map_colormap_limits.pop(imager, None)
+        progress_bar.empty()
 
     if imager_removed != []:
         st.session_state['imagers_list_'] = imagers_list
