@@ -199,6 +199,7 @@ def load_fits(files):
         for file_path in files:
             try:
                 map_ = sunpy.map.Map(file_path)
+                map_.meta['fits_file'] = os.path.basename(file_path)
                 maps_.append(map_)
             except RuntimeError as err:
                 print('Handling RuntimeError error:', err)
@@ -296,6 +297,9 @@ class model_fittings:
             # In version >0.11.0 more AIA channels added so this will update the fitting files
             # prodused at earlier versions by replasing the imager values from "AIA" to "AIA-193".
             parameters['imager'] = parameters['imager'].replace('AIA', 'AIA-193')
+            # In version >0.11.0 the fits file name is added to the single fits
+            if 'fits_file' not in parameters.columns:
+                parameters['fits_file'] = ''
 
         model_fittings_class = model_fittings(fitting['event_selected'],
                                               fitting['date_process'],

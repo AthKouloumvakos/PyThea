@@ -384,6 +384,7 @@ def run():
     # Store the fitting
     single_fit = model.to_dataframe()
     single_fit['imager'] = imager_select
+    single_fit['fits_file'] = running_map.meta['fits_file']
 
     if store_fit_button_pressed:
         if 'model_fittings' not in st.session_state:
