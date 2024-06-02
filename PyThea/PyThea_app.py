@@ -48,6 +48,13 @@ def delete_from_state(vars):
             del st.session_state[var]
 
 
+def highlight_row(row, row_index):
+    if row.name.strftime('%Y-%m-%dT%H:%M:%S.%f') == row_index.strftime('%Y-%m-%dT%H:%M:%S.%f').values[0]:
+        return ['background-color: lightpink']*len(row)
+    else:
+        return ['']*len(row)
+
+
 def footer_text():
     st.subheader('About this application:')
     st.markdown("""
@@ -401,10 +408,13 @@ def run():
         st.markdown('---')
         st.markdown('### Parameters Table')
         st.markdown('**Running Fitting Table:**')
-        st.dataframe(single_fit)
+        col_formats = {col: '{:,.2f}'.format for col in single_fit.select_dtypes(include='number').columns}
+        st.dataframe(single_fit.style.format(col_formats))
         if 'model_fittings' in st.session_state:
             st.markdown('**Stored Fitting Table:**')
-            st.dataframe(st.session_state.model_fittings.parameters)
+            st.dataframe(st.session_state.model_fittings.parameters.style.apply(highlight_row,
+                                                                                row_index=single_fit.index, axis=1).format(col_formats)
+                         )
             col1, col2 = st.columns((2, 2))
             col2.selectbox('Select a fitting',
                            options=st.session_state.model_fittings.parameters.index,
