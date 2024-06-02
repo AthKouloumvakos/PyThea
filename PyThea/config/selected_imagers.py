@@ -76,3 +76,7 @@ imager_dict['WISPR2'] = {'fido': (a.Instrument.wispr, a.Detector.outer),
 imager_dict['EUI-FSI'] = {'fido': (a.Instrument('EUI'), a.soar.Product('EUI-FSI174-IMAGE'), a.Level(2)),
                           'process': {'superpixel': 1},
                           'source': 'SOLO', 'instrument': 'EUI-FSI', 'wavelength': '174'}
+
+imager_dict['METIS'] = {'fido': (a.Instrument('METIS'), a.soar.Product('METIS-VL-TB'), a.Level(2)),
+                        'process': {'dimensions': (1024*u.pixel, 1024*u.pixel), 'superpixel': 2},
+                        'source': 'SOLO', 'instrument': 'METIS', 'detector': 'VLD', 'wavelength': 'TB'}

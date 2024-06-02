@@ -305,4 +305,6 @@ def maps_clims(images):
             return [14., 14.]
         elif images[1].detector == 'Inner':
             return [13., 13.]
+    if images[1].instrument == 'Metis':
+        return [12.80, 13.00]
     return [np.nanquantile(images[1].data, 0.20)-10, np.nanquantile(images[1].data, 0.80)+10]

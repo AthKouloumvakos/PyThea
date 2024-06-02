@@ -133,6 +133,9 @@ def make_figure(map, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):
     if map.instrument == 'WISPR':
         clim = [-10**-clim[0], 10**-clim[1]]
 
+    if map.instrument == 'Metis':
+        clim = [-10**-clim[0], 10**-clim[1]]
+
     if cmap == 'default':
         # TODO: For plain images or when EUVIA-B are used, this does not work very well.
         map.plot(norm=colors.Normalize(vmin=clim[0], vmax=clim[1]))
@@ -156,7 +159,8 @@ def make_figure(map, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):
 
     axis.set_title(re.sub(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}',
                           ' $T_{AGV}:$' + parse_time(map.date_average).strftime('%Y-%m-%d %H:%M:%S'),
-                          map.latex_name), fontsize=10, pad=8)
+                          map.latex_name.replace('VLD', 'METIS-VDL')),
+                   fontsize=10, pad=8)
 
     return fig, axis
 
@@ -340,6 +344,8 @@ def load_fits(files):
         for file_path in files:
             try:
                 map_ = sunpy.map.Map(file_path)
+                if isinstance(map_, list):  # Added because of METIS
+                    map_ = map_[0]
                 map_.meta['fits_file'] = os.path.basename(file_path)
                 maps_.append(map_)
             except RuntimeError as err:
