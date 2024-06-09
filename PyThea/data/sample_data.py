@@ -30,6 +30,6 @@ json_fitting_file_sample_data = pooch.create(
     path=os.path.join(database_dir, 'sample_data'),  # The cache folder
     base_url=f'{github_main_url}/raw/main/data/',  # The remote data url on Github
     registry={
-        'FLX1p0D20211028T153500MEllipsoid.json': 'sha256:700687ed982317400ec409390571747694237de9688a2816baa7b1770b75c9b1',
+        'FLX1p0D20211028T153500MEllipsoid.json': 'sha256:34fced8530875110117ba27a73541d3acd0c90bc8fca99367c1ec4cdfc05ce86',
     },
 )

@@ -1,4 +1,29 @@
-# v0.11.0 (17-April-2024)
+# v0.12.0 (09-Jun-2024)
+
+## Features
+ - Adds more imaging data from SDO/AIA.
+ - Adds acceleration calculation in the kinematic plots.
+ - Implements acceleration plotting in the app.
+ - Includes fits file name in fitting files and dataframes.
+ - Highlights a row in the fitting table when fitting exist in table.
+
+## Major Changes
+ - Decouples the loading of fits files from download_fits function.
+
+## Minor Changes
+ - Improves configuration dictionary for selected imagers.
+ - Improves json warning message in the main app page.
+ - Adds documentation page link to the main app page.
+ - Updates README files.
+ - Improves plot_fitting_model and adds figure test.
+ - Improves application layout.
+
+## Bug Fixes
+ - Fixes a potential bug in filter_maps when no filtering is applied.
+ - Fixes a bug with progress bar with stqdm.
+ - Fixes a bug with image processing mode selection.
+
+# v0.11.0 (19-May-2024)
 
 ## Features
  - Adds tests for ellipsoid location on AIA and STEREO COR images.
