@@ -114,7 +114,7 @@ PyThea's utilities can also be used to plot the imaging data from the processed_
 
     >>> from PyThea.utils import make_figure
 
-    >>> fig, ax = make_figure(processed_images[0], 'Running Diff.', clim=[-20, 20], clip_model=True)
+    >>> fig, ax = make_figure(processed_images[0], cmap='Greys_r', clim=[-20, 20], clip_model=True)
     >>> plt.show()
 
 Using the ``clim`` keyword argument the user can provide the values of the colormaps limits for the image ploting. This can improve the image contrast and therefore the visibility of the different features. Additionally, the user can select if the figure will be clipped at the image limits using the ``clip_model`` function. This is particularly useful when there is an overplot of the geometrical model and the model lies outside of the image axis. The user can also provide a custom figure and axis handle using the ``fig`` and ``axis`` keyword arguments.
@@ -137,7 +137,7 @@ To over-plot a geometrical model to an image, the user can either construct the 
                           obstime=obstime,
                           observer='earth', frame=frames.HeliographicStonyhurst)
     >>> model_shock = ellipsoid(center, 3.273576*u.R_sun, 3.4432*u.R_sun, 4.414359*u.R_sun, 0 * u.degree)
-    >>> fig, ax = make_figure(processed_images[0], 'Running Diff.', clim=[-20, 20], clip_model=True)
+    >>> fig, ax = make_figure(processed_images[0], cmap='Greys_r', clim=[-20, 20], clip_model=True)
     >>> model_shock.plot(ax, mode='Full')
     >>> plt.show()
 

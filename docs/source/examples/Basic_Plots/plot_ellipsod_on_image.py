@@ -78,7 +78,7 @@ model_shock = ellipsoid(center,
 # %%
 # Plot the first image using the ``make_figure`` utility and over-plot at the same axis the ellipsoid model.
 
-fig, ax = make_figure(processed_images[0], 'Running Diff.', clim=[-20, 20], clip_model=True)
+fig, ax = make_figure(processed_images[0], cmap='Greys_r', clim=[-20, 20], clip_model=True)
 model_shock.plot(ax, mode='Full')
 
 plt.show()

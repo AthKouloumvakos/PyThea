@@ -82,21 +82,22 @@ def get_hek_flare(day):
     return selectbox_list, flare_list_
 
 
-def make_figure(map, image_mode, clim=[-20, 20], clip_model=True, **kwargs):
+def make_figure(map, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):
     '''
     Makes the main imager figure and returns the figure and axis handle.
     '''
     fig = kwargs.get('fig', plt.figure())
     axis = kwargs.get('axis', plt.subplot(projection=map))
 
-    if image_mode == 'Plain':
+    median_filter_value = kwargs.get('median_filter', 1)
+    if median_filter_value != 1:
+        map = sunpy.map.Map(median_filter(map.data, size=int(median_filter_value)), map.meta)
+
+    if cmap == 'default':
         # TODO: For plain images or when EUVIA-B are used, this does not work very well.
         map.plot(norm=colors.Normalize(vmin=clim[0], vmax=clim[1]))
     else:
-        median_filter_value = kwargs.get('median_filter', 1)
-        if median_filter_value != 1:
-            map = sunpy.map.Map(median_filter(map.data, size=int(median_filter_value)), map.meta)
-        map.plot(cmap='Greys_r',
+        map.plot(cmap=cmap,
                  norm=colors.Normalize(vmin=clim[0], vmax=clim[1]))
 
     map.draw_limb(resolution=90)

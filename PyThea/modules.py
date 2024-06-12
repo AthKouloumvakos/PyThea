@@ -185,8 +185,10 @@ def final_parameters_gmodel(st):
 
 
 def figure_streamlit(st, running_map, image_mode, imager, model):
-
-    fig, axis = make_figure(running_map, image_mode,
+    if image_mode == 'Plain':
+        cmap = 'default'
+    fig, axis = make_figure(running_map,
+                            cmap=cmap,
                             clim=st.session_state.map_colormap_limits[imager],
                             clip_model=st.session_state.clip_model,
                             median_filter=st.session_state.images_median_filter)

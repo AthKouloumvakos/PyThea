@@ -42,6 +42,6 @@ processed_images = single_imager_maps_process(maps,
 # %%
 # Plot the first image using the ``make_figure`` utility.
 
-fig, ax = make_figure(processed_images[0], 'Running Diff.', clim=[-20, 20], clip_model=True)
+fig, ax = make_figure(processed_images[0], cmap='Greys_r', clim=[-20, 20], clip_model=True)
 
 plt.show()
