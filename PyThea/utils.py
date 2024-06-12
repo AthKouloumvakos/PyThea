@@ -59,28 +59,36 @@ from PyThea.version import version
 database_dir = os.path.join(Path.home(), 'PyThea')
 
 
-def get_hek_flare(day):
+def get_hek_flare(timerange, thresshold='B1.0'):
     '''
-    Returns from HEK the flare list for a given day
+    Returns the flare list for a given day from HEK.
+
+    This function will download the flare data from HEK and return a list of flares.
+
+    Parameters
+    ----------
+    timerange: sunpy.net.attrs.Time
+        The time range of the data search.
+
+    thresshold: str, optional
+        The flare class above which the search will return records (default: 'B1.0').
+
+    Returns
+    -------
+    parfive.Results
     '''
-    flare_list = Fido.search(a.Time(day, day + datetime.timedelta(days=1)),
+    flare_list = Fido.search(timerange,
                              a.hek.EventType('FL'),
-                             a.hek.FL.GOESCls > 'B1.0',
+                             a.hek.FL.GOESCls > thresshold,
                              a.hek.OBS.Observatory == 'GOES')
     if len(flare_list['hek']) == 0:
-        selectbox_list = ['No events returned', ]
         flare_list_ = []
     else:
         flare_list_ = flare_list['hek']['event_starttime', 'event_peaktime',
                                         'event_endtime', 'fl_goescls',
                                         'fl_peakflux', 'hgs_x', 'hgs_y', 'ar_noaanum']
-        selectbox_list = []
-        for flares in flare_list_:
-            fl_ = flares['fl_goescls']
-            t_ = flares['event_peaktime'].strftime('%Y-%m-%dT%H:%M:%S')
-            selectbox_list.append((f'FL{fl_}|{t_}'))
 
-    return selectbox_list, flare_list_
+    return flare_list_
 
 
 def make_figure(map, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):

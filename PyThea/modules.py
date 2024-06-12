@@ -21,6 +21,7 @@
 import datetime
 
 import astropy.units as u
+from sunpy.net import attrs as a
 
 from PyThea.callbacks import change_fitting_sliders, change_long_lat_sliders
 from PyThea.config.config_sliders import sliders_dict as sd
@@ -39,7 +40,17 @@ def date_and_event_selection(st):
     initialisation = col2.select_slider('How to initialise?',
                                         options=('Manual', 'Event', 'File'), value='Event')
     if initialisation == 'Event':
-        selectbox_list, flare_list_ = get_hek_flare(day)
+        timerange = a.Time(day, day + datetime.timedelta(days=1))
+        flare_list_ = get_hek_flare(timerange)
+        if len(flare_list_) == 0:
+            selectbox_list = ['No events returned', ]
+        else:
+            selectbox_list = []
+            for flares in flare_list_:
+                fl_ = flares['fl_goescls']
+                t_ = flares['event_peaktime'].strftime('%Y-%m-%dT%H:%M:%S')
+                selectbox_list.append((f'FL{fl_}|{t_}'))
+
         selectbox_list.insert(0, 'Select event')
         event_selected = st.sidebar.selectbox('Solar Events', options=selectbox_list)
         if event_selected != 'Select event' and event_selected != 'No events returned':
@@ -185,8 +196,8 @@ def final_parameters_gmodel(st):
 
 
 def figure_streamlit(st, running_map, image_mode, imager, model):
-    if image_mode == 'Plain':
-        cmap = 'default'
+    cmap = 'default' if image_mode == 'Plain' else 'Greys_r'
+
     fig, axis = make_figure(running_map,
                             cmap=cmap,
                             clim=st.session_state.map_colormap_limits[imager],

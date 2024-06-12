@@ -3,13 +3,14 @@ Test the utilities
 """
 
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import matplotlib.dates as mdates
 from astropy.coordinates import SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
 from sunpy.coordinates import get_horizons_coord
 from sunpy.coordinates.frames import HeliographicStonyhurst
+from sunpy.net import attrs as a
 from sunpy.net import hek
 
 from PyThea.config.selected_bodies import bodies_dict
@@ -21,14 +22,31 @@ def test_get_hek_flare():
     """
     Test that the get_hek_flare returns a hek.hek.HEKTable and the results are formated correct.
     """
+    def make_selectbox_list(fl_list):
+        if len(fl_list) == 0:
+            selectbox_list = ['No events returned', ]
+        else:
+            selectbox_list = []
+            for flares in fl_list:
+                fl_ = flares['fl_goescls']
+                t_ = flares['event_peaktime'].strftime('%Y-%m-%dT%H:%M:%S')
+                selectbox_list.append((f'FL{fl_}|{t_}'))
+        return selectbox_list
+
     # This test requests the flare info for a date that returns a list of flares and compares against previous results
-    selectbox_list, flare_list = get_hek_flare(datetime(2017, 9, 10, 0, 0, 0))
+    day = datetime(2017, 9, 10, 0, 0, 0)
+    timerange = a.Time(day, day + timedelta(days=1))
+    flare_list = get_hek_flare(timerange)
     assert type(flare_list) == hek.hek.HEKTable
+    selectbox_list = make_selectbox_list(flare_list)
     assert selectbox_list == ['FLM1.1|2017-09-09T23:53:00', 'FLC9.0|2017-09-10T03:09:00', 'FLC2.9|2017-09-10T09:20:00',
                               'FLC1.6|2017-09-10T14:23:00', 'FLC1.0|2017-09-10T15:26:00', 'FLX8.2|2017-09-10T16:06:00']
 
     # This test requests the flare info for a date that returns an empty list
-    selectbox_list, flare_list = get_hek_flare(datetime(2030, 9, 10, 0, 0, 0))
+    day = datetime(2030, 9, 10, 0, 0, 0)
+    timerange = a.Time(day, day + timedelta(days=1))
+    flare_list = get_hek_flare(timerange)
+    selectbox_list = make_selectbox_list(flare_list)
     assert flare_list == []
     assert selectbox_list == ['No events returned']
 
