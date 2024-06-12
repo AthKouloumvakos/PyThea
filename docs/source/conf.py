@@ -91,6 +91,8 @@ sphinx_gallery_conf = {
     'nested_sections': False
 }
 
+autosummary_generate = True
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -115,7 +117,10 @@ html_theme_options = {
 nitpicky = True
 nitpick_ignore = [('py:class', "Unit('deg')"),
                   ('py:class', "Unit('m')"),
-                  ('py:class', "Unit('rad')")]
+                  ('py:class', "Unit('rad')"),
+                  ('py:class', 'optional'),
+                  ('py:class', 'keyword-only')
+                  ]
 
 intersphinx_mapping = {'python': ('https://docs.python.org/3/', None),
                        'xarray': ('https://xarray.pydata.org/en/stable/', None),
@@ -124,7 +129,8 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3/', None),
                        'sunpy': ('https://docs.sunpy.org/en/stable/', None),
                        'matplotlib': ('https://matplotlib.org/stable/', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),
-                       'pandas': ('http://pandas.pydata.org/pandas-docs/dev', None)
+                       'pandas': ('http://pandas.pydata.org/pandas-docs/dev', None),
+                       'parfive': ('https://parfive.readthedocs.io/en/stable/', None)
                        }
 
 # default_role = 'any'

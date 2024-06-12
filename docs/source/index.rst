@@ -93,3 +93,9 @@ In Greek mythology, Thea, also called Euryphaessa "wide-shining", is the Titanes
    :maxdepth: 1
 
    _examples/index.rst
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Reference:
+
+   reference.rst

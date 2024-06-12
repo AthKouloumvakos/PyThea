@@ -69,6 +69,8 @@ def get_hek_flare(timerange, thresshold='B1.0'):
     ----------
     timerange: sunpy.net.attrs.Time
         The time range of the data search.
+    thresshold: str
+        The flare class above which to do the search (default 'B1.0').
 
     thresshold: str, optional
         The flare class above which the search will return records (default: 'B1.0').
