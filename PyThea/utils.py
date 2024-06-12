@@ -36,7 +36,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import sunpy.map
-from astropy.coordinates import SkyCoord
+from astropy.coordinates import Distance, SkyCoord, SphericalRepresentation
 from astropy.visualization.wcsaxes.wcsapi import wcsapi_to_celestial_frame
 from scipy.interpolate import UnivariateSpline
 from scipy.ndimage import median_filter
@@ -50,6 +50,7 @@ from sunpy.visualization import drawing
 
 from PyThea.config.selected_bodies import bodies_dict
 from PyThea.config.selected_imagers import imager_dict
+from PyThea.geometrical_models import ellipsoid, gcs, spheroid
 from PyThea.sunpy_dev.map.maputils import (filter_maps,
                                            maps_sequence_processing,
                                            prepare_maps)
@@ -313,6 +314,41 @@ class model_fittings:
     def model_id(self):
         str_id = self.event_selected.replace('-', '').replace(':', '').replace('|', 'D').replace('.', 'p') + 'M' + self.geometrical_model
         return str_id
+
+    def get_geomertical_model(self, index):
+        if isinstance(index, int):
+            model_parameters = self.parameters.iloc[index]
+        elif isinstance(index, str):
+            model_parameters = self.parameters.loc[index]
+
+        obstime = model_parameters.name
+
+        Spher_rep = SphericalRepresentation(model_parameters['hgln']*u.degree,
+                                            model_parameters['hglt']*u.degree,
+                                            Distance(np.abs(model_parameters['rcenter']*u.R_sun)))
+        center = SkyCoord(np.sign(model_parameters['rcenter']*u.R_sun) * Spher_rep.to_cartesian(),
+                          frame=frames.HeliographicStonyhurst,
+                          observer='earth',
+                          obstime=obstime)
+
+        if self.geometrical_model == 'Spheroid':
+            model_shock = spheroid(center,
+                                   model_parameters['radaxis']*u.R_sun,
+                                   model_parameters['orthoaxis1']*u.R_sun)
+        elif self.geometrical_model == 'Ellipsoid':
+            model_shock = ellipsoid(center,
+                                    model_parameters['radaxis']*u.R_sun,
+                                    model_parameters['orthoaxis1']*u.R_sun,
+                                    model_parameters['orthoaxis2']*u.R_sun,
+                                    model_parameters['tilt']*u.degree)
+        elif self.geometrical_model == 'GCS':
+            model_shock = gcs(center,
+                              model_parameters['height']*u.R_sun,
+                              model_parameters['alpha']*u.degree,
+                              model_parameters['kappa'],
+                              model_parameters['tilt']*u.degree)
+
+        return model_shock
 
     def to_dict(self):
         parameters = copy(self.parameters)
