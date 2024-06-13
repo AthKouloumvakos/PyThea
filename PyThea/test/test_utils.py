@@ -5,6 +5,7 @@ Test the utilities
 import json
 from datetime import datetime, timedelta
 
+import astropy.units as u
 import matplotlib.dates as mdates
 from astropy.coordinates import SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
@@ -14,8 +15,11 @@ from sunpy.net import attrs as a
 from sunpy.net import hek
 
 from PyThea.config.selected_bodies import bodies_dict
-from PyThea.data.sample_data import json_fitting_file_sample_data
-from PyThea.utils import get_hek_flare, model_fittings, parameter_fit
+from PyThea.config.selected_imagers import imager_dict
+from PyThea.data.sample_data import (json_fitting_file_sample_data,
+                                     stereo_sample_data)
+from PyThea.utils import (get_hek_flare, load_fits, maps_process,
+                          model_fittings, parameter_fit)
 
 
 def test_get_hek_flare():
@@ -138,3 +142,13 @@ def test_parameter_fit_polynomial():
 
     fit = parameter_fit(x, y, {'type': 'polynomial', 'order': 2})
     assert_quantity_allclose([fit['popt'][0], fit['popt'][1]*xx[1], fit['popt'][2]], [0, 2, 0], atol=1e-5)
+
+
+def test_maps_process():
+    sta_cor2 = load_fits([stereo_sample_data.fetch('20120622_235400_d4c2a.fts')])
+    stb_cor2 = load_fits([stereo_sample_data.fetch('20140221_235400_d4c2b.fts')])
+    maps, _ = maps_process({'COR2A': [sta_cor2], 'COR2B': [stb_cor2]}, ['COR2A', 'COR2B'], 'Plain')
+    for key in maps.keys():
+        assert_quantity_allclose(maps[key][0].exposure_time, 1*u.second)
+        assert_quantity_allclose([maps[key][0].dimensions[0], maps[key][0].dimensions[1]],
+                                 [d/imager_dict[key]['process']['superpixel'] for d in imager_dict[key]['process']['dimensions']])
