@@ -48,15 +48,15 @@ from sunpy.net import attrs as a
 from sunpy.time import parse_time
 from sunpy.visualization import drawing
 
-from PyThea.config.selected_bodies import bodies_dict
-from PyThea.config.selected_imagers import imager_dict
+from PyThea.config.selected_bodies import bodies_dict as bodies_dict_default
+from PyThea.config.selected_imagers import imager_dict as imager_dict_default
 from PyThea.geometrical_models import ellipsoid, gcs, spheroid
 from PyThea.sunpy_dev.map.maputils import (filter_maps,
                                            maps_sequence_processing,
                                            prepare_maps)
 from PyThea.version import version
 
-database_dir = os.path.join(Path.home(), 'PyThea')
+database_dir_default = os.path.join(Path.home(), 'PyThea')
 
 
 def get_hek_flare(timerange, thresshold='B1.0'):
@@ -133,10 +133,27 @@ def make_figure(map, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):
     return fig, axis
 
 
-def plot_bodies(axis, bodies_list, smap):
-    '''
-    Plots in the images the possition of the pre-configured bodies (Earth, STA, Venus etc.)
-    '''
+def plot_bodies(axis, bodies_list, smap, bodies_dict=bodies_dict_default):
+    """
+    Plots the positions of pre-configured bodies (e.g., Earth, STA, Venus) on the given axis.
+
+    Parameters
+    ----------
+    axis : matplotlib.axes._subplots.AxesSubplot
+        The matplotlib axis to plot on.
+    bodies_list : list
+        A list of bodies to be plotted.
+    smap : sunpy.map.Map
+        The SunPy map object containing the data.
+    bodies_dict : dict
+        A dictionary where keys are body names and values are tuples containing
+        the body ID for Horizons coordinates and the color for plotting.
+        The default bodies_dict is from PyThea.config.selected_bodies import bodies_dict
+
+    Returns
+    -------
+    None
+    """
     for body in bodies_list:
         body_coo = get_horizons_coord(bodies_dict[body][0], smap.date_average)
         if contains_coordinate(smap, body_coo):
@@ -144,7 +161,7 @@ def plot_bodies(axis, bodies_list, smap):
                             fillstyle='none', markersize=6, label=body)
 
 
-def plot_solar_reference_lines(axis, bodies_list, smap, mode='Limb from Obs.'):
+def plot_solar_reference_lines(axis, bodies_list, smap, mode='Limb from Obs.', bodies_dict=bodies_dict_default):
     '''
     Plots solar reference lines (e.g. solar limb, central meridians, equator) in wcs axis.
     '''
@@ -180,19 +197,46 @@ def plot_solar_reference_lines(axis, bodies_list, smap, mode='Limb from Obs.'):
         smap.draw_grid(linewidth=1, color='red', system='carrington', alpha=0.8)
 
 
-def download_fits(timerange, imager):
-    '''
-    Downloads the imaging data (fits files) from VSO
-    '''
+def download_fits(timerange, imager, imager_dict=imager_dict_default, database_dir=database_dir_default):
+    """
+    Downloads the imaging data (FITS files) from the Virtual Solar Observatory (VSO).
+
+    Parameters
+    ----------
+    timerange : sunpy.net.attrs.Time
+        The time range of the data search.
+    imager : str
+        The name of the imager (e.g., 'AIA', 'HMI').
+    imager_dict : dict
+        A dictionary containing imager properties where keys are imager names and
+        values are dictionaries with properties including 'fido', 'source', 'instrument',
+        'detector' (optional), and 'wavelength' (optional). The default imager_dict is the
+        from PyThea.config.selected_imagers import imager_dict
+    database_dir : str
+        The base directory where the data will be saved.
+        The default database_dir is os.path.join(Path.home(), 'PyThea')
+
+    Returns
+    -------
+    list
+        A list of downloaded FITS file paths.
+    """
     imager_prop = imager_dict[imager]
     result = Fido.search(timerange, *imager_prop['fido'])
     print(result)
+
     if result:
         if 'detector' in imager_prop:
             sub_path = imager_prop['detector']
         elif 'wavelength' in imager_prop:
             sub_path = imager_prop['wavelength']
-        path_str = f'{database_dir}/data/{imager_prop["source"]}/{imager_prop["instrument"]}/{sub_path}'+'/{file}'
+        else:
+            sub_path = ''
+
+        if sub_path:
+            path_str = f'{database_dir}/data/{imager_prop["source"]}/{imager_prop["instrument"]}/{sub_path}' + '/{file}'
+        else:
+            path_str = f'{database_dir}/data/{imager_prop["source"]}/{imager_prop["instrument"]}' + '/{file}'
         downloaded_files = Fido.fetch(result, path=path_str)
     else:
         downloaded_files = []
@@ -201,10 +245,21 @@ def download_fits(timerange, imager):
 
 
 def load_fits(files):
-    '''
-    Loads the imaging data (fits files) from a list of files.
-    '''
+    """
+    Loads imaging data (FITS files) from a list of files and returns them as SunPy map objects.
+
+    Parameters
+    ----------
+    files : list
+        A list of file paths to the FITS files.
+
+    Returns
+    -------
+    sunpy.map.Map or list of sunpy.map.Map
+        A SunPy map sequence if multiple maps are loaded, or a single SunPy map if only one map is loaded.
+    """
     maps_ = []
+
     if files:
         for file_path in files:
             try:
@@ -217,26 +272,45 @@ def load_fits(files):
                 print('Handling OSError error:', err)
                 os.remove(file_path)
                 print(f"File '{file_path}' has been removed.")
+
         if maps_:
-            maps_ = sunpy.map.Map(maps_, sequence=True)
+            maps_ = sunpy.map.Map(maps_, sequence=True) if len(maps_) > 1 else maps_[0]
+
     return maps_
 
 
 def maps_process(maps_dict_in, imagers_list_in, image_mode, **kwargs):
     '''
-    Process the images for the selected imagers and return the final maps and the list of imagers loaded.
+    Parameters
+    ----------
+    maps_dict_in : dict
+        Dictionary of input maps, where keys are imager names and values are lists of maps.
+    imagers_list_in : list
+        List of imagers to process.
+    image_mode : str
+        The mode in which to process the images.
+    **kwargs : dict, optional
+        Additional processing settings for specific imagers.
 
-    Note
-    ----
-    Here the maps_dict_in is the session_state.map_ when used from the application.
+    Returns
+    -------
+    dict
+        Dictionary of processed maps, where keys are imager names and values are lists of processed maps.
+    list
+        List of imagers that were successfully processed and have output maps.
+
+    Notes
+    -----
+    The `maps_dict_in` is the `session_state.map_` when used from the application.
+    """
     '''
     maps_dict_out = {}
     imagers_list_out = []
 
     for imager in imagers_list_in:
-        if imager in maps_dict_in and maps_dict_in[imager] != []:
+        if imager in maps_dict_in and maps_dict_in[imager]:
             if not kwargs:
-                extras = imager_dict[imager]['process']
+                extras = imager_dict_default[imager]['process']
             else:
                 if imager in kwargs:
                     extras = kwargs[imager]
@@ -245,17 +319,34 @@ def maps_process(maps_dict_in, imagers_list_in, image_mode, **kwargs):
             maps_dict_out[imager] = single_imager_maps_process(maps_dict_in[imager],
                                                                image_mode=image_mode,
                                                                **extras)
-            if maps_dict_out[imager] != []:
+            if maps_dict_out[imager]:
                 imagers_list_out.append(imager)
 
     return maps_dict_out, imagers_list_out
 
 
 def single_imager_maps_process(map_list, skip=None, **kwargs):
-    '''
-    Process the images for a single imager and return the final maps.
-    '''
+    """
+    Processes the images for a single imager and returns the final maps after applying specified operations.
 
+    Parameters
+    ----------
+    map_list : list
+        List of maps to be processed.
+    skip : str or None, optional
+        Operations to skip during processing (default is None).
+    **kwargs : dict
+        Additional keyword arguments for processing operations.
+
+    Returns
+    -------
+    list
+        List of processed maps after applying the specified operations.
+
+    Notes
+    -----
+    Operations can be skipped by specifying them in `skip`, e.g., 'filter', 'prepare', 'sequence_processing'.
+    """
     if 'filter' not in str(skip or ''):
         map_list = filter_maps(map_list, **kwargs)
 
