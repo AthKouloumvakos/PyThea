@@ -60,7 +60,7 @@ database_dir_default = os.path.join(Path.home(), 'PyThea')
 
 
 def get_hek_flare(timerange, thresshold='B1.0'):
-    '''
+    """
     Returns the flare list for a given day from HEK.
 
     This function will download the flare data from HEK and return a list of flares.
@@ -76,7 +76,7 @@ def get_hek_flare(timerange, thresshold='B1.0'):
     Returns
     -------
     parfive.Results
-    '''
+    """
     flare_list = Fido.search(timerange,
                              a.hek.EventType('FL'),
                              a.hek.FL.GOESCls > thresshold,
@@ -92,9 +92,35 @@ def get_hek_flare(timerange, thresshold='B1.0'):
 
 
 def make_figure(map, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):
-    '''
-    Makes the main imager figure and returns the figure and axis handle.
-    '''
+    """
+    Creates the main imager figure and returns the figure and axis handles.
+
+    Parameters
+    ----------
+    map : sunpy.map.Map
+        The SunPy map to be plotted.
+    cmap : str, optional
+        The colormap to be used for the plot (default is 'Greys_r').
+    clim : list, optional
+        The color limits for the plot as [min, max] (default is [-20, 20]).
+    clip_model : bool, optional
+        Whether to clip the axis limits to the map's data shape (default is True).
+    **kwargs : dict
+        Additional keyword arguments for customization, including:
+            - fig: The figure object (default creates a new figure).
+            - axis: The axis object (default creates a new axis with the map's projection).
+            - median_filter: The size of the median filter to apply (default is 1, which means no filtering).
+
+    Returns
+    -------
+    tuple
+        The figure and axis handles.
+
+    Notes
+    -----
+    This function customizes the plot by optionally applying a median filter,
+    setting color limits, drawing the solar limb, and adjusting axis properties.
+    """
     fig = kwargs.get('fig', plt.figure())
     axis = kwargs.get('axis', plt.subplot(projection=map))
 
@@ -106,8 +132,7 @@ def make_figure(map, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):
         # TODO: For plain images or when EUVIA-B are used, this does not work very well.
         map.plot(norm=colors.Normalize(vmin=clim[0], vmax=clim[1]))
     else:
-        map.plot(cmap=cmap,
-                 norm=colors.Normalize(vmin=clim[0], vmax=clim[1]))
+        map.plot(cmap=cmap, norm=colors.Normalize(vmin=clim[0], vmax=clim[1]))
 
     map.draw_limb(resolution=90)
 
@@ -118,8 +143,6 @@ def make_figure(map, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):
         axis.set_xlim([0, map.data.shape[0]])
         axis.set_ylim([0, map.data.shape[1]])
 
-    # TODO: When LASCO maps have crota \ne 0 the image is reversed so north is down.
-    # This is a temporary fix. The best is to derotate the images from the begining.
     cref = map.pixel_to_world(0*u.pix, 0*u.pix)
     if cref.Tx > 0:
         axis.invert_xaxis()
@@ -162,9 +185,29 @@ def plot_bodies(axis, bodies_list, smap, bodies_dict=bodies_dict_default):
 
 
 def plot_solar_reference_lines(axis, bodies_list, smap, mode='Limb from Obs.', bodies_dict=bodies_dict_default):
-    '''
-    Plots solar reference lines (e.g. solar limb, central meridians, equator) in wcs axis.
-    '''
+    """
+    Plots solar reference lines (e.g., solar limb, central meridians, equator) on a WCS axis.
+
+    Parameters
+    ----------
+    axis : matplotlib.axes.Axes
+        The axis to plot on.
+    bodies_list : list
+        List of bodies to plot reference lines for (e.g., 'Earth', 'Venus').
+    smap : sunpy.map.Map
+        The SunPy map for which the reference lines are plotted.
+    mode : str, optional
+        The mode of reference lines to plot. Options are 'Limb from Obs.', 'Central Meridian from Obs.',
+        'Carr. Prime Meridian+Solar Equator', 'Stonyhurst Grid', 'Carrington Grid' (default is 'Limb from Obs.').
+    bodies_dict : dict, optional
+        Dictionary containing body names as keys and tuples of (body ID, color) as values.
+        Default is `bodies_dict_default`.
+
+    Notes
+    -----
+    The function uses the Horizons system to get body coordinates and supports various modes for plotting
+    reference lines including limb, central meridian, solar equator, and grids in different coordinate systems.
+    """
     def draw_central_meridian(axis, body_coo, date, color):
         body_coo = body_coo.transform_to(frames.HeliographicStonyhurst)
         constant_lon = SkyCoord(body_coo.lon, np.linspace(-90, 90, 90) * u.deg,
@@ -185,14 +228,14 @@ def plot_solar_reference_lines(axis, bodies_list, smap, mode='Limb from Obs.', b
         if mode in ['Central Meridian from Obs.', 'meridian']:
             draw_central_meridian(axis, body_coo, smap.date_average, bodies_dict[body][1])
 
-    if mode in ['Carr. Prime Meridian+Solar Equator', ['carr-me']]:
+    if mode in ['Carr. Prime Meridian+Solar Equator', 'carr-me']:
         drawing.equator(axis, linewidth=1, resolution=90)
         drawing.prime_meridian(axis, linewidth=1, resolution=90)
-    elif mode in ['Stonyhurst Grid', ['stony-grid']]:
+    elif mode in ['Stonyhurst Grid', 'stony-grid']:
         earth = get_horizons_coord(3, smap.date_average)
         draw_central_meridian(axis, earth, smap.date_average, 'white')
         smap.draw_grid(linewidth=1, color='red', system='stonyhurst', alpha=0.8)
-    elif mode in ['Carrington Grid', ['carr-grid']]:
+    elif mode in ['Carrington Grid', 'carr-grid']:
         drawing.prime_meridian(axis, linewidth=1, resolution=90)
         smap.draw_grid(linewidth=1, color='red', system='carrington', alpha=0.8)
 
@@ -280,7 +323,7 @@ def load_fits(files):
 
 
 def maps_process(maps_dict_in, imagers_list_in, image_mode, **kwargs):
-    '''
+    """
     Parameters
     ----------
     maps_dict_in : dict
@@ -303,7 +346,6 @@ def maps_process(maps_dict_in, imagers_list_in, image_mode, **kwargs):
     -----
     The `maps_dict_in` is the `session_state.map_` when used from the application.
     """
-    '''
     maps_dict_out = {}
     imagers_list_out = []
 
@@ -361,9 +403,35 @@ def single_imager_maps_process(map_list, skip=None, **kwargs):
 
 # TODO: Implement units here
 class model_fittings:
-    '''
-    A class to store the fittings of the geometrical model.
-    '''
+    """
+    A class to store and manage the fittings of the geometrical model.
+
+    Parameters
+    ----------
+    event_selected : str
+        The selected event for the fitting.
+    date_process : str
+        The date of the fitting process.
+    geometrical_model : str
+        The type of the geometrical model used.
+    model_parameters : pandas.DataFrame
+        The parameters of the geometrical model.
+    kinematics : dict, optional
+        The kinematic parameters of the model (default is {'fit_method': None}).
+
+    Methods
+    -------
+    load_from_json(json_file)
+        Loads model fittings from a JSON file.
+    model_id()
+        Generates a unique ID for the model.
+    get_geomertical_model(index)
+        Retrieves the geometrical model at a given index.
+    to_dict()
+        Converts the model fittings to a dictionary.
+    to_json(buffer=False)
+        Converts the model fittings to JSON format.
+    """
 
     def __init__(self, event_selected, date_process, geometrical_model, model_parameters, kinematics={'fit_method': None}):
         self.event_selected = event_selected
@@ -374,6 +442,19 @@ class model_fittings:
 
     @staticmethod
     def load_from_json(json_file):
+        """
+        Loads the model fittings from a JSON file.
+
+        Parameters
+        ----------
+        json_file : str or file object
+            The JSON file containing the model fittings.
+
+        Returns
+        -------
+        model_fittings
+            An instance of the model_fittings class.
+        """
         if isinstance(json_file, str):
             with open(json_file, 'r') as file:
                 json_content = file.read()
@@ -411,10 +492,31 @@ class model_fittings:
         return model_fittings_class
 
     def model_id(self):
+        """
+        Generates a unique ID for the model based on event_selected and geometrical_model.
+
+        Returns
+        -------
+        str
+            The unique ID of the model.
+        """
         str_id = self.event_selected.replace('-', '').replace(':', '').replace('|', 'D').replace('.', 'p') + 'M' + self.geometrical_model
         return str_id
 
     def get_geomertical_model(self, index):
+        """
+        Retrieves the geometrical model at the given index.
+
+        Parameters
+        ----------
+        index : int or str
+            The index of the model parameters.
+
+        Returns
+        -------
+        object
+            The geometrical model object.
+        """
         if isinstance(index, int):
             model_parameters = self.parameters.iloc[index]
         elif isinstance(index, str):
@@ -450,6 +552,14 @@ class model_fittings:
         return model_shock
 
     def to_dict(self):
+        """
+        Converts the model fittings to a dictionary.
+
+        Returns
+        -------
+        dict
+            The dictionary representation of the model fittings.
+        """
         parameters = copy(self.parameters)
         parameters['time'] = parameters.index.strftime('%Y-%m-%dT%H:%M:%S.%f')
         parameters = parameters.to_dict(orient='list')
@@ -462,9 +572,20 @@ class model_fittings:
         return model_fittings_dict
 
     def to_json(self, buffer=False):
-        '''
-        Returns the fittings of the geometrical model as a json format
-        '''
+        """
+        Converts the model fittings to JSON format.
+
+        Parameters
+        ----------
+        buffer : bool, optional
+            If True, returns a BytesIO buffer containing the JSON data. If False, returns a JSON string (default is False).
+
+        Returns
+        -------
+        str or io.BytesIO
+            The JSON representation of the model fittings. Returns a JSON string if buffer is False,
+            otherwise returns a BytesIO buffer containing the JSON data.
+        """
         model_dict = self.to_dict()
         model_dict.update({'date_created': (datetime.datetime.utcnow()).strftime('%Y-%m-%dT%H:%M:%S')})
         model_dict.update({'version': version})
@@ -476,28 +597,54 @@ class model_fittings:
 
 
 def plot_fitting_model(model, fit_args, plt_type='HeightT', fig=None, axis=None):
-    '''
-    Plot the height(speed)--time evolution of the fitting parameters.
-    '''
+    """
+    Plot the height (or speed/acceleration) evolution of the fitting parameters over time.
+
+    Parameters
+    ----------
+    model : model_fittings
+        The model_fittings object containing the geometrical model and its parameters.
+    fit_args : dict
+        A dictionary containing the fitting parameters:
+            - 'type': str, type of fit ('polynomial', 'spline', or 'custom')
+            - 'order': int, order of the polynomial or spline
+            - 'smooth': float, smoothing factor for spline fitting (only for 'spline')
+            - 'expression': str, custom expression for fitting (only for 'custom')
+            - 'bounds': tuple, bounds for the custom fitting parameters (only for 'custom')
+    plt_type : str, optional
+        The type of plot to generate ('HeightT', 'SpeedT', 'AccelerationT', 'LongT', 'LatT').
+        Default is 'HeightT'.
+    fig : matplotlib.figure.Figure, optional
+        The figure object to plot on. If None, a new figure is created.
+    axis : matplotlib.axes.Axes, optional
+        The axis object to plot on. If None, a new axis is created.
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        The figure object with the plot.
+    axis : matplotlib.axes.Axes
+        The axis object with the plot.
+    """
     palete = sns.color_palette('deep')
 
     Rs2km = (1 * u.R_sun).to_value(u.km)
     sec = 24*60*60
 
     parameters = {
-        'Spheroid':
-            {'height': ['+', '', palete[3], 'h-apex'],
-             'orthoaxis1': ['x', '', palete[0], 'r-axis1'],
-             },
-        'Ellipsoid':
-            {'height': ['+', '', palete[3], 'h-apex'],
-             'orthoaxis1': ['x', '', palete[0], 'r-axis1'],
-             'orthoaxis2': ['x', '', palete[2], 'r-axis2'],
-             },
-        'GCS':
-            {'height': ['+', '', palete[3], 'h-apex'],
-             'rapex': ['x', '', palete[0], 'r-apex'],
-             },
+        'Spheroid': {
+            'height': ['+', '', palete[3], 'h-apex'],
+            'orthoaxis1': ['x', '', palete[0], 'r-axis1'],
+        },
+        'Ellipsoid': {
+            'height': ['+', '', palete[3], 'h-apex'],
+            'orthoaxis1': ['x', '', palete[0], 'r-axis1'],
+            'orthoaxis2': ['x', '', palete[2], 'r-axis2'],
+        },
+        'GCS': {
+            'height': ['+', '', palete[3], 'h-apex'],
+            'rapex': ['x', '', palete[0], 'r-apex'],
+        },
     }
 
     parameters = parameters[model.geometrical_model]
@@ -509,78 +656,120 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT', fig=None, axis=None)
 
     if plt_type == 'HeightT':
         for p in parameters.keys():
-            axis.plot(model.parameters.index,
-                      model.parameters[p],
-                      marker=parameters[p][0],
-                      linestyle=parameters[p][1],
-                      color=parameters[p][2],
-                      label=parameters[p][3])
-            if len(model.parameters[p])-1 > fit_args['order']:
-                # How to get confidence intervals from curve_fit?
+            axis.plot(
+                model.parameters.index,
+                model.parameters[p],
+                marker=parameters[p][0],
+                linestyle=parameters[p][1],
+                color=parameters[p][2],
+                label=parameters[p][3]
+            )
+            if len(model.parameters[p]) - 1 > fit_args['order']:
                 fit = parameter_fit(model.parameters.index, model.parameters[p], fit_args)
                 axis.plot(fit['best_fit_x'], fit['best_fit_y'], '-', color=parameters[p][2])
-                axis.fill_between(fit['best_fit_x'], fit['sigma_bounds']['up'], fit['sigma_bounds']['low'],
-                                  color=parameters[p][2], alpha=0.20)
+                axis.fill_between(
+                    fit['best_fit_x'],
+                    fit['sigma_bounds']['up'],
+                    fit['sigma_bounds']['low'],
+                    color=parameters[p][2],
+                    alpha=0.20
+                )
                 if fit_args['type'] == 'spline':
-                    axis.fill_between(fit['best_fit_x'], fit['sigv_bounds']['up'], fit['sigv_bounds']['low'],
-                                      color=parameters[p][2], alpha=0.05)
+                    axis.fill_between(
+                        fit['best_fit_x'],
+                        fit['sigv_bounds']['up'],
+                        fit['sigv_bounds']['low'],
+                        color=parameters[p][2],
+                        alpha=0.05
+                    )
             else:
                 axis.plot(model.parameters.index, model.parameters[p], '--', color=parameters[p][2])
         ylabel = 'Height of apex and length of flanks [Rsun]'
         axis.set_ylim(bottom=0)
     elif plt_type in ('SpeedT', 'AccelerationT'):
         gradient_power = {'SpeedT': 1, 'AccelerationT': 2}
-        const = {'SpeedT': Rs2km/sec, 'AccelerationT': Rs2km/sec**2}
+        const = {'SpeedT': Rs2km / sec, 'AccelerationT': Rs2km / sec**2}
         for p in parameters.keys():
-            if len(model.parameters[p])-gradient_power[plt_type] > fit_args['order']:
-                # How to get confidence intervals from curve_fit?
+            if len(model.parameters[p]) - gradient_power[plt_type] > fit_args['order']:
                 fit = parameter_fit(model.parameters.index, model.parameters[p], fit_args)
                 if plt_type == 'SpeedT':
                     best_fit = const[plt_type] * np.gradient(fit['best_fit_y'], fit['best_fit_x_num'])
                     upper_bound = const[plt_type] * np.gradient(fit['sigma_bounds']['up'], fit['best_fit_x_num'])
                     lower_bound = const[plt_type] * np.gradient(fit['sigma_bounds']['low'], fit['best_fit_x_num'])
                     if fit_args['type'] == 'spline':
-                        axis.fill_between(fit['best_fit_x'], const[plt_type] * fit['sigv_bounds']['dlow'], const[plt_type] * fit['sigv_bounds']['dup'],
-                                          color=parameters[p][2], alpha=0.05)
+                        axis.fill_between(
+                            fit['best_fit_x'],
+                            const[plt_type] * fit['sigv_bounds']['dlow'],
+                            const[plt_type] * fit['sigv_bounds']['dup'],
+                            color=parameters[p][2],
+                            alpha=0.05
+                        )
                     ylabel = 'Speed [km/s]'
                 elif plt_type == 'AccelerationT':
-                    best_fit = const[plt_type] * np.gradient(np.gradient(fit['best_fit_y'], fit['best_fit_x_num'], edge_order=2), fit['best_fit_x_num'], edge_order=2)
-                    upper_bound = const[plt_type] * np.gradient(np.gradient(fit['sigma_bounds']['up'], fit['best_fit_x_num'], edge_order=2), fit['best_fit_x_num'], edge_order=2)
-                    lower_bound = const[plt_type] * np.gradient(np.gradient(fit['sigma_bounds']['low'], fit['best_fit_x_num'], edge_order=2), fit['best_fit_x_num'], edge_order=2)
+                    best_fit = const[plt_type] * np.gradient(
+                        np.gradient(fit['best_fit_y'], fit['best_fit_x_num'], edge_order=2),
+                        fit['best_fit_x_num'],
+                        edge_order=2
+                    )
+                    upper_bound = const[plt_type] * np.gradient(
+                        np.gradient(fit['sigma_bounds']['up'], fit['best_fit_x_num'], edge_order=2),
+                        fit['best_fit_x_num'],
+                        edge_order=2
+                    )
+                    lower_bound = const[plt_type] * np.gradient(
+                        np.gradient(fit['sigma_bounds']['low'], fit['best_fit_x_num'], edge_order=2),
+                        fit['best_fit_x_num'],
+                        edge_order=2
+                    )
                     if fit_args['type'] == 'spline':
-                        axis.fill_between(fit['best_fit_x'], const[plt_type] * fit['sigv_bounds']['ddlow'], const[plt_type] * fit['sigv_bounds']['ddup'],
-                                          color=parameters[p][2], alpha=0.05)
+                        axis.fill_between(
+                            fit['best_fit_x'],
+                            const[plt_type] * fit['sigv_bounds']['ddlow'],
+                            const[plt_type] * fit['sigv_bounds']['ddup'],
+                            color=parameters[p][2],
+                            alpha=0.05
+                        )
                     ylabel = 'Acceleration [km/s$^2$]'
 
                 axis.plot(fit['best_fit_x'], best_fit, '-', color=parameters[p][2], label=parameters[p][3])
-                axis.fill_between(fit['best_fit_x'], lower_bound, upper_bound,
-                                  color=parameters[p][2], alpha=0.20)
-
+                axis.fill_between(fit['best_fit_x'], lower_bound, upper_bound, color=parameters[p][2], alpha=0.20)
             else:
                 ylabel = ' '
-                axis.text(0.5, 0.5, f'Not enough points for \n fitting with order {fit_args["order"]}.',
-                          transform=axis.transAxes,
-                          fontsize=20, color='gray', alpha=0.5,
-                          ha='center', va='center', rotation=30)
+                axis.text(
+                    0.5, 0.5,
+                    f'Not enough points for \n fitting with order {fit_args["order"]}.',
+                    transform=axis.transAxes,
+                    fontsize=20, color='gray', alpha=0.5,
+                    ha='center', va='center', rotation=30
+                )
                 break
 
     if plt_type != 'AccelerationT':
         axis.set_ylim(bottom=0)
 
     if plt_type == 'LongT' or plt_type == 'LatT':
-        parameters = {'LongT': ['hgln', '+', palete[3], 'Longitude'],
-                      'LatT': ['hglt', '+', palete[2], 'Latitude']}
-        axis.plot(model.parameters.index,
-                  model.parameters[parameters[plt_type][0]],
-                  marker=parameters[plt_type][1],
-                  linestyle='',
-                  color=parameters[plt_type][2],
-                  label=parameters[plt_type][3])
-        if len(model.parameters[parameters[plt_type][0]])-1 > 3:
+        parameters = {
+            'LongT': ['hgln', '+', palete[3], 'Longitude'],
+            'LatT': ['hglt', '+', palete[2], 'Latitude']
+        }
+        axis.plot(
+            model.parameters.index,
+            model.parameters[parameters[plt_type][0]],
+            marker=parameters[plt_type][1],
+            linestyle='',
+            color=parameters[plt_type][2],
+            label=parameters[plt_type][3]
+        )
+        if len(model.parameters[parameters[plt_type][0]]) - 1 > 3:
             fit = parameter_fit(model.parameters.index, model.parameters[parameters[plt_type][0]], fit_args)
             axis.plot(fit['best_fit_x'], fit['best_fit_y'], '-', color=parameters[plt_type][2])
-            axis.fill_between(fit['best_fit_x'], fit['sigma_bounds']['up'], fit['sigma_bounds']['low'],
-                              color=parameters[plt_type][2], alpha=0.05)
+            axis.fill_between(
+                fit['best_fit_x'],
+                fit['sigma_bounds']['up'],
+                fit['sigma_bounds']['low'],
+                color=parameters[plt_type][2],
+                alpha=0.05
+            )
         ylabel = parameters[plt_type][3] + ' [degrees]'
 
     axis.set_xlabel('Time [UTC]')
@@ -616,31 +805,60 @@ def plot_fitting_model(model, fit_args, plt_type='HeightT', fig=None, axis=None)
 
 
 def parameter_fit(x, y, fit_args):
-    '''
+    """
     Performs a polynomial or spline fit to a set of x, y parameters.
-    '''
+
+    Parameters
+    ----------
+    x : array-like
+        The independent variable, typically datetime objects.
+    y : array-like
+        The dependent variable, numerical data to be fitted.
+    fit_args : dict
+        A dictionary containing the fitting parameters:
+            - 'type': str, type of fit ('polynomial', 'spline', or 'custom')
+            - 'order': int, order of the polynomial or spline
+            - 'smooth': float, smoothing factor for spline fitting (only for 'spline')
+            - 'expression': str, custom expression for fitting (only for 'custom')
+            - 'bounds': tuple, bounds for the custom fitting parameters (only for 'custom')
+
+    Returns
+    -------
+    fitting : dict
+        A dictionary containing the fitting results:
+            - 'popt': optimal parameters for the fit (only for 'polynomial' and 'custom')
+            - 'pcov': covariance of the optimal parameters (only for 'polynomial' and 'custom')
+            - 'sigma': standard deviation of the residuals
+            - 'best_fit_x_num': array, x-values for the best fit
+            - 'best_fit_x': array, datetime index corresponding to best_fit_x_num
+            - 'best_fit_y': array, y-values for the best fit
+            - 'sigma_bounds': dict, upper and lower sigma bounds for the fit
+            - 'sigv_bounds': dict, velocity and acceleration sigma bounds for the spline fit (only for 'spline')
+    """
     minx = x[0].replace(second=0, microsecond=0)
     xx = (mdates.date2num(x) - mdates.date2num(minx))  # fractional days from minx
     step = 1/(60*24)  # one minute timestep in units of xx (fractional days)
-    xxx = np.arange(0, xx.max()+step, step)  # Makes an array with a timestep of one minute in fractional days
+    xxx = np.arange(0, xx.max() + step, step)  # Makes an array with a timestep of one minute in fractional days
     dd = pd.DatetimeIndex(mdates.num2date(xxx + mdates.date2num(minx)))
 
     if fit_args['type'] == 'polynomial':
-        # scipy.optimize.curve_fit and numpy.polyfit
         popt, pcov = np.polyfit(xx, y, fit_args['order'], full=False, cov=True)
         sigma = np.sqrt(np.diagonal(pcov))  # calculate sigma from covariance matrix
         best_fit = np.polyval(popt, xxx)
         sigma_bound_up = np.polyval((popt + sigma), xxx)
         sigma_bound_low = np.polyval((popt - sigma), xxx)
-        fitting = {'popt': popt,
-                   'pcov': pcov,
-                   'sigma': sigma,
-                   'best_fit_x_num': xxx,
-                   'best_fit_x': dd,
-                   'best_fit_y': best_fit,
-                   'sigma_bounds': {'up': sigma_bound_up,
-                                    'low': sigma_bound_low},
-                   }
+        fitting = {
+            'popt': popt,
+            'pcov': pcov,
+            'sigma': sigma,
+            'best_fit_x_num': xxx,
+            'best_fit_x': dd,
+            'best_fit_y': best_fit,
+            'sigma_bounds': {
+                'up': sigma_bound_up,
+                'low': sigma_bound_low
+            },
+        }
     elif fit_args['type'] == 'spline':
         spl = UnivariateSpline(xx, y, s=fit_args['smooth'], k=fit_args['order'])
         resid = y - spl(xx)  # true - prediction
@@ -661,20 +879,25 @@ def parameter_fit(x, y, fit_args):
             sv_bound_ddup = np.maximum(sv_bound_ddup, np.gradient(np.gradient(spl(xxx), xxx)))
             sv_bound_ddlow = np.minimum(sv_bound_ddlow, np.gradient(np.gradient(spl(xxx), xxx)))
 
-        fitting = {'spl': spl,
-                   'sigma': sigma,
-                   'best_fit_x_num': xxx,
-                   'best_fit_x': dd,
-                   'best_fit_y': best_fit,
-                   'sigma_bounds': {'up': sigma_bound_up,
-                                    'low': sigma_bound_low},
-                   'sigv_bounds': {'up': sv_bound_up,
-                                   'low': sv_bound_low,
-                                   'dup': sv_bound_dup,
-                                   'dlow': sv_bound_dlow,
-                                   'ddup': sv_bound_ddup,
-                                   'ddlow': sv_bound_ddlow},
-                   }
+        fitting = {
+            'spl': spl,
+            'sigma': sigma,
+            'best_fit_x_num': xxx,
+            'best_fit_x': dd,
+            'best_fit_y': best_fit,
+            'sigma_bounds': {
+                'up': sigma_bound_up,
+                'low': sigma_bound_low
+            },
+            'sigv_bounds': {
+                'up': sv_bound_up,
+                'low': sv_bound_low,
+                'dup': sv_bound_dup,
+                'dlow': sv_bound_dlow,
+                'ddup': sv_bound_ddup,
+                'ddlow': sv_bound_ddlow
+            },
+        }
     elif fit_args['type'] == 'custom':
         expression = fit_args['expression']  # 'a * exp(-b * x) + c'
 
@@ -686,13 +909,16 @@ def parameter_fit(x, y, fit_args):
         best_fit = func(xxx, *popt)
         sigma_bound_up = func(xxx, *(popt + sigma))
         sigma_bound_low = func(xxx, *(popt - sigma))
-        fitting = {'popt': popt,
-                   'pcov': pcov,
-                   'sigma': sigma,
-                   'best_fit_x_num': xxx,
-                   'best_fit_x': dd,
-                   'best_fit_y': best_fit,
-                   'sigma_bounds': {'up': sigma_bound_up,
-                                    'low': sigma_bound_low},
-                   }
+        fitting = {
+            'popt': popt,
+            'pcov': pcov,
+            'sigma': sigma,
+            'best_fit_x_num': xxx,
+            'best_fit_x': dd,
+            'best_fit_y': best_fit,
+            'sigma_bounds': {
+                'up': sigma_bound_up,
+                'low': sigma_bound_low
+            },
+        }
     return fitting
