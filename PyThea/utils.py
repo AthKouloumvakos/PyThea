@@ -159,7 +159,7 @@ def make_figure(map, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):
     return fig, axis
 
 
-def plot_bodies(axis, bodies_list, smap, bodies_dict=bodies_dict_default):
+def plot_bodies(axis, bodies_list, smap, bodies_dict=None):
     """
     Plots the positions of pre-configured bodies (e.g., Earth, STA, Venus) on the given axis.
 
@@ -180,14 +180,21 @@ def plot_bodies(axis, bodies_list, smap, bodies_dict=bodies_dict_default):
     -------
     None
     """
+    if bodies_dict is None:
+        bodies_dict = bodies_dict_default
+
     for body in bodies_list:
+        if body not in bodies_dict:
+            RuntimeWarning(f'Body information was missing in bodies_dict for {body}')
+            continue
+
         body_coo = get_horizons_coord(bodies_dict[body][0], smap.date_average)
         if contains_coordinate(smap, body_coo):
             axis.plot_coord(body_coo, 'o', color=bodies_dict[body][1],
                             fillstyle='none', markersize=6, label=body)
 
 
-def plot_solar_reference_lines(axis, bodies_list, smap, mode='Limb from Obs.', bodies_dict=bodies_dict_default):
+def plot_solar_reference_lines(axis, bodies_list, smap, mode='Limb from Obs.', bodies_dict=None):
     """
     Plots solar reference lines (e.g., solar limb, central meridians, equator) on a WCS axis.
 
@@ -218,7 +225,14 @@ def plot_solar_reference_lines(axis, bodies_list, smap, mode='Limb from Obs.', b
         v, _ = drawing._plot_vertices(constant_lon, axis, wcsapi_to_celestial_frame(axis.wcs), None,
                                       color=color, close_path=False, linewidth=1)
 
+    if bodies_dict is None:
+        bodies_dict = bodies_dict_default
+
     for body in bodies_list:
+        if body not in bodies_dict:
+            RuntimeWarning(f'Body information was missing in bodies_dict for {body}')
+            continue
+
         try:
             body_coo = get_horizons_coord(bodies_dict[body][0], smap.date_average)
         except ValueError as ve:
@@ -243,7 +257,7 @@ def plot_solar_reference_lines(axis, bodies_list, smap, mode='Limb from Obs.', b
         smap.draw_grid(linewidth=1, color='red', system='carrington', alpha=0.8)
 
 
-def download_fits(timerange, imager, imager_dict=imager_dict_default, database_dir=database_dir_default):
+def download_fits(timerange, imager, imager_dict=None, database_dir=None):
     """
     Downloads the imaging data (FITS files) from the Virtual Solar Observatory (VSO).
 
@@ -253,36 +267,50 @@ def download_fits(timerange, imager, imager_dict=imager_dict_default, database_d
         The time range of the data search.
     imager : str
         The name of the imager (e.g., 'AIA', 'HMI').
-    imager_dict : dict
+    imager_dict : dict, optional
         A dictionary containing imager properties where keys are imager names and
         values are dictionaries with properties including 'fido', 'source', 'instrument',
-        'detector' (optional), and 'wavelength' (optional). The default imager_dict is the
-        from PyThea.config.selected_imagers import imager_dict
-    database_dir : str
-        The base directory where the data will be saved.
-        The default database_dir is os.path.join(Path.home(), 'PyThea')
+        'detector' (optional), and 'wavelength' (optional). The default imager_dict is from
+        PyThea.config.selected_imagers.import imager_dict.
+    database_dir : str, optional
+        The base directory where the data will be saved. The default is os.path.join(Path.home(), 'PyThea').
 
     Returns
     -------
     list
         A list of downloaded FITS file paths.
     """
-    imager_prop = imager_dict[imager]
-    result = Fido.search(timerange, *imager_prop['fido'])
+
+    if imager_dict is None:
+        imager_dict = imager_dict_default[imager]
+    else:
+        if imager in imager_dict:
+            imager_dict = imager_dict[imager]
+        else:
+            if 'fido' not in imager_dict:
+                raise ValueError('Provided imager_dict does not contain fido information')
+
+    if imager_dict is None:
+        database_dir = database_dir_default
+    else:
+        if not os.path.isdir(database_dir):
+            raise ValueError(f"The provided database_dir '{database_dir}' is not a valid directory")
+
+    result = Fido.search(timerange, *imager_dict['fido'])
     print(result)
 
     if result:
-        if 'detector' in imager_prop:
-            sub_path = imager_prop['detector']
-        elif 'wavelength' in imager_prop:
-            sub_path = imager_prop['wavelength']
+        if 'detector' in imager_dict:
+            sub_path = imager_dict['detector']
+        elif 'wavelength' in imager_dict:
+            sub_path = imager_dict['wavelength']
         else:
             sub_path = ''
 
         if sub_path:
-            path_str = f'{database_dir}/data/{imager_prop["source"]}/{imager_prop["instrument"]}/{sub_path}' + '/{file}'
+            path_str = f'{database_dir}/data/{imager_dict["source"]}/{imager_dict["instrument"]}/{sub_path}' + '/{file}'
         else:
-            path_str = f'{database_dir}/data/{imager_prop["source"]}/{imager_prop["instrument"]}' + '/{file}'
+            path_str = f'{database_dir}/data/{imager_dict["source"]}/{imager_dict["instrument"]}' + '/{file}'
         downloaded_files = Fido.fetch(result, path=path_str)
     else:
         downloaded_files = []
