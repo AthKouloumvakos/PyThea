@@ -34,20 +34,29 @@ from sunpy.coordinates import frames
 
 def sphere(n=20):
     """
-    Returns the (x,y,z) coordinates of a unit sphere centred at the origin.
+    Returns the (x, y, z) coordinates of a unit sphere centered at the origin.
     The coordinates are (n+1)-by-(n+1) matrices.
-    """
 
+    Parameters
+    ----------
+    n : int, optional
+        The number of intervals along the theta and phi axes (default is 20).
+
+    Returns
+    -------
+    tuple of np.ndarray
+        A tuple containing three (n+1)-by-(n+1) matrices representing the x, y, and z coordinates of the sphere.
+    """
     theta = np.linspace(-np.pi, np.pi, n+1)
-    phi = np.linspace(-1*np.pi/2, 1 * np.pi/2, n+1)
+    phi = np.linspace(-np.pi/2, np.pi/2, n+1)
     cosphi = np.cos(phi)
     sintheta = np.sin(theta)
 
-    x =  np.outer(cosphi, np.cos(theta))
-    y =  np.outer(cosphi, sintheta)
-    z =  np.outer(np.sin(phi), np.ones_like(theta))
+    x = np.outer(cosphi, np.cos(theta))
+    y = np.outer(cosphi, sintheta)
+    z = np.outer(np.sin(phi), np.ones_like(theta))
 
-    return [x, y, z]
+    return x, y, z
 
 
 class spheroid:
@@ -102,8 +111,13 @@ class spheroid:
     def coordinates(self):
         """
         Returns the coordinates of the spheroid cloud of points as `~astropy.coordinates.SkyCoord`.
+
+        Returns
+        -------
+        `~astropy.coordinates.SkyCoord`
+            The coordinates of the spheroid.
         """
-        [x__, y__, z__] = sphere(self.n)
+        x__, y__, z__ = sphere(self.n)
 
         x_ = self.radaxis * x__ + self.rcenter
         y_ = self.orthoaxis1 * y__
@@ -118,16 +132,24 @@ class spheroid:
 
     def intersecting_curve(self):
         """
-        Returns the coordinates of intersection of the spheroid with a unit sphere
-         centred at the origin as `~astropy.coordinates.SkyCoord`.
-         More information here: https://mathworld.wolfram.com/Sphere-SphereIntersection.html
+        Returns the coordinates of the intersection of the spheroid with a unit sphere
+        centered at the origin as `~astropy.coordinates.SkyCoord`.
+
+        Returns
+        -------
+        `~astropy.coordinates.SkyCoord`
+            The coordinates of the intersection curve.
+
+        Notes
+        -----
+        More information here: https://mathworld.wolfram.com/Sphere-SphereIntersection.html
         """
         d = self.rcenter
         r = self.radaxis
         R = 1 * u.R_sun
 
         step = 40
-        theta = np.linspace(0, 2*np.pi, step)
+        theta = np.linspace(0, 2 * np.pi, step)
         x_ = np.ones_like(theta) * (d**2 - r**2 + R**2) / (2 * d)
         # y_**2 - z_**2 = R**2 - x_**2
         alpha = np.sqrt(4 * d**2 * R**2 - (d**2 - r**2 + R**2)**2) / (2 * d)
@@ -142,19 +164,37 @@ class spheroid:
 
     @staticmethod
     @u.quantity_input
-    def hek_from_rab(rc: (u.R_sun), radaxis: (u.R_sun), orthoaxis1: (u.R_sun)):
-        '''
-        Returns the semi-axis length from the height, epsilon, and kappa parameters
-        '''
+    def hek_from_rab(rc: u.R_sun, radaxis: u.R_sun, orthoaxis1: u.R_sun):
+        """
+        Returns the semi-axis length from the height, epsilon, and kappa parameters.
+
+        Parameters
+        ----------
+        rc : `~astropy.units.Quantity`
+            The radial distance of the spheroid center from the solar center.
+        radaxis : `~astropy.units.Quantity`
+            The spheroid's first (radial) semi-axis length.
+        orthoaxis1 : `~astropy.units.Quantity`
+            The spheroid's second semi-axis length (orthogonal axis wrt the radial axis).
+
+        Returns
+        -------
+        height : `~astropy.units.Quantity`
+            The radial distance of the spheroid apex from the solar center.
+        epsilon : float
+            The eccentricity of the spheroid.
+        kappa : float
+            Spheroid self-similar constant.
+        """
         height = rc + radaxis
         kappa = orthoaxis1 / (height - 1 * u.R_sun)
 
         if radaxis < orthoaxis1:
-            epsilon = -1. * np.sqrt(1 - (radaxis / orthoaxis1)**2)
+            epsilon = -1 * np.sqrt(1 - (radaxis / orthoaxis1)**2)
         elif radaxis > orthoaxis1:
-            epsilon = np.sqrt(1. - (orthoaxis1 / radaxis)**2)
+            epsilon = np.sqrt(1 - (orthoaxis1 / radaxis)**2)
         elif radaxis == orthoaxis1:
-            epsilon = 0.
+            epsilon = 0
         else:
             height, kappa, epsilon = np.nan * u.R_sun, np.nan, np.nan
 
@@ -163,14 +203,32 @@ class spheroid:
     @staticmethod
     @u.quantity_input
     def rab_from_hek(height: (u.R_sun), epsilon, kappa):
-        '''
-        Returns the height, epsilon, and kappa parameters from the semi-axis length
-        '''
-        s = kappa * (height - 1. * u.R_sun)
+        """
+        Returns the height, epsilon, and kappa parameters from the semi-axis length.
+
+        Parameters
+        ----------
+        height : `~astropy.units.Quantity`
+            The radial distance of the spheroid apex from the solar center.
+        epsilon : float
+            The eccentricity of the spheroid.
+        kappa : float
+            Spheroid self-similar constant.
+
+        Returns
+        -------
+        rc : `~astropy.units.Quantity`
+            The radial distance of the spheroid center from the solar center.
+        radaxis : `~astropy.units.Quantity`
+            The spheroid's first (radial) semi-axis length.
+        orthoaxis1 : `~astropy.units.Quantity`
+            The spheroid's second semi-axis length (orthogonal axis wrt the radial axis).
+        """
+        s = kappa * (height - 1 * u.R_sun)
         if epsilon < 0:
-            d = s * np.sqrt(1. - epsilon**2)
+            d = s * np.sqrt(1 - epsilon**2)
         elif epsilon > 0:
-            d = s / np.sqrt(1. - epsilon**2)
+            d = s / np.sqrt(1 - epsilon**2)
         elif epsilon == 0:
             d = s
         else:
@@ -186,6 +244,11 @@ class spheroid:
     def apex(self):
         """
         Returns the coordinates of the spheroid apex as `~astropy.coordinates.SkyCoord`.
+
+        Returns
+        -------
+        `~astropy.coordinates.SkyCoord`
+            The coordinates of the spheroid apex.
         """
         rapex = self.center.radius + self.radaxis
         Spher_rep = SphericalRepresentation(self.center.lon, self.center.lat,
@@ -199,6 +262,11 @@ class spheroid:
     def base(self):
         """
         Returns the coordinates of the spheroid base as `~astropy.coordinates.SkyCoord`.
+
+        Returns
+        -------
+        `~astropy.coordinates.SkyCoord`
+            The coordinates of the spheroid base.
         """
         rbase = (-self.center.radius + self.radaxis)
         Spher_rep = SphericalRepresentation(self.center.lon, self.center.lat,
@@ -211,9 +279,21 @@ class spheroid:
     def rotate(self, x_, y_, z_):
         """
         Rotates the (x,y,z) coordinates from the geometrical model's coordinate system
-         to the Heliospheric coordinates.
+        to the Heliospheric coordinates.
 
-        Returns the coordinates as `~astropy.coordinates.SkyCoord`.
+        Parameters
+        ----------
+        x_ : `~numpy.ndarray`
+            The x coordinates of the points.
+        y_ : `~numpy.ndarray`
+            The y coordinates of the points.
+        z_ : `~numpy.ndarray`
+            The z coordinates of the points.
+
+        Returns
+        -------
+        x, y, z : `~numpy.ndarray`
+            The rotated x, y, z coordinates of the points.
         """
         Longc = self.center.lon.to_value(u.rad)
         Latc  = self.center.lat.to_value(u.rad)
@@ -228,9 +308,22 @@ class spheroid:
         return x, y, z
 
     def plot(self, axis, mode='Skeleton', only_surface=False):
-        '''
-        Plots the spheroid model at the provided axes
-        '''
+        """
+        Plots the spheroid model on the provided axes.
+
+        Parameters
+        ----------
+        axis : matplotlib.axes._axes.Axes
+            The axes on which to plot the spheroid.
+        mode : str, optional
+            The mode of plotting. Can be 'Full' to plot the full spheroid or 'Skeleton' to plot only the skeleton. Default is 'Skeleton'.
+        only_surface : bool, optional
+            If True, plot only the surface of the spheroid. Default is False.
+
+        Returns
+        -------
+        None
+        """
         if mode == 'Full':
             axis.plot_coord(self.coordinates, color='red', linestyle='-', linewidth=0.2)
         elif (mode == 'Skeleton') and (only_surface is False):
