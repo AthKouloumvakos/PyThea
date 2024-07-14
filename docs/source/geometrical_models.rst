@@ -38,3 +38,19 @@ Any of the above four geometrical parameters :math:`r_{apex}`, :math:`\kappa`, :
    An example of the fitted ellipsoid model to running difference images white-light and extreme ultraviolet images from SDO/AIA and SOHO/LASCO, respectively.
 
 In the case where the three semi-axes of the ellipsoid are equal (:math:`a=b=c`), the surface is a sphere, and if only two semi-axes are equal, the surface is an ellipsoid of revolution, or most commonly called a spheroid. The two cases are also presented in :numref:`fig-ellipsoid-model`. Then, a spheroid is obtained by revolving an ellipse about one of its principal axes, and it has a circular symmetry. When revolving the ellipse about its minor (major) axis, an oblate (prolate) spheroid is formed. Therefore, a spheroid is oblate (prolate) when :math:`a` and :math:`b` are equal and also are greater (smaller) than :math:`c`. The possitional parameters of the spheroid are the same as the ellipsoid, except for the tilt angle (:math:`\gamma`) which is redundant for the spheroid. For the geometrical parameters, since :math:`b` and :math:`c` are equal the aspect ratio (:math:`\alpha`) is the only redundant parameter, whereas, the other parameters are the same.
+
+The Graduated Cylindrical Shell Model
+-------------------------------------
+
+The Graduated Cylindrical Shell (GCS) model is an empirical geometrical model of a flux rope defined by Thernisien et al. (2006, 2011). It consists of a curved front that is a cylindrical shell forming the main part of the CME -from its 'legs' to the apex– and two attached cones that correspond to the legs of the CME. The resulting shape is reminiscent of a croissant. The model is constrained to expand self-similarly, which it seems to be the case for most of the CMEs at heliocentric heights :math:`\gt 10 R_{sun}` (e.g. Balmaceda et al., 2020). Previous studies (Dumbović et al., 2019) have shown that the GCS model reproduces well the large-scale structure of flux rope-like CMEs in the solar corona, and it is widely used to reconstruct their 3D structure. A view of the GCS geometrical model is shown in :numref:`gcs-geometrical-model`.
+
+.. figure:: ./images/GCS_geometrical_model.png
+   :name: gcs-geometrical-model
+   :width: 800px
+   :align: center
+
+   Plane sections of the GCS model (left and middle panels) showing the different parameters, and a schematic of the model mesh (right panel).
+
+Following Thernisien et al. (2006), we define the GCS model using three positional and three geometrical parameters. We define as a point of reference for the GCS model the apex center. This point is represented in PyThea as a SkyCoord in the HGS coordinate system. The primary axis of the GCS model is defined from the solar center and directed towards the apex center. In the spherical coordinates, the three positional parameters (rapex, :math:`\phi`, :math:`\theta`) define the heliocentric distance, latitude, and longitude of the flux rope apex center, respectively. Additionally, the flux rope can be tilted relative to the solar equator. For a tilt angle, :math:`\gamma`, equal to zero, both legs of the CME are located at the solar equator.
+
+The geometrical parameters of the GCS model are three: 1) the heliocentric height at the apex, hapex (OA in Figure 4), 2) the aspect ratio at the apex, κ, which is defined as the ratio OO’ to :math:`r_A` (see :numref:`gcs-geometrical-model`) and sets the rate of lateral versus radial expansion of the CME, and 3) the half angle, :math:`\alpha`, which is the angle between the axis of the cone and the primary axis. From these six parameters we can fully define the GCS model, therefore, in PyThea the user can adjust :math:`\phi`, :math:`\theta`, and :math:`\gamma` to match the flux rope position and orientation with observations, and hapex, κ, and :math:`\alpha` to fit the geometry.
