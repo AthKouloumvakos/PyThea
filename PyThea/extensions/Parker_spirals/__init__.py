@@ -23,7 +23,8 @@ def spiral(pos, sw_speed, date, omega=360. * u.degree / (25.38 * 24 * 60 * 60 * 
     astropy.coordinates.SkyCoord
         The calculated spiral coordinates in heliographic Carrington coordinates.
     """
-    r = np.arange(1, pos.radius.to_value(u.R_sun), 0.1) * u.R_sun
+    r = np.arange(1, pos.radius.to_value(u.R_sun), 0.1)
+    r = np.append(r, pos.radius.to_value(u.R_sun)) * u.R_sun
     alpha = omega * ((pos.radius - r) / sw_speed)
     hg_coord = SkyCoord(pos.lon + alpha, pos.lat, r,
                         frame='heliographic_carrington',

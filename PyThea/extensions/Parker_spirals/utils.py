@@ -5,11 +5,28 @@ from PyThea.config.selected_bodies import bodies_dict
 from PyThea.extensions import Parker_spirals
 
 
-def plot_parker_spiral(axis, map, bodies, sw_speed=350*(u.km/u.second)):
+def plot_parker_spiral(axis, map, bodies, sw_speed=350 * (u.km / u.second)):
+    """
+    Plot Parker spiral for specified bodies on the given map axis.
+
+    Parameters
+    ----------
+    axis : matplotlib.axes.Axes
+        The axis on which to plot the Parker spiral.
+    map : sunpy.map.Map
+        The solar map on which the Parker spiral will be plotted.
+    bodies : list of str
+        List of bodies for which to plot the Parker spiral.
+    sw_speed : Quantity, optional
+        Solar wind speed for the Parker spiral (default: 350 km/s).
+
+    Returns
+    -------
+    None
+    """
     for body in bodies:
         pos = get_horizons_coord(bodies_dict[body][0], map.date_average, 'id')
-        pos = pos.transform_to(frames.HeliographicCarrington(observer='Earth',
-                                                             obstime=map.date_average))
+        pos = pos.transform_to(frames.HeliographicCarrington(observer='Earth', obstime=map.date_average))
 
         spiral_coord = Parker_spirals.spiral(pos, sw_speed[body], map.date_average)
 
