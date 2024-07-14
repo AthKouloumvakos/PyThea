@@ -292,7 +292,7 @@ def download_fits(timerange, imager, imager_dict=None, database_dir=None):
             if 'fido' not in imager_dict:
                 raise ValueError('Provided imager_dict does not contain fido information')
 
-    if imager_dict is None:
+    if database_dir is None:
         database_dir = database_dir_default
     else:
         if not os.path.isdir(database_dir):

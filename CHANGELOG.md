@@ -1,3 +1,17 @@
+# v0.13.0 (14-Jul-2024)
+
+## Features
+ - Adds imaging data from PSP/WISPR.
+ - Implements new feature of Parker spiral and HEK events visualization on the images.
+ - Adds a method to get directly the geometrical model from model_fittings.
+ - Adds tests for extensions, WISPR imaging.
+ - Adds and improves docstrings in utilities, modules, and geometrical models.
+ - Adds GCS and kinematic plots in documentation
+ - Adds function reference in the documentation
+
+## Minor Changes
+ - Changes some optional inputs for get_hek_flare, make_figure, plot_bodies, and plot_solar_reference_lines to be better utilised.
+
 # v0.12.0 (09-Jun-2024)
 
 ## Features
