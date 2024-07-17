@@ -6,16 +6,16 @@ channels:
 
 dependencies:
   - python=3.9
-  - numpy
+  - numpy=1.26.4
   - pandas
   - scipy
   - matplotlib
   - aiapy
-  - astropy
+  - astropy=6.0.0
   - astroquery
   - numexpr
   - sunpy=5.1.2
-  - parfive==2.1.0  # The issue with streamlit and asyncio is resolved (see #13). Keep this for a while to make sure everything works smoothly.
+  - parfive=2.1.0  # The issue with streamlit and asyncio is resolved (see #13). Keep this for a while to make sure everything works smoothly.
   - streamlit
   - seaborn
   - pyvista

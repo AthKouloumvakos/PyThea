@@ -1,8 +1,8 @@
-numpy
+numpy==1.26.4
 pandas
 scipy
 aiapy
-astropy
+astropy==6.0.0
 astroquery
 jplephem
 numexpr
