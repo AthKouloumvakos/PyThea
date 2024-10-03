@@ -1,3 +1,13 @@
+# v0.14.0 (03-Oct-2024)
+
+## Features
+ - Adds imaging data from Solar Orbiter EUI and METIS.
+ - Implements offline fits file loading from local database.
+
+## Minor Changes
+ - Simplifies the configuration of the database directory.
+ - Improves Parker Spiral visualization.
+
 # v0.13.0 (14-Jul-2024)
 
 ## Features
