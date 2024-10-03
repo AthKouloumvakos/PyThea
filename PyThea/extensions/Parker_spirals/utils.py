@@ -41,3 +41,5 @@ def plot_parker_spiral(axis, map, bodies, sw_speed=350 * (u.km / u.second)):
             axis.plot_coord(spiral_coord[0], markersize=16, linewidth=10, marker='+', color='white')
 
         axis.plot_coord(spiral_coord[0], markersize=3, linewidth=4, marker='s', color=bodies_dict[body][1])
+
+        axis.plot_coord(spiral_coord[-1], markersize=8, linewidth=6, marker='x', color=bodies_dict[body][1])
