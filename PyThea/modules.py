@@ -24,6 +24,7 @@ import astropy.units as u
 from sunpy.net import attrs as a
 
 from PyThea.callbacks import change_fitting_sliders, change_long_lat_sliders
+from PyThea.config import database_dir_default
 from PyThea.config.config_sliders import sliders_dict as sd
 from PyThea.extensions.hek.utils import plot_hek
 from PyThea.extensions.Parker_spirals.utils import plot_parker_spiral
@@ -120,6 +121,10 @@ def date_and_event_selection(st):
             st.session_state.geometrical_model = st.session_state.model_fittings.geometrical_model
 
             st.rerun()
+
+    st.session_state.offline_mode = st.sidebar.checkbox('Work with offline mode active?', value=False)
+    if st.session_state.offline_mode:
+        st.sidebar.info(f'Fits files will be loaded from PyThea\'s database directory: {database_dir_default}', icon='ℹ️')
 
 
 def fitting_and_slider_options_container(st):

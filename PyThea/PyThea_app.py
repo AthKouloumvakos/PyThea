@@ -39,6 +39,7 @@ from PyThea.modules import (date_and_event_selection, figure_streamlit,
 from PyThea.sunpy_dev.map.maputils import get_closest, maps_clims
 from PyThea.utils import (download_fits, load_fits, model_fittings,
                           plot_fitting_model, single_imager_maps_process)
+from PyThea.utils_database import get_fits_filenames_from_database
 from PyThea.version import version
 
 
@@ -296,7 +297,15 @@ def run():
             if imager not in st.session_state.map_:
                 timerange = a.Time(st.session_state.date_process + datetime.timedelta(hours=imaging_time_range[0]),
                                    st.session_state.date_process + datetime.timedelta(hours=imaging_time_range[1]))
-                downloaded_files = download_fits(timerange, imager)
+
+                if st.session_state.offline_mode is False:
+                    downloaded_files = download_fits(timerange, imager)
+                elif st.session_state.offline_mode is True:
+                    progress_bar.desc = f'Load {imager} images from local database.'
+                    event_id = st.session_state.event_selected.replace('-', '').replace(':', '').replace('|', 'D').replace('.', 'p') \
+                        + 'M' + st.session_state.geometrical_model
+                    downloaded_files = get_fits_filenames_from_database(event_id, timerange, imager)
+
                 st.session_state.map_[imager] = load_fits(downloaded_files)
                 st.session_state.map_[imager] = single_imager_maps_process(st.session_state.map_[imager],
                                                                            **selected_imagers.imager_dict[imager]['process'],

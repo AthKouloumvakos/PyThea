@@ -11,6 +11,7 @@ from setuptools import find_packages, setup
 if not os.path.isdir(os.path.join(Path.home(), 'PyThea')):
     os.mkdir(os.path.join(Path.home(), 'PyThea'))
     os.mkdir(os.path.join(Path.home(), 'PyThea', 'data'))
+    os.mkdir(os.path.join(Path.home(), 'PyThea', 'data_manager'))
 
 with open('README_pypi.md', 'r', encoding='utf8') as f:
     long_description = f.read()
