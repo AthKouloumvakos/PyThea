@@ -8,7 +8,8 @@ export PYTHONPATH="${PYTHONPATH}:{top_level_dir_that_pythea_lives}/PyThea"
 """
 
 import os
-from pathlib import Path
+
+from PyThea.config import database_dir_default
 
 
 def test_database_dir_exists():
@@ -20,5 +21,4 @@ def test_database_dir_exists():
         print("Skipping test as it's running in GitHub Actions.")
         return
 
-    database_dir = os.path.join(Path.home(), 'PyThea')
-    assert os.path.exists(database_dir), f"PyThea's database directory '{database_dir}' does not exist."
+    assert os.path.exists(database_dir_default), f"PyThea's database directory '{database_dir_default}' does not exist."

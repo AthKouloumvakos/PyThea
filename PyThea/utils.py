@@ -25,7 +25,6 @@ import os
 import re
 import warnings
 from copy import copy
-from pathlib import Path
 
 import astropy.units as u
 import matplotlib.colors as colors
@@ -48,6 +47,7 @@ from sunpy.net import attrs as a
 from sunpy.time import parse_time
 from sunpy.visualization import drawing
 
+from PyThea.config import database_dir_default
 from PyThea.config.selected_bodies import bodies_dict as bodies_dict_default
 from PyThea.config.selected_imagers import imager_dict as imager_dict_default
 from PyThea.geometrical_models import ellipsoid, gcs, spheroid
@@ -55,8 +55,6 @@ from PyThea.sunpy_dev.map.maputils import (filter_maps,
                                            maps_sequence_processing,
                                            prepare_maps)
 from PyThea.version import version
-
-database_dir_default = os.path.join(Path.home(), 'PyThea')
 
 
 def get_hek_flare(timerange, thresshold='B1.0'):
@@ -279,7 +277,7 @@ def download_fits(timerange, imager, imager_dict=None, database_dir=None):
         'detector' (optional), and 'wavelength' (optional). The default imager_dict is from
         PyThea.config.selected_imagers.import imager_dict.
     database_dir : str, optional
-        The base directory where the data will be saved. The default is os.path.join(Path.home(), 'PyThea').
+        The base directory where the data will be saved. The default is database_dir_default from PyThea.config.
 
     Returns
     -------

@@ -1,13 +1,13 @@
 import os
-from pathlib import Path
 
 import pooch
 
-database_dir = os.path.join(Path.home(), 'PyThea')
+from PyThea.config import database_dir_default
+
 github_main_url = 'https://github.com/AthKouloumvakos/PyThea-sample-data'
 
 aia_sample_data = pooch.create(
-    path=os.path.join(database_dir, 'sample_data'),  # The cache folder
+    path=os.path.join(database_dir_default, 'sample_data'),  # The cache folder
     base_url=f'{github_main_url}/raw/main/data/',  # The remote data url on Github
     registry={
         'aia_lev1_1600a_2012_06_06t04_07_29_12z_image_lev1.fits': 'sha256:7e88d8a277ad3dd111c1bcff3c3936d6d5ef5186e05b4bfa7749ee43c05577d5',
@@ -16,7 +16,7 @@ aia_sample_data = pooch.create(
 )
 
 stereo_sample_data = pooch.create(
-    path=os.path.join(database_dir, 'sample_data'),  # The cache folder
+    path=os.path.join(database_dir_default, 'sample_data'),  # The cache folder
     base_url=f'{github_main_url}/raw/main/data/',  # The remote data url on Github
     registry={
         '20120622_235400_d4c2a.fts': 'sha256:940680fe8bea754c9859170585d8299b9b049b631155435a31ecacf5b702d9cf',
@@ -27,7 +27,7 @@ stereo_sample_data = pooch.create(
 )
 
 wispr_sample_data = pooch.create(
-    path=os.path.join(database_dir, 'sample_data'),  # The cache folder
+    path=os.path.join(database_dir_default, 'sample_data'),  # The cache folder
     base_url=f'{github_main_url}/raw/main/data/',  # The remote data url on Github
     registry={
         'psp_l3_wispr_20210808t103707_v1_1211.fits': 'sha256:85035693c4677e8fa8a3e61b8051d6f0a46e96806b5b0cbdb3efa77652308bda',
@@ -36,7 +36,7 @@ wispr_sample_data = pooch.create(
 )
 
 json_fitting_file_sample_data = pooch.create(
-    path=os.path.join(database_dir, 'sample_data'),  # The cache folder
+    path=os.path.join(database_dir_default, 'sample_data'),  # The cache folder
     base_url=f'{github_main_url}/raw/main/data/',  # The remote data url on Github
     registry={
         'FLX1p0D20211028T153500MEllipsoid.json': 'sha256:34fced8530875110117ba27a73541d3acd0c90bc8fca99367c1ec4cdfc05ce86',
