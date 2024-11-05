@@ -7,7 +7,7 @@
 ![flake8](https://github.com/AthKouloumvakos/PyThea/actions/workflows/flake8.yml/badge.svg)
 ![pytest](https://github.com/AthKouloumvakos/PyThea/actions/workflows/pytest.yml/badge.svg)
 
-_PyThea_ is an open-source software package that can be used to reconstruct the 3D structure of Coronal Mass Ejections (CMEs) and shock waves and determine their kinematics using remote-sensing observations. The tool implements the Graduated Cylindrical Shell (GCS) model that can be used to reconstruct CMEs and two geometrical models, namely a spheroid and ellipsoid model to reconstruct shock waves. It also implements remote-sensing observations from multiple viewpoints such as the Solar and Heliospheric Observatory (SoHO) and Solar Terrestrial Relations Observatory (STEREO).
+_PyThea_ is an open-source software package that can be used to reconstruct the 3D structure of Coronal Mass Ejections (CMEs) and shock waves and determine their kinematics using remote-sensing observations. The tool implements the Graduated Cylindrical Shell (GCS) model that can be used to reconstruct CMEs and two geometrical models, namely a spheroid and ellipsoid model to reconstruct shock waves. It also implements remote-sensing observations from multiple viewpoints such as the Solar and Heliospheric Observatory (SoHO), Solar Terrestrial Relations Observatory (STEREO), and Parker Solar Probe.
 
 ## 💾 Installation
 
@@ -106,3 +106,7 @@ If you use _PyThea_ for scientific work or research presented in a publication, 
 ## ⓘ The mythology of Thea:
 
 In Greek mythology, Thea, also called Euryphaessa "wide-shining", is the Titaness of sight and the shining light of the clear blue sky. Her brother/consort is Hyperion, a Titan and god of the sun, and together they are the parents of Helios (the Sun), Selene (the Moon), and Eos (the Dawn).
+
+## Development Support:
+
+The lead author of this software package Athanasios Kouloumvakos acknowledges financial support from NASA Grant 80NSSC24K0071   for the further development and improvement of PyThea during 2024. This grant was part of the NASA Headquarters Heliophysics Tools and Methods Program in response to NASA ROSES–2022 (NNH22ZDA001N).
