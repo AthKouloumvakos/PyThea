@@ -300,11 +300,13 @@ def mask_occulter(smap, apply_mask=True, mask_value=0):
 
 
 def maps_clims(images):
-    if images[1].instrument == 'WISPR':
-        if images[1].detector == 'Outer':
+    i = 0 if len(images) < 2 else 1
+
+    if images[i].instrument == 'WISPR':
+        if images[i].detector == 'Outer':
             return [14., 14.]
-        elif images[1].detector == 'Inner':
+        elif images[i].detector == 'Inner':
             return [13., 13.]
-    if images[1].instrument == 'Metis':
+    if images[i].instrument == 'Metis':
         return [12.80, 13.00]
-    return [np.nanquantile(images[1].data, 0.20)-10, np.nanquantile(images[1].data, 0.80)+10]
+    return [np.nanquantile(images[i].data, 0.20)-10, np.nanquantile(images[i].data, 0.80)+10]
