@@ -79,7 +79,8 @@ def get_fits_filenames_from_database(event_id, timerange, imager):
 
     if downloaded_files is None:
         downloaded_files = download_fits(timerange, imager)
-
+        if not downloaded_files:
+            return None
         nested_dict_ = create_nested_dict(db_args, downloaded_files.data)
         nested_dict_ = {str(timerange): nested_dict_}
 
