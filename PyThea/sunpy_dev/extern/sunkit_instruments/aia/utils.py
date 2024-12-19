@@ -8,7 +8,7 @@ __all__ = ['prep_aia']
 def prep_aia(map_sequence):
     try:
         map_sequence = [update_pointing(tmap) for tmap in map_sequence]
-    except:
+    except Exception as e:
         warnings.warn('Prepare AIA maps failed, script proceeded without update_pointing. Check connection with JSOC.', UserWarning)
 
     map_sequence = [fix_observer_location(tmap) for tmap in map_sequence]
