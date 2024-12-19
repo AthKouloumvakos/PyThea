@@ -1,3 +1,19 @@
+# v1.0.0 (19-Nov-2024)
+
+## Features
+ - Adds imaging data from Solar Orbiter's SOLOHi.
+ - Implements offline fits file loading from local database.
+
+## Minor Changes
+ - Updates Test figure hashes.
+ - Final changes in README before the major release.
+
+ ## Bug Fixes
+ - Fixes a temporary bug with JSOC and AIA prep
+ - Fixes potential bug with maps loading into map sequence.
+ - Fixes a bug when fits database is selected but no files downloaded.
+ - Fixes a bug with the maps clims.
+
 # v0.14.0 (03-Oct-2024)
 
 ## Features
