@@ -128,10 +128,7 @@ def make_figure(map, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):
     if median_filter_value != 1:
         map = sunpy.map.Map(median_filter(map.data, size=int(median_filter_value)), map.meta)
 
-    if map.instrument == 'WISPR':
-        clim = [-10**-clim[0], 10**-clim[1]]
-
-    if map.instrument == 'Metis':
+    if map.instrument in ['WISPR', 'Metis'] or map.instrument.startswith('SoloHI'):
         clim = [-10**-clim[0], 10**-clim[1]]
 
     if cmap == 'default':
@@ -155,9 +152,19 @@ def make_figure(map, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):
     if cref.Ty > 0:
         axis.invert_yaxis()
 
-    axis.set_title(re.sub(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}',
-                          ' $T_{AGV}:$' + parse_time(map.date_average).strftime('%Y-%m-%d %H:%M:%S'),
-                          map.latex_name.replace('VLD', 'METIS-VDL')),
+    if map.instrument == 'SoloHI':
+        title = 'SoloHI' + f' Tile-{map.detector}' ' $T_{AGV}:$' + parse_time(map.date_average).strftime('%Y-%m-%d %H:%M:%S')
+    elif map.instrument == 'Metis':
+        title = re.sub(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}',
+                       ' $T_{AGV}:$' + parse_time(map.date_average).strftime('%Y-%m-%d %H:%M:%S'),
+                       map.latex_name.replace('VLD', 'METIS-VDL'))
+    else:
+        title = re.sub(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}',
+                       ' $T_{AGV}:$' + parse_time(map.date_average).strftime('%Y-%m-%d %H:%M:%S'),
+                       map.latex_name)
+    print(map.instrument)
+    print(map.latex_name)
+    axis.set_title(title,
                    fontsize=10, pad=8)
 
     return fig, axis

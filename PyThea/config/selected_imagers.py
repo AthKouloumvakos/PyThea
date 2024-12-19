@@ -80,3 +80,10 @@ imager_dict['EUI-FSI'] = {'fido': (a.Instrument('EUI'), a.soar.Product('EUI-FSI1
 imager_dict['METIS'] = {'fido': (a.Instrument('METIS'), a.soar.Product('METIS-VL-TB'), a.Level(2)),
                         'process': {'dimensions': (1024*u.pixel, 1024*u.pixel), 'superpixel': 2},
                         'source': 'SOLO', 'instrument': 'METIS', 'detector': 'VLD', 'wavelength': 'TB'}
+
+for tile in range(1, 5):
+    z = 'T' if tile in [1, 2] else 'G'
+    imager_dict[f'SOLOHI-T{tile}'] = {'fido': (a.Instrument('SOLOHI'),
+                                               a.soar.Product(f'SOLOHI-{tile}F{z}'), a.Level(2)),
+                                      'process': {'superpixel': 2},
+                                      'source': 'SOLO', 'instrument': 'SOLOHI', 'detector': f'T{tile}'}

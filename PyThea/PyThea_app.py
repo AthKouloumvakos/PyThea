@@ -85,7 +85,7 @@ def footer_text():
             More imaging data have been added:
             - SDO/AIA images from 211A channel.
             - PSP/WISPR inner and outer telescope images.
-            - SolO/EUI and METIS images.
+            - SolO/EUI, METIS, and HI(tiles 1&2) images.
             ''', icon='ℹ️')
     st.warning('''
            **NOTE: From PyThea >0.8.1 the JSON fitting files will be slightly different from the old ones.**
