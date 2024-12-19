@@ -18,6 +18,16 @@ __all__ = ['maps_sequence_processing', 'get_closest', 'normalize_exposure',
            'prepare_maps', 'difference_maps', 'mask_occulter']
 
 
+def check_maps_sequence(map_sequence):
+    if map_sequence:
+        if isinstance(map_sequence, MapSequence):
+            return map_sequence
+        else:
+            return sunpy.map.Map(map_sequence, sequence=True)
+    else:
+        return []
+
+
 def maps_sequence_processing(map_sequence, **kwargs):
     """
     Returns a sequence of maps which is processed as plain images, running or base difference images.
@@ -36,6 +46,7 @@ def maps_sequence_processing(map_sequence, **kwargs):
         A SunPy map.
     """
 
+    map_sequence = check_maps_sequence(map_sequence)
     if len(map_sequence) == 0:
         return []
 
@@ -139,6 +150,7 @@ def filter_maps(map_sequence, **kwargs):
 
     '''
 
+    map_sequence = check_maps_sequence(map_sequence)
     if len(map_sequence) == 0:
         return []
 
@@ -155,11 +167,7 @@ def filter_maps(map_sequence, **kwargs):
         map_sequence = [tmap for tmap in map_sequence if tmap.meta['polar'] == kwargs['polar']]
 
     if len(map_sequence) != 0:
-        if isinstance(map_sequence, MapSequence):
-            return map_sequence
-        else:
-            sequence_final = sunpy.map.Map(map_sequence, sequence=True)
-
+        sequence_final = check_maps_sequence(map_sequence)
     else:
         sequence_final = []
 
@@ -188,6 +196,7 @@ def prepare_maps(map_sequence, **kwargs):
 
     '''
 
+    map_sequence = check_maps_sequence(map_sequence)
     if len(map_sequence) == 0:
         return []
 
@@ -246,6 +255,7 @@ def difference_maps(smapi, smapm):
     if smapm.exposure_time != 1*u.second:
         smapm = normalize_exposure(smapm)
     smap_difference = smapi.data - smapm.data
+
     return sunpy.map.Map(smap_difference, smapi.meta)
 
 
