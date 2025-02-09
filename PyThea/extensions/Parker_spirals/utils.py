@@ -25,7 +25,7 @@ def plot_parker_spiral(axis, map, bodies, sw_speed=350 * (u.km / u.second)):
     None
     """
     for body in bodies:
-        pos = get_horizons_coord(bodies_dict[body][0], map.date_average, 'id')
+        pos = get_horizons_coord(bodies_dict[body][0], map.date_average)
         pos = pos.transform_to(frames.HeliographicCarrington(observer='Earth', obstime=map.date_average))
 
         spiral_coord = Parker_spirals.spiral(pos, sw_speed[body], map.date_average)

@@ -19,7 +19,7 @@ def test_parker_spiral():
     time = '2022-01-01T00:00:00'
     body = bodies_dict['Earth'][0]
 
-    pos = get_horizons_coord(body, time, 'id')
+    pos = get_horizons_coord(body, time)
     pos = pos.transform_to(frames.HeliographicCarrington(observer='Earth', obstime=time))
 
     spiral_coord = Parker_spirals.spiral(pos, 350 * (u.km/u.second), time)
@@ -43,7 +43,7 @@ def test_footpoint():
     time = '2022-01-01T00:00:00'
     body = bodies_dict['Earth'][0]
 
-    pos = get_horizons_coord(body, time, 'id')
+    pos = get_horizons_coord(body, time)
     pos = pos.transform_to(frames.HeliographicCarrington(observer='Earth', obstime=time))
 
     footpoint_coord = Parker_spirals.footpoint(pos, 350 * (u.km/u.second), time)
