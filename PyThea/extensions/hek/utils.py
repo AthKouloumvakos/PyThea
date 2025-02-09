@@ -43,6 +43,9 @@ def plot_hek(axis, map, mode, time_range=[-2, 2], hek_responses=None):
             responses = hek_client.search(a.Time(start_time, end_time),
                                           a.hek.AR, a.hek.FRM.Name == 'HMI SHARP')
 
+            if str(responses) == '<No columns>':
+                return []
+
             responses.keep_columns(['ar_noaanum', 'ar_mcintoshcls', 'ar_mtwilsoncls', 'hgs_x', 'hgs_y', 'event_starttime'])
             indx = [i for i, x in enumerate(responses['ar_noaanum']) if x is None]
             responses.remove_rows(indx)
@@ -98,6 +101,10 @@ def plot_hek(axis, map, mode, time_range=[-2, 2], hek_responses=None):
         if hek_responses is None or not hek_responses['Flares']:
             responses = hek_client.search(a.Time(start_time, end_time),
                                           a.hek.FL, a.hek.FRM.Name == 'SWPC')
+
+            if str(responses) == '<No columns>':
+                return []
+
             responses.keep_columns(['event_starttime', 'event_peaktime', 'fl_goescls', 'hgs_x', 'hgs_y', 'ar_noaanum'])
             responses.remove_rows(np.where((responses['hgs_x'] == 0) & (responses['hgs_y'] == 0)))
             responses = responses[['event_starttime', 'event_peaktime', 'fl_goescls', 'hgs_x', 'hgs_y', 'ar_noaanum']]
