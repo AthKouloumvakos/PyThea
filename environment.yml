@@ -5,16 +5,16 @@ channels:
   - defaults
 
 dependencies:
-  - python=3.9
-  - numpy=1.26.4
+  - python=3.10
+  - numpy
   - pandas
   - scipy
   - matplotlib
   - aiapy
-  - astropy=6.0.0
+  - astropy
   - astroquery
   - numexpr
-  - sunpy=5.1.2
+  - sunpy=6.0.4
   - parfive=2.1.0  # The issue with streamlit and asyncio is resolved (see #13). Keep this for a while to make sure everything works smoothly.
   - streamlit
   - seaborn

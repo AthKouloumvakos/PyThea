@@ -31,12 +31,12 @@ PyThea is an open-source software package that can be used to reconstruct the 3D
 Installing and Running PyThea
 =============================
 
-To install and run PyThea, Python >=3.8 or later is required. We recommend creating a virtual environment using conda and installing PyThea with pip.
+To install and run PyThea, Python >=3.10 or later is required. We recommend creating a virtual environment using conda and installing PyThea with pip.
 
 .. code-block:: bash
 
   # Create the virtual environment
-  conda create --name PyThea python=3.9
+  conda create --name PyThea python=3.10
 
   # Activate the environment
   conda activate PyThea

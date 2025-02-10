@@ -6,7 +6,7 @@ Installing PyThea
 Requirements
 ------------
 
-Python 3.8 or later is required to install and run PyThea.
+Python 3.10 or later is required to install and run PyThea.
 
 If you do not have Python installed already, use these `instructions <https://www.python.org/downloads>`_ to download and install it.
 
@@ -35,9 +35,9 @@ To create a new Conda environment called "PyThea", and then activate it follow t
 
    .. code-block:: bash
 
-      conda create --name PyThea python=3.9
+      conda create --name PyThea python=3.10
 
-   You can replace "3.8" with the desired Python version.
+   You can replace "3.10" with the desired Python version.
 
 3. Use the following command to activate the "PyThea" environment:
 
@@ -63,7 +63,7 @@ Install with pip
 .. code-block:: bash
 
   # Create the virtual environment
-  conda create --name PyThea python=3.9
+  conda create --name PyThea python=3.10
 
   # Activate the environment
   conda activate PyThea

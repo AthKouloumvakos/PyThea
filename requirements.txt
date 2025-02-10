@@ -1,12 +1,12 @@
-numpy==1.26.4
+numpy
 pandas
 scipy
 aiapy
-astropy==6.0.0
+astropy
 astroquery
 jplephem
 numexpr
-sunpy==5.1.2
+sunpy==6.0.4
 sunpy_soar
 parfive==2.1.0
 pooch
