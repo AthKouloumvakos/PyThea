@@ -1,3 +1,15 @@
+# v1.1.0 (12-Feb-2025)
+
+## Minor Changes
+ - Updates the dependencies for sunpy>6.0
+ - Improves the utility of HEK events retrieval
+
+ ## Bug Fixes
+ - Fixes a flakes8 error for using bare except
+ - Fixes get_horizons_coord passing id_type
+ - Fixes a bug when no flare or AR data returned from HEK in the app
+ - Removes AIA fix_observer_location as it is no longer needed
+
 # v1.0.0 (19-Nov-2024)
 
 ## Features
