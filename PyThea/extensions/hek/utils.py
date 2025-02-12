@@ -8,8 +8,67 @@ from sunpy.net import hek
 from sunpy.physics.differential_rotation import solar_rotate_coordinate
 from sunpy.time import parse_time
 
+hek_client = hek.HEKClient()
 
-def plot_hek(axis, map, mode, time_range=[-2, 2], hek_responses=None):
+
+def get_hek_active_regions(date, time_range):
+    start_time = date + TimeDelta(time_range[0] * u.hour)
+    end_time = date + TimeDelta(time_range[1] * u.hour)
+
+    responses = hek_client.search(a.Time(start_time, end_time),
+                                  a.hek.AR, a.hek.FRM.Name == 'HMI SHARP')
+
+    if str(responses) == '<No columns>':
+        return []
+
+    responses.keep_columns(['ar_noaanum', 'ar_mcintoshcls', 'ar_mtwilsoncls', 'hgs_x', 'hgs_y', 'event_starttime'])
+    indx = [i for i, x in enumerate(responses['ar_noaanum']) if x is None]
+    responses.remove_rows(indx)
+    responses = responses[['ar_noaanum', 'ar_mcintoshcls', 'ar_mtwilsoncls', 'hgs_x', 'hgs_y', 'event_starttime']]
+    dates = Time(responses['event_starttime'])
+    time_diff = np.abs(dates - date)
+    time_diff_seconds = np.array([td.sec for td in time_diff])
+    if len(np.unique(time_diff_seconds)) > 1:
+        responses.remove_rows(np.where(time_diff_seconds == np.max(time_diff_seconds)))
+
+    responses_ = hek_client.search(a.Time(start_time, end_time),
+                                   a.hek.AR, a.hek.FRM.Name == 'NOAA SWPC Observer')
+    responses_.keep_columns(['ar_noaanum', 'ar_mcintoshcls', 'ar_mtwilsoncls', 'hgs_x', 'hgs_y'])
+
+    responses['ar_mcintoshcls'] = np.full(responses['ar_noaanum'].shape[0], None)
+    responses['ar_mtwilsoncls'] = np.full(responses['ar_noaanum'].shape[0], None)
+
+    for rn, clm, clw in zip(responses_['ar_noaanum'], responses_['ar_mcintoshcls'], responses_['ar_mtwilsoncls']):
+        i = np.argwhere(responses['ar_noaanum'] == rn)
+        responses['ar_mcintoshcls'][i] = clm
+        responses['ar_mtwilsoncls'][i] = clw
+
+    return responses
+
+
+def get_hek_coronal_holes(start_time, end_time):
+
+    responses = hek_client.search(a.Time(start_time, end_time),
+                                  a.hek.CH, a.hek.FRM.Name == 'SPoCA')
+    return responses
+
+
+def get_hek_flares(start_time, end_time):
+    # TODO: Merge this with get_hek_flare from PyThea utils.
+    responses = hek_client.search(a.Time(start_time, end_time),
+                                  a.hek.FL, a.hek.FRM.Name == 'SWPC')
+
+    if str(responses) == '<No columns>':
+        return []
+
+    responses.keep_columns(['event_starttime', 'event_peaktime', 'fl_goescls', 'hgs_x', 'hgs_y', 'ar_noaanum'])
+    responses.remove_rows(np.where((responses['hgs_x'] == 0) & (responses['hgs_y'] == 0)))
+    responses = responses[['event_starttime', 'event_peaktime', 'fl_goescls', 'hgs_x', 'hgs_y', 'ar_noaanum']]
+
+    return responses
+
+
+def plot_hek(axis, date, mode, time_range=[-2, 2], hek_responses=None):
     """
     Plots HEK (Heliophysics Event Knowledgebase) events on a given axis.
 
@@ -34,40 +93,13 @@ def plot_hek(axis, map, mode, time_range=[-2, 2], hek_responses=None):
     responses: list
         The list of HEK event responses.
     """
-    hek_client = hek.HEKClient()
-    start_time = map.date_average + TimeDelta(time_range[0] * u.hour)
-    end_time = map.date_average + TimeDelta(time_range[1] * u.hour)
+
+    start_time = date + TimeDelta(time_range[0] * u.hour)
+    end_time = date + TimeDelta(time_range[1] * u.hour)
 
     if mode == 'Active Regions':
         if hek_responses is None or not hek_responses['Active Regions']:
-            responses = hek_client.search(a.Time(start_time, end_time),
-                                          a.hek.AR, a.hek.FRM.Name == 'HMI SHARP')
-
-            if str(responses) == '<No columns>':
-                return []
-
-            responses.keep_columns(['ar_noaanum', 'ar_mcintoshcls', 'ar_mtwilsoncls', 'hgs_x', 'hgs_y', 'event_starttime'])
-            indx = [i for i, x in enumerate(responses['ar_noaanum']) if x is None]
-            responses.remove_rows(indx)
-            responses = responses[['ar_noaanum', 'ar_mcintoshcls', 'ar_mtwilsoncls', 'hgs_x', 'hgs_y', 'event_starttime']]
-            dates = Time(responses['event_starttime'])
-            time_diff = np.abs(dates - map.date_average)
-            time_diff_seconds = np.array([td.sec for td in time_diff])
-            if len(np.unique(time_diff_seconds)) > 1:
-                responses.remove_rows(np.where(time_diff_seconds == np.max(time_diff_seconds)))
-
-            responses_ = hek_client.search(a.Time(start_time, end_time),
-                                           a.hek.AR, a.hek.FRM.Name == 'NOAA SWPC Observer')
-            responses_.keep_columns(['ar_noaanum', 'ar_mcintoshcls', 'ar_mtwilsoncls', 'hgs_x', 'hgs_y'])
-
-            responses['ar_mcintoshcls'] = np.full(responses['ar_noaanum'].shape[0], None)
-            responses['ar_mtwilsoncls'] = np.full(responses['ar_noaanum'].shape[0], None)
-
-            for rn, clm, clw in zip(responses_['ar_noaanum'], responses_['ar_mcintoshcls'], responses_['ar_mtwilsoncls']):
-                i = np.argwhere(responses['ar_noaanum'] == rn)
-                responses['ar_mcintoshcls'][i] = clm
-                responses['ar_mtwilsoncls'][i] = clw
-            print(responses)
+            responses = get_hek_active_regions(date, time_range)
         else:
             responses = hek_responses['Active Regions']
 
@@ -81,8 +113,7 @@ def plot_hek(axis, map, mode, time_range=[-2, 2], hek_responses=None):
                           horizontalalignment='center', verticalalignment='center')
     elif mode == 'Coronal Holes':
         if hek_responses is None or not hek_responses['Coronal Holes']:
-            responses = hek_client.search(a.Time(start_time, end_time),
-                                          a.hek.CH, a.hek.FRM.Name == 'SPoCA')
+            responses = get_hek_coronal_holes(start_time, end_time)
         else:
             responses = hek_responses['Coronal Holes']
 
@@ -95,19 +126,11 @@ def plot_hek(axis, map, mode, time_range=[-2, 2], hek_responses=None):
                 [(float(v[0]), float(v[1])) * u.arcsec for v in p3],
                 obstime=ch_date, observer='earth',
                 frame=frames.Helioprojective)
-            rotated_ch_boundary = solar_rotate_coordinate(ch_boundary, time=map.date_average)
+            rotated_ch_boundary = solar_rotate_coordinate(ch_boundary, time=date)
             axis.plot_coord(rotated_ch_boundary, color='c')
     elif mode == 'Flares':
         if hek_responses is None or not hek_responses['Flares']:
-            responses = hek_client.search(a.Time(start_time, end_time),
-                                          a.hek.FL, a.hek.FRM.Name == 'SWPC')
-
-            if str(responses) == '<No columns>':
-                return []
-
-            responses.keep_columns(['event_starttime', 'event_peaktime', 'fl_goescls', 'hgs_x', 'hgs_y', 'ar_noaanum'])
-            responses.remove_rows(np.where((responses['hgs_x'] == 0) & (responses['hgs_y'] == 0)))
-            responses = responses[['event_starttime', 'event_peaktime', 'fl_goescls', 'hgs_x', 'hgs_y', 'ar_noaanum']]
+            responses = get_hek_flares(start_time, end_time)
         else:
             responses = hek_responses['Flares']
 

@@ -352,7 +352,7 @@ def figure_streamlit(st, running_map, image_mode, imager, model):
         if 'hek_responses' not in st.session_state:
             st.session_state.hek_responses = {'Active Regions': [], 'Coronal Holes': [], 'Flares': []}
         for mode in st.session_state.hek_list:
-            st.session_state.hek_responses[mode] = plot_hek(axis, running_map, mode,
+            st.session_state.hek_responses[mode] = plot_hek(axis, running_map.date_average, mode,
                                                             st.session_state.imaging_time_range,
                                                             hek_responses=st.session_state.hek_responses)
 
