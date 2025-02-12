@@ -18,15 +18,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: '3.10'
       - name: Checkout PyThea
         uses: actions/checkout@master
       - name: Install flake8
         run: pip install flake8
       - name: Python flake8 Lint
-        uses: py-actions/flake8@v2.2.0
+        uses: py-actions/flake8@v2.3.0
         with:
           args: "--select 'E101,E11,E111,E112,E113,E121,E122,E123,E124,E125,E126,E127,E128,E129,E131,E133,E20,E211,E225,E231,E241,E242,E251,E252,E26,E265,E266,E27,E301,E302,E303,E304,E305,E306,E401,E402,E502,E701,E711,E712,E713,E714,E722,E731,E901,E902,F401,F822,F823,F841,W191,W291,W292,W293,W391,W601,W602,W603,W604,W605,W690'"
           exclude: "__init__.py,PyThea/extensions/"

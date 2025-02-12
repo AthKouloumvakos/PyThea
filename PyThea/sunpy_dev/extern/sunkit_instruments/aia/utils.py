@@ -8,7 +8,7 @@ __all__ = ['prep_aia']
 def prep_aia(map_sequence):
     try:
         map_sequence = [update_pointing(tmap) for tmap in map_sequence]
-    except Exception as e:
+    except Exception:
         warnings.warn('Prepare AIA maps failed, script proceeded without update_pointing. Check connection with JSOC.', UserWarning)
 
     # AIAMap already fixes the .observer_coordinate property with HAE, therefore, the following is removed.
