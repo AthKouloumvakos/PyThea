@@ -19,6 +19,8 @@
 
 
 import datetime
+import glob
+import os
 from copy import copy
 
 import astropy.units as u
@@ -60,6 +62,20 @@ def highlight_row(row, row_index):
     return ['']*len(row)
 
 
+def clear_text_input():
+    st.session_state['manual_dir'] = st.session_state['manual_dir_text']
+    st.session_state['manual_dir_text'] = ''
+
+
+def list_fits_files(directory):
+    """Returns a list of .fits and .fts file paths from the selected directory."""
+    if directory:
+        fits_files = glob.glob(os.path.join(directory, '*.fits')) + \
+            glob.glob(os.path.join(directory, '*.fts'))
+        return fits_files
+    return []
+
+
 def footer_text():
     st.subheader('About this application:')
     st.markdown("""
@@ -85,6 +101,10 @@ def footer_text():
     st.markdown("""
                 **Citation**: Please cite the following paper [![https://www.frontiersin.org/articles/10.3389/fspas.2022.974137/](https://img.shields.io/static/v1?label=Paper&message=Frontiers&color=red)](https://www.frontiersin.org/articles/10.3389/fspas.2022.974137/) and [![https://doi.org/10.5281/zenodo.5713659](https://zenodo.org/badge/DOI/10.5281/zenodo.5713659.svg)](https://doi.org/10.5281/zenodo.5713659)
                 """)
+    st.success('''
+            **Don't miss these new features:**
+            - Import .fits files from folder.
+            ''', icon='ℹ️')
     st.info('''
             More imaging data have been added:
             - SDO/AIA images from 211A channel.
@@ -208,6 +228,37 @@ def run():
                                                  kwargs={'vars': ['map', 'map_', 'imagers_list_', 'hek_responses']},
                                                  use_container_width=True)
 
+        # Import Imagers Manually
+        select_imager_manual_form = st.container()
+        if 'manual_dir' not in st.session_state:
+            st.session_state['manual_dir'] = ''
+
+        imager_manual = select_imager_manual_form.selectbox('Select an imager for manual import',
+                                                            options={key: value for key, value in selected_imagers.imager_dict.items() if not key.endswith('m')})
+        select_imager_manual_form.text_input('Enter path containing the .fits files',
+                                             key='manual_dir_text', on_change=clear_text_input)
+
+        if st.session_state.manual_dir:
+            if os.path.isdir(st.session_state.manual_dir):
+                fits_files = list_fits_files(st.session_state.manual_dir)
+                if fits_files:
+                    selected_imagers.imager_dict[f'{imager_manual}m'] = selected_imagers.imager_dict[imager_manual].copy()
+                    selected_imagers.imager_dict[f'{imager_manual}m']['fido'] = {
+                        'path': st.session_state.manual_dir,
+                        'fits_files': fits_files}
+                    st.session_state['manual_dir'] = ''
+                    st.rerun()
+                else:
+                    select_imager_manual_form.warning('No FITS files found in the selected directory.')
+            else:
+                select_imager_manual_form.error('Invalid directory. Please enter a valid folder path.')
+            st.session_state['manual_dir'] = ''
+
+        filtered_imager_dict = [key for key in selected_imagers.imager_dict.keys() if key.endswith('m')]
+        if filtered_imager_dict:
+            formatted_list = ', '.join(filtered_imager_dict)
+            select_imager_manual_form.success(f'Imagers available for manual import: {formatted_list}')
+
     with st.sidebar.expander('Processing Options'):
         procoption_container = st.container()
         if 'imagers_list_' not in st.session_state:
@@ -305,7 +356,10 @@ def run():
                                    st.session_state.date_process + datetime.timedelta(hours=imaging_time_range[1]))
 
                 if st.session_state.offline_mode is False:
-                    downloaded_files = download_fits(timerange, imager)
+                    if imager[-1] != 'm':
+                        downloaded_files = download_fits(timerange, imager)
+                    else:
+                        downloaded_files = selected_imagers.imager_dict[imager]['fido']['fits_files']
                 elif st.session_state.offline_mode is True:
                     progress_bar.desc = f'Load {imager} images from local database.'
                     event_id = st.session_state.event_selected.replace('-', '').replace(':', '').replace('|', 'D').replace('.', 'p') \
