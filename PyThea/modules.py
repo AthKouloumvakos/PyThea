@@ -100,7 +100,7 @@ def date_and_event_selection(st):
                 t_ = st.session_state.date_process.strftime('%Y-%m-%dT%H:%M:%S')
                 st.session_state.event_selected = f'{ev_id}|{t_}'
                 st.rerun()
-            st.form_submit_button()
+            st.form_submit_button(use_container_width=True)
 
     elif initialisation == 'File':
         # File upload for loading fitting file (JSON)
@@ -122,7 +122,7 @@ def date_and_event_selection(st):
 
             st.rerun()
 
-    st.session_state.offline_mode = st.sidebar.checkbox('Work with offline mode active?', value=False)
+    st.session_state.offline_mode = st.sidebar.toggle('Work with offline mode active?', value=False)
     if st.session_state.offline_mode:
         st.sidebar.info(f'Fits files will be loaded from PyThea\'s database directory: {database_dir_default}', icon='ℹ️')
 

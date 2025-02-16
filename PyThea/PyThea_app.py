@@ -192,7 +192,7 @@ def run():
                                                        options=selected_imagers.imager_dict.keys(),
                                                        default=['LC2', 'LC3', 'COR2A'],
                                                        key='imagers_list')
-        select_imagers_form.form_submit_button(label='Submit')
+        select_imagers_form.form_submit_button(label='Submit', use_container_width=True)
         select_timerange_form = st.form(key='select_timerange_form', border=False)
         imaging_time_range = select_timerange_form.slider('Time Range [hours]',
                                                           min_value=-3., max_value=6.,
@@ -200,7 +200,8 @@ def run():
                                                           key='imaging_time_range')
         select_timerange_form.form_submit_button(label='Submit',
                                                  on_click=delete_from_state,
-                                                 kwargs={'vars': ['map', 'map_', 'imagers_list_', 'hek_responses']})
+                                                 kwargs={'vars': ['map', 'map_', 'imagers_list_', 'hek_responses']},
+                                                 use_container_width=True)
 
     with st.sidebar.expander('Processing Options'):
         procoption_container = st.container()
