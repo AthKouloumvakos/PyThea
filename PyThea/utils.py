@@ -97,7 +97,7 @@ def make_figure(map, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):
 
     Parameters
     ----------
-    map : sunpy.map.Map
+    map : sunpy.map.GenericMap
         The SunPy map to be plotted.
     cmap : str, optional
         The colormap to be used for the plot (default is 'Greys_r').
@@ -180,7 +180,7 @@ def plot_bodies(axis, bodies_list, smap, bodies_dict=None):
         The matplotlib axis to plot on.
     bodies_list : list
         A list of bodies to be plotted.
-    smap : sunpy.map.Map
+    smap : sunpy.map.GenericMap
         The SunPy map object containing the data.
     bodies_dict : dict
         A dictionary where keys are body names and values are tuples containing
@@ -215,7 +215,7 @@ def plot_solar_reference_lines(axis, bodies_list, smap, mode='Limb from Obs.', b
         The axis to plot on.
     bodies_list : list
         List of bodies to plot reference lines for (e.g., 'Earth', 'Venus').
-    smap : sunpy.map.Map
+    smap : sunpy.map.GenericMap
         The SunPy map for which the reference lines are plotted.
     mode : str, optional
         The mode of reference lines to plot. Options are 'Limb from Obs.', 'Central Meridian from Obs.',
@@ -340,7 +340,7 @@ def load_fits(files):
 
     Returns
     -------
-    sunpy.map.Map or list of sunpy.map.Map
+    sunpy.map.GenericMap or list of sunpy.map.GenericMap
         A SunPy map sequence if multiple maps are loaded, or a single SunPy map if only one map is loaded.
     """
     maps_ = []

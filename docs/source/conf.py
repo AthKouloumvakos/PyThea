@@ -6,6 +6,7 @@
 
 # -- Path setup --------------------------------------------------------------
 
+import datetime
 import os
 import sys
 
@@ -13,17 +14,18 @@ import sys
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import sphinx_rtd_theme
 from sphinx_gallery.sorting import ExplicitOrder
+
+from PyThea.version import version as pythea_version
 
 sys.path.insert(0, os.path.abspath('../../'))
 
 # -- Project information -----------------------------------------------------
 
 project = 'PyThea'
-copyright = '2024, Athanasios Kouloumvakos'
 author = 'Athanasios Kouloumvakos'
-version = ''
+copyright = f'{datetime.datetime.now().year}, {author}'
+version = pythea_version
 release = ''
 
 
@@ -99,7 +101,7 @@ autosummary_generate = True
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+# html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -110,7 +112,7 @@ html_css_files = ['css/custom.css']
 html_logo = '../logo/pythea_logo_wb.png'
 html_theme_options = {
     'logo_only': False,
-    'display_version': True,
+    # 'display_version': True,
 }
 # html_favicon = "./_static/icon.ico"
 
@@ -123,7 +125,7 @@ nitpick_ignore = [('py:class', "Unit('deg')"),
                   ]
 
 intersphinx_mapping = {'python': ('https://docs.python.org/3/', None),
-                       'xarray': ('https://xarray.pydata.org/en/stable/', None),
+                       'xarray': ('https://docs.xarray.dev/en/stable/', None),
                        'astropy': ('https://docs.astropy.org/en/stable/', None),
                        'scipy': ('https://docs.scipy.org/doc/scipy', None),
                        'sunpy': ('https://docs.sunpy.org/en/stable/', None),

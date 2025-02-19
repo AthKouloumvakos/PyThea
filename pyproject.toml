@@ -1,6 +1,88 @@
 [build-system]
 requires = [
-         "setuptools",
-         "setuptools_scm",
-         "wheel",
-         ]
+  "setuptools>=62.1",
+  "setuptools_scm[toml]>=8.0.1",
+  "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "PyThea"
+description = "PyThea: A software package to reconstruct the 3D structure of CMEs and shock waves"
+requires-python = ">=3.11"
+readme = "README.md"
+license = { file = "LICENSE.md" }
+classifiers=[
+  'Programming Language :: Python',
+  'Programming Language :: Python :: 3',
+  'Programming Language :: Python :: 3.11',
+  'Development Status :: 5 - Production/Stable',
+  'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+  'Operating System :: OS Independent',
+  'Intended Audience :: Science/Research',
+  'Topic :: Scientific/Engineering :: Physics',
+]
+keywords=['science', 'solar physics', 'solar', 'coronal mass ejections', 'shock waves', 'EUV waves']
+authors = [
+  { name = "Athanasios Kouloumvakos", email = "athkouloumvakos@gmail.com" },
+]
+
+dependencies = [
+  "sunpy==6.0.4",
+  "parfive>=2.0.0",  # The issue with streamlit and asyncio is resolved (see #13). Keep this for a while to make sure everything works smoothly.
+  "pandas",
+  "scipy",
+  "matplotlib",
+  "aiapy",
+  "numexpr",
+  "streamlit",
+  "seaborn",
+  "pyvista",
+  "sunpy_soar",
+]
+
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://www.pythea.org"
+Documentation = "https://www.pythea.org/en/latest/"
+"Source Code" = "https://github.com/AthKouloumvakos/PyThea"
+Download = "https://pypi.org/project/PyThea"
+
+[project.optional-dependencies]
+all = ["pythea"]
+tests = [
+  "jplephem",
+  "pooch",
+  "pytest",
+  "pytest-astropy",
+  "pytest-sugar",
+  "pytest-mpl"
+]
+docs = [
+  "pooch",
+  "plotly",
+  "jplephem",
+  "sphinx>=6.0.0",
+  "sphinx-automodapi",
+  "sphinx-gallery",
+  "jupyter_sphinx",
+  "sphinx-rtd-theme",
+  "numpydoc"
+]
+
+[tool.setuptools]
+zip-safe = false
+include-package-data = true
+platforms = ["any"]
+provides = ["PyThea"]
+license-files = ["LICENSE.md"]
+
+[tool.setuptools.packages.find]
+include = ["PyThea*"]
+
+[tool.setuptools_scm]
+version_file = "PyThea/_version.py"
+
+[project.scripts]
+pythea = "PyThea.pythea_cli:main"

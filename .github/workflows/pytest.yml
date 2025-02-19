@@ -20,7 +20,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
       - name: Checkout PyThea
         uses: actions/checkout@master
       - name: Create a virtual environment
@@ -28,6 +28,6 @@ jobs:
       - name: Activate the enviroment
         run: source env/bin/activate
       - name: Install requirements
-        run: pip install -r requirements.txt
+        run: pip install 'PyThea[tests]'
       - name: pytest
         run: python -m pytest

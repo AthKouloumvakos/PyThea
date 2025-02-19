@@ -9,7 +9,6 @@ import sys
 from typing import Optional
 
 import click
-import pytest
 import streamlit
 import streamlit.web.bootstrap as bootstrap
 from streamlit.runtime.credentials import check_credentials
@@ -104,6 +103,13 @@ def update():
 @click.option('--all', is_flag=True, default=False, help='Run the test including figure tests.')
 def main_test(mpl, remote_data, all):
     """Test PyThea."""
+    try:
+        import pytest
+    except ImportError:
+        raise RuntimeError(
+            'ERROR: `pytest` is not installed.'
+            'Please install it using: pip install "PyThea[tests]"'
+        )
 
     test_directory = os.path.dirname(__file__)
 

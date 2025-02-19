@@ -16,8 +16,8 @@ We recommend, creating a virtual environment for _PyThea_ and installing the pac
 If you use Anaconda or Miniconda (which we also recommend) you can create a virtual environment using ```conda``` and then install _PyThea_ using from PyPI using ```pip```. In the terminal do the following:
 
 ```python
-# Create a virtual environment. Use python>3.9
-conda create --name PyThea python=3.10
+# Create a virtual environment. Use python>3.11
+conda create --name PyThea python=3.11
 
 # Activate the environment
 conda activate PyThea
@@ -85,7 +85,7 @@ Deactivate the environment when you finish.
 
 If there is an error when running ```PyThea streamlit``` then you can manually run PyThea following these steps:
 
-1) Locate where PyThea_app.py have been instaled. This is usually inside the anaconda3 enviroment folder. For example here ```~/opt/anaconda3/envs/PyThea/lib/python3.9/site-packages/PyThea```
+1) Locate where PyThea_app.py have been instaled. This is usually inside the anaconda3 enviroment folder. For example here ```~/opt/anaconda3/envs/PyThea/lib/python3.11/site-packages/PyThea```
 
 2) Then run the PyThea_app.py using: ```streamlit run <PyTheaRootDir>/PyThea_app.py``` replacing  \<PyTheaRootDir\> with your path first.
 
