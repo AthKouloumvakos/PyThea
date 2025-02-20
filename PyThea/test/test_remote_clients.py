@@ -57,32 +57,72 @@ def test_hek_client_flare_data():
     assert all(hek_query['event_endtime'] == Time(['2011-08-09 07:27:00.000', '2011-08-09 08:08:00.000']))
 
 
-def imager_query():
-    for imager in imager_dict.keys():
-        yield imager
+def imager_query(imagers):
+    return imagers.keys()
+
+
+imagers_vso = {
+    'AIA-193': [60, 61], 'AIA-211': [60, 61],
+    'LC2': [5], 'LC3': [5],
+    'COR2A': [7], 'COR2B': [7],
+    'EUVIA': [11], 'EUVIB': [11],
+    'COR1A': [18, 34], 'COR1B': [17, 66],
+    'HI1A': [1, 2, 3], 'HI1B': [1, 2],
+    'HI2A': [1, 2], 'HI2B': [1],
+    'WISPR1': [193], 'WISPR2': [193],
+}
 
 
 @pytest.mark.remote_data
-@pytest.mark.parametrize('imager', imager_query())
+@pytest.mark.parametrize('imager', imager_query(imagers_vso))
 def test_vso_search(imager):
     """
     Tests that the Fido.search returns always the same number of files from VSO.
     """
-    file_num = {'AIA-193': [60, 61], 'AIA-211': [60, 61],
-                'LC2': [5], 'LC3': [5],
-                'COR2A': [7], 'COR2B': [7],
-                'EUVIA': [11], 'EUVIB': [11],
-                'COR1A': [18, 34], 'COR1B': [17, 66],
-                'HI1A': [1, 2, 3], 'HI1B': [1, 2],
-                'HI2A': [1, 2], 'HI2B': [1], }
+    if imager in ['WISPR1', 'WISPR2']:
+        query_times = [
+            a.Time('2021/08/08 00:00:00', '2021/08/09 00:00:00'),
+        ]
+    else:
+        query_times = [
+            a.Time('2011/01/01 00:00:00', '2011/01/01 01:00:00'),
+            a.Time('2012/01/01 00:00:00', '2012/01/01 01:00:00'),
+            a.Time('2013/01/01 00:00:00', '2013/01/01 01:00:00')
+        ]
 
-    for query in [a.Time('2011/01/01 00:00:00', '2011/01/01 01:00:00'),
-                  a.Time('2012/01/01 00:00:00', '2012/01/01 01:00:00'),
-                  a.Time('2013/01/01 00:00:00', '2013/01/01 01:00:00'), ]:
-        args = imager_dict[imager]['fido']
+    args = imager_dict[imager]['fido']
+
+    for query in query_times:
         result = Fido.search(query, *args)
 
         assert len(result) == 1
         assert 'vso' in result.keys()
+        assert result.file_num in imagers_vso[imager]
 
-        assert result.file_num in file_num[imager]
+
+imagers_soar = {
+    'SOLOHI-T1': [120],
+    'SOLOHI-T2': [120],
+    'EUI-FSI': [144],
+    'METIS': [554],
+}
+
+
+@pytest.mark.remote_data
+@pytest.mark.parametrize('imager', imager_query(imagers_soar))
+def test_soar_search(imager):
+    """
+    Tests that the Fido.search returns always the same number of files from VSO.
+    """
+    query_times = [
+        a.Time('2023/10/10 00:00:00', '2023/10/11 00:00:00'),
+    ]
+
+    args = imager_dict[imager]['fido']
+
+    for query in query_times:
+        result = Fido.search(query, *args)
+
+        assert len(result) == 1
+        assert 'soar' in result.keys()
+        assert result.file_num in imagers_soar[imager]
