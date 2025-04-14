@@ -434,7 +434,6 @@ def run():
             fig, axis = figure_streamlit(st, get_closest(st.session_state.map[supl_imagers[0]], running_map_date), image_mode, supl_imagers[0], model)
             col1.pyplot(fig)
             fig, axis = figure_streamlit(st, get_closest(st.session_state.map[supl_imagers[1]], running_map_date), image_mode, supl_imagers[1], model)
-            model.plot(axis, mode='Skeleton')
             col2.pyplot(fig)
 
     #############################################################
