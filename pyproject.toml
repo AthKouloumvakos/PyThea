@@ -28,8 +28,7 @@ authors = [
 ]
 
 dependencies = [
-  "sunpy==6.0.4",
-  "parfive>=2.0.0",  # The issue with streamlit and asyncio is resolved (see #13). Keep this for a while to make sure everything works smoothly.
+  "sunpy>=7.0.1",
   "pandas",
   "scipy",
   "matplotlib",
