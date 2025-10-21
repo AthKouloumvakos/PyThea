@@ -1,6 +1,16 @@
 # v1.1.0 (12-Feb-2025)
 
 ## Minor Changes
+ - Change installation to pyproject.toml
+ - Updates dependences with sunpy>=7.0.1
+
+ ## Bug Fixes
+ - Fixes remote tests with the addition of new imagers
+ - Fixes bug with supplementary imager
+
+# v1.1.0 (12-Feb-2025)
+
+## Minor Changes
  - Updates the dependencies for sunpy>6.0
  - Improves the utility of HEK events retrieval
 
