@@ -121,8 +121,8 @@ def make_figure(map, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):
     This function customizes the plot by optionally applying a median filter,
     setting color limits, drawing the solar limb, and adjusting axis properties.
     """
-    fig = kwargs.get('fig', plt.figure())
-    axis = kwargs.get('axis', plt.subplot(projection=map))
+    fig = kwargs['fig'] if 'fig' in kwargs else plt.figure()
+    axis = kwargs['axis'] if 'axis' in kwargs else plt.subplot(projection=map)
 
     median_filter_value = kwargs.get('median_filter', 1)
     if median_filter_value != 1:
