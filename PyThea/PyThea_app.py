@@ -50,10 +50,14 @@ def delete_from_state(vars):
 
 
 def highlight_row(row, row_index):
-    if row.name.strftime('%Y-%m-%dT%H:%M:%S.%f') == row_index.strftime('%Y-%m-%dT%H:%M:%S.%f').values[0]:
-        return ['background-color: lightpink']*len(row)
-    else:
-        return ['']*len(row)
+    try:
+        if not len(row_index):
+            return ['']*len(row)
+        if row.name.strftime('%Y-%m-%dT%H:%M:%S.%f') == row_index.strftime('%Y-%m-%dT%H:%M:%S.%f').values[0]:
+            return ['background-color: lightpink']*len(row)
+    except (IndexError, AttributeError):
+        pass
+    return ['']*len(row)
 
 
 def footer_text():
@@ -163,6 +167,8 @@ def run():
         long_val = [0., 360.]
     elif st.session_state.coord_system == 'HGS':
         long_val = [-180., 180.]
+    else:
+        raise ValueError(f"Unsupported coordinate system: '{st.session_state.coord_system}'. Expected 'HGC' or 'HGS'.")
 
     longit = st.sidebar.slider(f'{st.session_state.coord_system} \
                                Longitude [deg.]:',
@@ -180,7 +186,6 @@ def run():
 
     fitting_sliders(st)
 
-    col1, col3, col2 = st.sidebar.columns(3)
     store_fit_button_pressed = st.sidebar.button('Store Fit')
 
     #############################################################
@@ -294,7 +299,7 @@ def run():
         st.session_state['imagers_list_'] = imagers_list
         progress_bar = st.progress(0, text='Preparing to Download data')
         for i, imager in enumerate(imager_added):
-            progress_bar.progress(i/len(imager_added), text=f'Download {imager} images from VSO')
+            progress_bar.progress((i + 1)/len(imager_added), text=f'Download {imager} images from VSO')
             if imager not in st.session_state.map_:
                 timerange = a.Time(st.session_state.date_process + datetime.timedelta(hours=imaging_time_range[0]),
                                    st.session_state.date_process + datetime.timedelta(hours=imaging_time_range[1]))
@@ -394,6 +399,8 @@ def run():
                           frame=frames.HeliographicStonyhurst,
                           observer='earth',
                           obstime=running_map_date)
+    else:
+        raise ValueError(f"Unsupported coordinate system: '{st.session_state.coord_system}'. Expected 'HGC' or 'HGS'.")
     st.session_state.center = center
 
     if st.session_state.geometrical_model == 'Spheroid':
@@ -402,6 +409,8 @@ def run():
         model = ellipsoid(center, radaxis, orthoaxis1, orthoaxis2, tilt)
     elif st.session_state.geometrical_model == 'GCS':
         model = gcs(center, height, alpha, kappa, tilt)
+    else:
+        raise ValueError(f"Unsupported geometrical model: '{st.session_state.geometrical_model}'. Expected 'Spheroid', 'Ellipsoid', or 'GCS'.")
 
     #############################################################
     # Plot main and supplement figure images
@@ -418,9 +427,11 @@ def run():
         st.markdown('*Active Regions without NOAA number have been removed from the table.')
 
     if plt_supp_imagers:
-        if len(st.session_state.imagers_list_) < 3:
-            other_element = [element for element in st.session_state.imagers_list_ if element != imager_select][0]
-            fig, axis = figure_streamlit(st, get_closest(st.session_state.map[other_element], running_map_date), image_mode, other_element, model)
+        other_elements = [element for element in st.session_state.imagers_list_ if element != imager_select]
+        if not other_elements:
+            st.warning('No supplementary imagers available.')
+        elif len(st.session_state.imagers_list_) < 3:
+            fig, axis = figure_streamlit(st, get_closest(st.session_state.map[other_elements[0]], running_map_date), image_mode, other_elements[0], model)
             st.pyplot(fig)
         else:
             supl_imagers_list = copy(st.session_state.imagers_list_)
@@ -502,6 +513,8 @@ def run():
             fit_args_ = {'type': 'custom', 'expression': fitcustexpres_select,
                          'bounds': ([-np.inf, -np.inf, -np.inf], [np.inf, np.inf, np.inf]), 'order': 3}
             st.info(f'A custom function {fit_args_["expression"]} was fitted when processing parameters.')
+        else:
+            raise ValueError(f"Unsupported fit mode: '{fit_mode}'. Expected 'polynomial', 'spline', or 'custom'.")
 
         if plt_kinematics_select == 'All':
             col1, col2 = st.columns(2)

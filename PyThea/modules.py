@@ -88,8 +88,8 @@ def date_and_event_selection(st):
 
     elif initialisation == 'Manual':
         # Manual form for event ID selection and time input
-        with st.sidebar.form('my_form'):
-            col1, col2 = st.columns(2)
+        with st.sidebar.form('my_form') as form:
+            col1, col2 = form.columns(2)
             ev_id = col1.selectbox('Event ID',
                                    options=['Select', 'FL', 'CME', 'SHW'])
             time = col2.time_input('Time', datetime.time(12, 0))
@@ -256,6 +256,8 @@ def final_parameters_gmodel(st):
             rcenter, radaxis, orthoaxis1 = (st.session_state.rcenter * u.R_sun,
                                             st.session_state.radaxis * u.R_sun,
                                             st.session_state.orthoaxis1 * u.R_sun)
+        else:
+            raise ValueError(f"Unsupported representation mode for Spheroid: '{rmode}'. Expected 'h, e, k' or 'r, a, b'.")
         return rcenter, radaxis, orthoaxis1
 
     elif gmodel == 'Ellipsoid':
@@ -269,6 +271,8 @@ def final_parameters_gmodel(st):
                                                         st.session_state.radaxis * u.R_sun,
                                                         st.session_state.orthoaxis1 * u.R_sun,
                                                         st.session_state.orthoaxis2 * u.R_sun)
+        else:
+            raise ValueError(f"Unsupported representation mode for Ellipsoid: '{rmode}'. Expected 'h, e, k, a' or 'r, a, b, c'.")
         tilt = st.session_state.tilt * u.degree
         return rcenter, radaxis, orthoaxis1, orthoaxis2, tilt
 
@@ -278,6 +282,8 @@ def final_parameters_gmodel(st):
             alpha = st.session_state.alpha * u.degree
             kappa = st.session_state.kappa
             rcenter = gcs.rcenter_(height, alpha, kappa)
+        else:
+            raise ValueError(f"Unsupported representation mode for GCS: '{rmode}'. Expected 'h, a, k, t'.")
         tilt = st.session_state.tilt * u.degree
         return rcenter, height, alpha, kappa, tilt
 
@@ -325,13 +331,17 @@ def figure_streamlit(st, running_map, image_mode, imager, model):
 
     # Plot the model based on the selected mesh mode
     plot_mode = st.session_state.plot_mesh_mode
-    if plot_mode == 'Skeleton':
+    if plot_mode == 'No plot':
+        pass
+    elif plot_mode == 'Skeleton':
         model.plot(axis, mode='Skeleton')
     elif plot_mode == 'Full':
         model.plot(axis, mode='Skeleton')
         model.plot(axis, mode='Full')
     elif plot_mode == 'Surface':
         model.plot(axis, only_surface=True)
+    else:
+        raise ValueError(f"Unsupported plot mode: '{plot_mode}'. Expected 'No plot', 'Skeleton', 'Full', or 'Surface'.")
 
     # Optionally plot star field, solar reference lines, and Parker spirals
     if st.session_state.star_field:
@@ -352,7 +362,7 @@ def figure_streamlit(st, running_map, image_mode, imager, model):
         if 'hek_responses' not in st.session_state:
             st.session_state.hek_responses = {'Active Regions': [], 'Coronal Holes': [], 'Flares': []}
         for mode in st.session_state.hek_list:
-            st.session_state.hek_responses[mode] = plot_hek(axis, running_map.date_average, mode,
+            st.session_state.hek_responses[mode] = plot_hek(axis, getattr(running_map, 'date_average', None) or running_map.date, mode,
                                                             st.session_state.imaging_time_range,
                                                             hek_responses=st.session_state.hek_responses)
 
