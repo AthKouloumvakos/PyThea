@@ -55,6 +55,9 @@ def update_nested_dict(d, u):
 
 def get_fits_filenames_from_database(event_id, timerange, imager):
 
+    if imager not in imager_dict:
+        raise KeyError(f"Unknown imager '{imager}'. Available imagers: {list(imager_dict.keys())}")
+
     db_args = [imager_dict[imager]['source'],
                imager_dict[imager]['instrument'],
                imager_dict[imager].get('detector', imager_dict[imager].get('wavelength'))]

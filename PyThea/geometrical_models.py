@@ -406,7 +406,7 @@ class spheroid:
         output += 'CRLT = %3.2f degrees \n'%center_.lat.to_value(u.degree)
         output += 'rcenter = %3.2f Rsun \n'%self.rcenter.to_value(u.R_sun)
         output += 'radaxis = %3.2f Rsun \n'%self.radaxis.to_value(u.R_sun)
-        output += 'height = %3.2f Rsun \n'%self.radaxis.to_value(u.R_sun)
+        output += 'height = %3.2f Rsun \n'%self.height.to_value(u.R_sun)
         output += 'kappa = %3.2f \n'%self.kappa
         output += 'epsilon = %3.2f '%self.epsilon
         output += '>'
@@ -576,7 +576,7 @@ class ellipsoid(spheroid):
         output += 'radaxis = %3.2f Rsun \n'%self.radaxis.to_value(u.R_sun)
         output += 'orthoaxis1 = %3.2f Rsun \n'%self.orthoaxis1.to_value(u.R_sun)
         output += 'orthoaxis2 = %3.2f Rsun \n'%self.orthoaxis2.to_value(u.R_sun)
-        output += 'height = %3.2f Rsun \n'%self.radaxis.to_value(u.R_sun)
+        output += 'height = %3.2f Rsun \n'%self.height.to_value(u.R_sun)
         output += 'kappa = %3.2f \n'%self.kappa
         output += 'alpha = %3.2f \n'%self.alpha
         output += 'epsilon = %3.2f '%self.epsilon
@@ -653,7 +653,7 @@ class gcs():
         """
         Returns the cross-section radius at the apex (see eq. 29 in T2011).
         """
-        rapex = self.kappa * (self.h_() / np.cos(self.alpha) +  self.h_() * np.tan(self.alpha)) / (1 - self.kappa ** 2)
+        rapex = self.kappa * (self.h / np.cos(self.alpha) + self.h * np.tan(self.alpha)) / (1 - self.kappa ** 2)
         return rapex
 
     @property
@@ -695,7 +695,6 @@ class gcs():
         Converted and modified from the IDL script shellskeleton.pro
         https://hesperia.gsfc.nasa.gov/ssw/stereo/secchi/idl/scraytrace/shellskeleton.pro
         """
-        self.height.to_value(u.R_sun)
         alpha = self.alpha.to_value(u.rad)
         kappa = self.kappa
         h = self.h.to_value(u.R_sun)
@@ -795,7 +794,7 @@ class gcs():
         output += 'CRLN = %3.2f degrees \n'%center_.lon.to_value(u.degree)
         output += 'CRLT = %3.2f degrees \n'%center_.lat.to_value(u.degree)
         output += 'rcenter = %3.2f Rsun \n'%self.rcenter.to_value(u.R_sun)
-        output += 'height = %3.2f Rsun \n'%self.radaxis.to_value(u.R_sun)
+        output += 'height = %3.2f Rsun \n'%self.height.to_value(u.R_sun)
         output += 'alpha = %3.2f \n'%self.alpha
         output += 'kappa = %3.2f \n'%self.kappa
         output += 'tilt = %3.2f '%self.tilt

@@ -91,7 +91,7 @@ def get_hek_flare(timerange, thresshold='B1.0'):
     return flare_list_
 
 
-def make_figure(map, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):
+def make_figure(smap, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):
     """
     Creates the main imager figure and returns the figure and axis handles.
 
@@ -122,48 +122,48 @@ def make_figure(map, cmap='Greys_r', clim=[-20, 20], clip_model=True, **kwargs):
     setting color limits, drawing the solar limb, and adjusting axis properties.
     """
     fig = kwargs['fig'] if 'fig' in kwargs else plt.figure()
-    axis = kwargs['axis'] if 'axis' in kwargs else plt.subplot(projection=map)
+    axis = kwargs['axis'] if 'axis' in kwargs else plt.subplot(projection=smap)
 
     median_filter_value = kwargs.get('median_filter', 1)
     if median_filter_value != 1:
-        map = sunpy.map.Map(median_filter(map.data, size=int(median_filter_value)), map.meta)
+        smap = sunpy.map.Map(median_filter(smap.data, size=int(median_filter_value)), smap.meta)
 
-    if map.instrument in ['WISPR', 'Metis'] or map.instrument.startswith('SoloHI'):
+    if smap.instrument in ['WISPR', 'Metis'] or smap.instrument.startswith('SoloHI'):
         clim = [-10**-clim[0], 10**-clim[1]]
 
     if cmap == 'default':
         # TODO: For plain images or when EUVIA-B are used, this does not work very well.
-        map.plot(norm=colors.Normalize(vmin=clim[0], vmax=clim[1]))
+        smap.plot(norm=colors.Normalize(vmin=clim[0], vmax=clim[1]))
     else:
-        map.plot(cmap=cmap, norm=colors.Normalize(vmin=clim[0], vmax=clim[1]))
+        smap.plot(cmap=cmap, norm=colors.Normalize(vmin=clim[0], vmax=clim[1]))
 
-    map.draw_limb(resolution=90)
+    smap.draw_limb(resolution=90)
 
     yax = axis.coords[1]
     yax.set_ticklabel(rotation=90)
 
     if clip_model:
-        axis.set_xlim([0, map.data.shape[0]])
-        axis.set_ylim([0, map.data.shape[1]])
+        axis.set_xlim([0, smap.data.shape[0]])
+        axis.set_ylim([0, smap.data.shape[1]])
 
-    cref = map.pixel_to_world(0*u.pix, 0*u.pix)
-    if cref.Tx > 0 and (map.instrument != 'WISPR'):
+    cref = smap.pixel_to_world(0*u.pix, 0*u.pix)
+    if cref.Tx > 0 and (smap.instrument != 'WISPR'):
         axis.invert_xaxis()
     if cref.Ty > 0:
         axis.invert_yaxis()
 
-    if map.instrument == 'SoloHI':
-        title = 'SoloHI' + f' Tile-{map.detector}' ' $T_{AGV}:$' + parse_time(map.date_average).strftime('%Y-%m-%d %H:%M:%S')
-    elif map.instrument == 'Metis':
+    if smap.instrument == 'SoloHI':
+        title = 'SoloHI' + f' Tile-{smap.detector}' ' $T_{AGV}:$' + parse_time(smap.date_average).strftime('%Y-%m-%d %H:%M:%S')
+    elif smap.instrument == 'Metis':
         title = re.sub(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}',
-                       ' $T_{AGV}:$' + parse_time(map.date_average).strftime('%Y-%m-%d %H:%M:%S'),
-                       map.latex_name.replace('VLD', 'METIS-VDL'))
+                       ' $T_{AGV}:$' + parse_time(smap.date_average).strftime('%Y-%m-%d %H:%M:%S'),
+                       smap.latex_name.replace('VLD', 'METIS-VDL'))
     else:
         title = re.sub(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}',
-                       ' $T_{AGV}:$' + parse_time(map.date_average).strftime('%Y-%m-%d %H:%M:%S'),
-                       map.latex_name)
-    print(map.instrument)
-    print(map.latex_name)
+                       ' $T_{AGV}:$' + parse_time(smap.date_average).strftime('%Y-%m-%d %H:%M:%S'),
+                       smap.latex_name)
+    print(smap.instrument)
+    print(smap.latex_name)
     axis.set_title(title,
                    fontsize=10, pad=8)
 
@@ -433,13 +433,15 @@ def single_imager_maps_process(map_list, skip=None, **kwargs):
     -----
     Operations can be skipped by specifying them in `skip`, e.g., 'filter', 'prepare', 'sequence_processing'.
     """
-    if 'filter' not in str(skip or ''):
+    skip_set = set([skip] if isinstance(skip, str) else (skip or []))
+
+    if 'filter' not in skip_set:
         map_list = filter_maps(map_list, **kwargs)
 
-    if 'prepare' not in str(skip or ''):
+    if 'prepare' not in skip_set:
         map_list = prepare_maps(map_list, **kwargs)
 
-    if 'sequence_processing' not in str(skip or ''):
+    if 'sequence_processing' not in skip_set:
         map_list = maps_sequence_processing(map_list, **kwargs)
 
     return map_list
@@ -477,12 +479,12 @@ class model_fittings:
         Converts the model fittings to JSON format.
     """
 
-    def __init__(self, event_selected, date_process, geometrical_model, model_parameters, kinematics={'fit_method': None}):
+    def __init__(self, event_selected, date_process, geometrical_model, model_parameters, kinematics=None):
         self.event_selected = event_selected
         self.date_process = date_process
         self.geometrical_model = geometrical_model
         self.parameters = model_parameters
-        self.kinematics = kinematics
+        self.kinematics = kinematics if kinematics is not None else {'fit_method': None}
 
     @staticmethod
     def load_from_json(json_file):
@@ -920,8 +922,8 @@ def parameter_fit(x, y, fit_args):
             sv_bound_low = np.minimum(sv_bound_low, spl(xxx))
             sv_bound_dup = np.maximum(sv_bound_dup, np.gradient(spl(xxx), xxx))
             sv_bound_dlow = np.minimum(sv_bound_dlow, np.gradient(spl(xxx), xxx))
-            sv_bound_ddup = np.maximum(sv_bound_ddup, np.gradient(np.gradient(spl(xxx), xxx)))
-            sv_bound_ddlow = np.minimum(sv_bound_ddlow, np.gradient(np.gradient(spl(xxx), xxx)))
+            sv_bound_ddup = np.maximum(sv_bound_ddup, np.gradient(np.gradient(spl(xxx), xxx), xxx))
+            sv_bound_ddlow = np.minimum(sv_bound_ddlow, np.gradient(np.gradient(spl(xxx), xxx), xxx))
 
         fitting = {
             'spl': spl,
