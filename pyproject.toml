@@ -9,13 +9,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "PyThea"
 description = "PyThea: A software package to reconstruct the 3D structure of CMEs and shock waves"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 readme = "README.md"
 license = { file = "LICENSE.md" }
 classifiers=[
   'Programming Language :: Python',
   'Programming Language :: Python :: 3',
-  'Programming Language :: Python :: 3.11',
+  'Programming Language :: Python :: 3.12',
   'Development Status :: 5 - Production/Stable',
   'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
   'Operating System :: OS Independent',
@@ -28,7 +28,7 @@ authors = [
 ]
 
 dependencies = [
-  "sunpy>=7.0.1",
+  "sunpy>=7.1.2",
   "pandas",
   "scipy",
   "matplotlib",

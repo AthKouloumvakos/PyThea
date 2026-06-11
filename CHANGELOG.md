@@ -1,4 +1,18 @@
-# v1.1.0 (12-Feb-2025)
+# v1.3.0 (12-Feb-2025)
+
+## Features
+- Extend net sources for selected imagers
+- Adds a method to manually import fits files from folder
+
+## Minor Changes
+ - Updates dependences with sunpy>=7.1.2
+
+ ## Bug Fixes
+ - Fixes a bug with figure creation
+ - Fixes a bug with kinematic plots
+ - Guard against uninitialized variables
+
+# v1.2.0 (12-Feb-2025)
 
 ## Minor Changes
  - Change installation to pyproject.toml
